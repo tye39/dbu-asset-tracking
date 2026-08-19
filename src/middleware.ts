@@ -47,6 +47,9 @@ export default auth((req) => {
   if (pathname.startsWith("/auditor") && userRole !== "INTERNAL_AUDITOR") {
     return NextResponse.redirect(new URL(getRoleDashboardRedirect(userRole), nextUrl));
   }
+  if (pathname.startsWith("/inventory") && userRole !== "INVENTORY_PERSON" && userRole !== "SYSTEM_ADMINISTRATOR" && userRole !== "PROPERTY_ADMINISTRATION_OFFICER") {
+    return NextResponse.redirect(new URL(getRoleDashboardRedirect(userRole), nextUrl));
+  }
 
   // Root path redirect
   if (pathname === "/") {
@@ -70,6 +73,8 @@ function getRoleDashboardRedirect(role?: string): string {
       return "/tech/dashboard";
     case "INTERNAL_AUDITOR":
       return "/auditor/dashboard";
+    case "INVENTORY_PERSON":
+      return "/inventory";
     default:
       return "/login";
   }
