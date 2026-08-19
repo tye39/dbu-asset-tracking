@@ -267,7 +267,7 @@ export async function getInventoryPersons() {
           phoneNumber: true,
           employeeId: true,
           role: { select: { name: true } },
-          department: { select: { name: true } }
+          department: { select: { id: true, name: true } }
         }
       },
       registeredBy: {

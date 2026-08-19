@@ -4,7 +4,6 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { getActiveSessions, getCompletedSessions } from "@/services/inventory";
 import { InventoryListClient } from "@/components/inventory-list-client";
-import { InventoryPersonDashboardClient } from "@/components/inventory-person-dashboard-client";
 
 export const revalidate = 0;
 
