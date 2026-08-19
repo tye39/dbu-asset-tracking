@@ -1,6 +1,5 @@
 import React from "react";
 import { getInventorySessionDetails, getInventoryExpectedAssets } from "@/services/inventory";
-import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { InventorySessionClient } from "@/components/inventory-session-client";
