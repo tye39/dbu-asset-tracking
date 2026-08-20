@@ -145,22 +145,47 @@ export function InventorySessionClient({
   const startCamera = async () => {
     setScanStatus("idle");
     setScanMessage("");
+    setActiveScan(true);
+
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" }
-      });
+      let stream: MediaStream;
+      try {
+        // Prefer environment/rear camera for mobile devices
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } }
+        });
+      } catch {
+        // Fallback to default video device (e.g. desktop webcam)
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      }
+
       streamRef.current = stream;
+      setCameraPermission(true);
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.setAttribute("playsinline", "true");
-        videoRef.current.play();
+        videoRef.current.play().catch(err => console.warn("video.play() failed:", err));
       }
-      setCameraPermission(true);
-      setActiveScan(true);
-    } catch (err) {
-      console.error("Camera access error", err);
+    } catch (err: unknown) {
+      console.error("Camera access error:", err);
       setCameraPermission(false);
       setActiveScan(false);
+
+      const errorObj = err as { name?: string; message?: string };
+      if (errorObj.name === "NotAllowedError" || errorObj.name === "PermissionDeniedError") {
+        setScanMessage("Camera permission denied. Please allow camera access in browser settings.");
+      } else if (errorObj.name === "NotFoundError" || errorObj.name === "DevicesNotFoundError") {
+        setScanMessage("No camera hardware found on this device.");
+      } else if (errorObj.name === "NotReadableError" || errorObj.name === "TrackStartError") {
+        setScanMessage("Camera is currently in use by another application.");
+      } else {
+        setScanMessage(`Camera error: ${errorObj.message || "Failed to initialize camera"}`);
+      }
     }
   };
 
@@ -173,8 +198,34 @@ export function InventorySessionClient({
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
     setActiveScan(false);
   };
+
+  // Ensure camera stream is attached when video element mounts
+  useEffect(() => {
+    if (activeScan && streamRef.current && videoRef.current) {
+      if (videoRef.current.srcObject !== streamRef.current) {
+        videoRef.current.srcObject = streamRef.current;
+        videoRef.current.play().catch(err => console.warn("Video play error:", err));
+      }
+    }
+  }, [activeScan]);
+
+  // Clean up media stream on component unmount
+  useEffect(() => {
+    return () => {
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+    };
+  }, []);
 
   // Submit scan to backend action
   const handleScanVerify = useCallback((assetTag: string) => {
@@ -244,7 +295,7 @@ export function InventorySessionClient({
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const code = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: "dontInvert"
+            inversionAttempts: "attemptBoth"
           });
 
           if (code && code.data) {
@@ -603,7 +654,10 @@ export function InventorySessionClient({
                       <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden border-2 border-sky-600 shadow-inner flex items-center justify-center">
                         <video
                           ref={videoRef}
-                          className="w-full h-full object-cover transform scale-x-[-1]"
+                          autoPlay
+                          playsInline
+                          muted
+                          className="w-full h-full object-cover"
                         />
                         <canvas ref={canvasRef} className="hidden" />
                         
