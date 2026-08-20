@@ -24,11 +24,18 @@ enum AssetStatus {
   ASSIGNED
   UNDER_MAINTENANCE
   DISPOSED
+  PENDING_ASSIGNMENT
 }
 
 enum AssignmentStatus {
-  ACTIVE
+  PENDING_ACCEPTANCE
+  ACCEPTED
+  RETURN_REQUESTED
+  REJECTED
   RETURNED
+  REASSIGNED
+  ACTIVE
+  CANCELLED
 }
 
 enum TransferStatus {
@@ -126,6 +133,8 @@ model User {
   transfersFromUser  Transfer[]   @relation("FromUser")
   returnsMade        Return[]     @relation("ReturnedBy")
   returnsReceived    Return[]     @relation("ReceivedBy")
+  assignmentsAccepted Assignment[] @relation("AcceptedBy")
+  assignmentsRejected Assignment[] @relation("RejectedBy")
   maintenanceFiled   Maintenance[] @relation("ReportedBy")
   maintenanceDone    Maintenance[] @relation("AssignedTo")
   disposals          Disposal[]
@@ -270,22 +279,32 @@ model QRCode {
 }
 
 model Assignment {
-  id             String           @id @default(uuid()) @db.Uuid
-  assetId        String           @db.Uuid
-  asset          Asset            @relation(fields: [assetId], references: [id])
-  assignedToId   String?          @db.Uuid // Optional (can be assigned to department only)
-  assignedTo     User?            @relation("AssignedTo", fields: [assignedToId], references: [id])
-  departmentId   String?             @db.Uuid // Optional (can be assigned to staff only)
-  department     OrganizationalUnit? @relation(fields: [departmentId], references: [id])
-  assignedById   String           @db.Uuid
-  assignedBy     User             @relation("AssignedBy", fields: [assignedById], references: [id])
-  status         AssignmentStatus @default(ACTIVE)
-  notes          String?
-  assignedAt     DateTime         @default(now())
-  returnedAt     DateTime?
-  returns        Return[]
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
+  id               String           @id @default(uuid()) @db.Uuid
+  assetId          String           @db.Uuid
+  asset            Asset            @relation(fields: [assetId], references: [id])
+  assignedToUserId String?          @db.Uuid @map("assignedToId") // Optional (can be assigned to department only)
+  assignedTo       User?            @relation("AssignedTo", fields: [assignedToUserId], references: [id])
+  departmentId     String?             @db.Uuid // Optional (can be assigned to staff only)
+  department       OrganizationalUnit? @relation(fields: [departmentId], references: [id])
+  assignedByUserId String           @db.Uuid @map("assignedById")
+  assignedBy       User             @relation("AssignedBy", fields: [assignedByUserId], references: [id])
+  status           AssignmentStatus @default(PENDING_ACCEPTANCE)
+  notes            String?
+  assignedAt       DateTime         @default(now())
+  returnedAt       DateTime?
+  returns          Return[]
+
+  // Acceptance & Return Workflow fields
+  acceptedAt       DateTime?
+  acceptedById     String?          @db.Uuid
+  acceptedBy       User?            @relation("AcceptedBy", fields: [acceptedById], references: [id])
+  rejectedAt       DateTime?
+  rejectedById     String?          @db.Uuid
+  rejectedBy       User?            @relation("RejectedBy", fields: [rejectedById], references: [id])
+  rejectionReason  String?          @map("rejectReason")
+
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 }
 
 model Transfer {
@@ -481,18 +500,28 @@ model RegistrationField {
 }
 
 model AssetTypeField {
-  id           String            @id @default(uuid()) @db.Uuid
-  assetTypeId  String            @db.Uuid
-  assetType    AssetType         @relation(fields: [assetTypeId], references: [id], onDelete: Cascade)
-  fieldId      String            @db.Uuid
-  field        RegistrationField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
-  isEnabled    Boolean           @default(true)
-  isRequired   Boolean           @default(false)
-  displayOrder Int               @default(0)
-  defaultValue String?
-  options      String?
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
+  id                  String            @id @default(uuid()) @db.Uuid
+  assetTypeId         String            @db.Uuid
+  assetType           AssetType         @relation(fields: [assetTypeId], references: [id], onDelete: Cascade)
+  fieldId             String            @db.Uuid
+  field               RegistrationField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  isEnabled           Boolean           @default(true)
+  isRequired          Boolean           @default(false)
+  displayOrder        Int               @default(0)
+  defaultValue        String?
+  options             String?
+
+  // Overrides and Validations
+  labelOverride       String?
+  placeholderOverride String?
+  descriptionOverride String?
+  validationMin       Float?
+  validationMax       Float?
+  validationMinLength Int?
+  validationMaxLength Int?
+
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
 
   @@unique([assetTypeId, fieldId])
 }

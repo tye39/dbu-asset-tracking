@@ -3,7 +3,7 @@
 import React, { useState, useTransition } from "react";
 import QRCode from "qrcode";
 import { useRouter } from "next/navigation";
-import { assignAssetAction, requestTransferAction } from "@/app/actions/assignment";
+import { assignAssetAction, requestTransferAction, acceptAssignmentAction, rejectAssignmentAction } from "@/app/actions/assignment";
 import { returnAssetAction, disposeAssetAction } from "@/app/actions/asset";
 import { createMaintenanceAction } from "@/app/actions/maintenance";
 import {
@@ -19,8 +19,10 @@ interface AssignmentRecord {
   id: string;
   assignedAt: Date | string;
   status: string;
+  assignedToUserId?: string | null;
   assignedTo?: { name: string } | null;
   department?: { name: string } | null;
+  assignedBy?: { name: string } | null;
 }
 
 interface MaintenanceRecord {
@@ -476,6 +478,52 @@ export function AssetDetailsClient({ asset, session, departments, staffUsers, en
   const [disposeReason, setDisposeReason] = useState("");
   const [disposeMethod, setDisposeMethod] = useState("");
   const [disposeNotes, setDisposeNotes] = useState("");
+  // Acceptance & Rejection workflow states
+  const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectReasonVal, setRejectReasonVal] = useState("");
+  const [targetAssignmentId, setTargetAssignmentId] = useState("");
+
+  const handleAcceptAssignmentClick = (assignmentId: string) => {
+    setTargetAssignmentId(assignmentId);
+    setShowAcceptModal(true);
+  };
+
+  const handleAcceptAssignmentConfirm = () => {
+    clearMessages();
+    setShowAcceptModal(false);
+    startTransition(async () => {
+      const res = await acceptAssignmentAction(null, targetAssignmentId);
+      if (res.error) setError(res.error);
+      else {
+        setSuccess("Asset assignment accepted successfully!");
+        router.refresh();
+      }
+    });
+  };
+
+  const handleRejectAssignmentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    clearMessages();
+    if (!rejectReasonVal.trim()) {
+      setError("Please specify a reason for rejecting or returning this asset.");
+      return;
+    }
+    startTransition(async () => {
+      const res = await rejectAssignmentAction(null, {
+        assignmentId: targetAssignmentId,
+        reason: rejectReasonVal
+      });
+      if (res.error) setError(res.error);
+      else {
+        setSuccess("Return / Reject request submitted successfully.");
+        setShowRejectModal(false);
+        setRejectReasonVal("");
+        setTargetAssignmentId("");
+        router.refresh();
+      }
+    });
+  };
 
   const clearMessages = () => {
     setError(null);
@@ -669,12 +717,7 @@ export function AssetDetailsClient({ asset, session, departments, staffUsers, en
                     <span className="text-slate-700 font-semibold">{fv.value}</span>
                   </div>
                 ))}
-              {asset.assetType && (
-                <div className="flex justify-between">
-                  <span className="text-slate-400 font-medium">Asset Type:</span>
-                  <span className="text-slate-700 font-semibold">{asset.assetType.name}</span>
-                </div>
-              )}
+
               {asset.campus && (!enabledFields || enabledFields.includes("campus")) && (
                 <div className="flex justify-between">
                   <span className="text-slate-400 font-medium">Campus:</span>
@@ -742,7 +785,45 @@ export function AssetDetailsClient({ asset, session, departments, staffUsers, en
                     )}
                   </div>
                 </div>
-              )}
+              )}              {/* Accept & Reject Workflow Panel for Assignee */}
+              {(() => {
+                const userPendingAssignment = asset.assignments?.find(
+                  (a) => a.assignedToUserId === session?.user?.id && a.status === "PENDING_ACCEPTANCE"
+                );
+                if (!userPendingAssignment) return null;
+                return (
+                  <div className="mt-5 border-t border-amber-200 pt-4 space-y-3 bg-amber-50/40 -mx-5 -mb-5 p-5 rounded-b-2xl">
+                    <p className="text-[10px] text-amber-700 font-extrabold uppercase tracking-wider">
+                      ⚠️ Action Required: Pending Acceptance
+                    </p>
+                    <p className="text-[10px] text-slate-500 font-semibold leading-normal">
+                      This asset has been assigned to you by <strong className="text-slate-700">{userPendingAssignment.assignedBy?.name || "the Property Officer"}</strong>. Please accept responsibility or return/reject it.
+                    </p>
+                    <div className="flex gap-2.5 w-full mt-3">
+                      <button
+                        type="button"
+                        onClick={() => handleAcceptAssignmentClick(userPendingAssignment.id)}
+                        disabled={isPending}
+                        className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
+                      >
+                        Accept Asset
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTargetAssignmentId(userPendingAssignment.id);
+                          setRejectReasonVal("");
+                          setShowRejectModal(true);
+                        }}
+                        disabled={isPending}
+                        className="flex-1 py-2 bg-red-650 hover:bg-red-750 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
+                      >
+                        Return / Reject Asset
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
 
@@ -1256,6 +1337,85 @@ export function AssetDetailsClient({ asset, session, departments, staffUsers, en
           }
         }
       `}</style>
+
+      {/* Return/Reject Reason Confirmation Dialog Modal */}
+      {showRejectModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-left">
+            <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-800">Reject / Return Assigned Asset</h3>
+              <button type="button" onClick={() => setShowRejectModal(false)} className="text-xs text-slate-400 hover:text-slate-600 font-bold">✕</button>
+            </div>
+            <form onSubmit={handleRejectAssignmentSubmit}>
+              <div className="p-6 space-y-4 text-xs">
+                <p className="text-slate-600 leading-normal">
+                  Please provide a clear reason for returning or rejecting this asset assignment. This reason will be recorded and sent to the Property Administration Officer.
+                </p>
+                <div>
+                  <label className="block text-[9px] font-bold text-slate-400 uppercase mb-1">Reason for Rejection / Return *</label>
+                  <textarea
+                    required
+                    rows={4}
+                    placeholder="e.g. This laptop was assigned to me by mistake. I am already using a Desktop PC and do not require another computer."
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none resize-none"
+                    value={rejectReasonVal}
+                    onChange={(e) => setRejectReasonVal(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="bg-slate-50 px-6 py-3.5 border-t border-slate-100 flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setShowRejectModal(false)}
+                  className="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isPending}
+                  className="px-4 py-1.5 bg-red-650 hover:bg-red-750 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
+                >
+                  Submit Rejection
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {showAcceptModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150 text-left">
+            <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-800">Accept Asset?</h3>
+              <button type="button" onClick={() => setShowAcceptModal(false)} className="text-xs text-slate-400 hover:text-slate-600 font-bold">✕</button>
+            </div>
+            <div className="p-6 space-y-4 text-xs">
+              <p className="text-slate-600 leading-normal">
+                Are you sure you want to accept this asset assignment and take responsibility for it?
+              </p>
+            </div>
+            <div className="bg-slate-50 px-6 py-3.5 border-t border-slate-100 flex justify-end space-x-2">
+              <button
+                type="button"
+                onClick={() => setShowAcceptModal(false)}
+                className="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-bold transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleAcceptAssignmentConfirm}
+                disabled={isPending}
+                className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
+              >
+                Confirm Accept
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

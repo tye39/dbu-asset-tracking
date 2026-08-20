@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
 import { Header } from "@/components/header";
 import { prisma } from "@/lib/db";
+import { PendingAssignmentsPanel } from "@/components/pending-assignments-panel";
 
 export default async function DashboardLayout({
   children,
@@ -29,6 +30,41 @@ export default async function DashboardLayout({
     isInventoryPerson: !!isInventoryPerson,
   };
 
+  // Fetch pending assignments for this authenticated user
+  const pendingAssignments = await prisma.assignment.findMany({
+    where: {
+      assignedToUserId: session.user.id,
+      status: "PENDING_ACCEPTANCE",
+    },
+    include: {
+      asset: {
+        include: {
+          category: true,
+          assetType: true,
+          department: true,
+        },
+      },
+      assignedBy: { select: { name: true } },
+    },
+    orderBy: { assignedAt: "desc" },
+  });
+
+  const pendingList = pendingAssignments.map((pa) => ({
+    id: pa.id,
+    assignedAt: pa.assignedAt,
+    assignedBy: pa.assignedBy?.name || "System",
+    asset: {
+      id: pa.asset.id,
+      name: pa.asset.name,
+      assetCode: pa.asset.assetCode,
+      serialNumber: pa.asset.serialNumber,
+      condition: pa.asset.condition || "N/A",
+      category: pa.asset.category.name,
+      assetTypeName: pa.asset.assetType?.name || "General",
+      department: pa.asset.department.name,
+    },
+  }));
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-slate-50">
       {/* Sidebar navigation panel */}
@@ -41,6 +77,7 @@ export default async function DashboardLayout({
 
         {/* Scrollable page body */}
         <main className="flex-1 overflow-y-auto p-6 focus:outline-none">
+          <PendingAssignmentsPanel pendingAssignments={pendingList} />
           {children}
         </main>
       </div>

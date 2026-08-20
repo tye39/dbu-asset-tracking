@@ -2,7 +2,7 @@ import React from "react";
 import { prisma } from "@/lib/db";
 import { AssetDetailsClient } from "@/components/asset-details-client";
 import { auth } from "@/auth";
-import { RoleName } from "@prisma/client";
+
 
 export const revalidate = 0;
 
@@ -35,8 +35,8 @@ export default async function AssetDetailPage({ params }: AssetDetailPageProps) 
         include: { field: true }
       },
       assignments: {
-        where: { status: "ACTIVE" },
-        include: { assignedTo: true, department: true }
+        where: { status: { in: ["ACTIVE", "ACCEPTED", "PENDING_ACCEPTANCE", "RETURN_REQUESTED"] } },
+        include: { assignedTo: true, department: true, assignedBy: { select: { name: true } } }
       },
       maintenances: {
         orderBy: { createdAt: "desc" },
@@ -72,7 +72,7 @@ export default async function AssetDetailPage({ params }: AssetDetailPageProps) 
   });
 
   const staffUsers = await prisma.user.findMany({
-    where: { role: { name: RoleName.STAFF_MEMBER }, deletedAt: null },
+    where: { deletedAt: null },
     select: { id: true, name: true },
     orderBy: { name: "asc" }
   });

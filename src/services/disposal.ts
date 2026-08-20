@@ -24,7 +24,10 @@ export async function disposeAsset(data: {
   const result = await prisma.$transaction(async (tx) => {
     // 1. Terminate any active assignments
     const activeAssignments = await tx.assignment.findMany({
-      where: { assetId: data.assetId, status: AssignmentStatus.ACTIVE },
+      where: {
+        assetId: data.assetId,
+        status: { in: [AssignmentStatus.ACTIVE, AssignmentStatus.ACCEPTED, AssignmentStatus.PENDING_ACCEPTANCE, AssignmentStatus.RETURN_REQUESTED] }
+      },
     });
 
     for (const assignment of activeAssignments) {

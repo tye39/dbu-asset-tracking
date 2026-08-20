@@ -37,6 +37,10 @@ interface FormFieldItem {
   defaultValue?: string | null;
   options?: string | null;
   isRequired: boolean;
+  validationMin?: number | null;
+  validationMax?: number | null;
+  validationMinLength?: number | null;
+  validationMaxLength?: number | null;
 }
 
 interface CategoryItem {
@@ -255,6 +259,34 @@ export function AssetRegistrationClient({
   const [loadingStaff, setLoadingStaff] = useState(false);
   const [staffError, setStaffError] = useState<string | null>(null);
 
+  // Clear validation error immediately when user types/changes any form state
+  useEffect(() => {
+    setError(null);
+  }, [
+    name,
+    serialNumber,
+    purchaseCost,
+    purchaseDate,
+    usefulLife,
+    salvageValue,
+    fundingSource,
+    warrantyStartDate,
+    warrantyEndDate,
+    expiryDate,
+    dynamicValues,
+    categoryId,
+    assetTypeId,
+    departmentId,
+    building,
+    roomNumber,
+    quantity,
+    condition,
+    assignedToId,
+    imageUrls,
+    attachmentUrl,
+    remarks
+  ]);
+
   // Dynamic Custodian Staff Filtering by Selected Responsible Unit / Department
   useEffect(() => {
     // Clears previous selected custodian staff instantly when department changes
@@ -424,25 +456,51 @@ export function AssetRegistrationClient({
       return;
     }
 
-    // Loop active configs to check requirements
+    // Loop active configs to check requirements and range/length constraints
     for (const cfg of configuredFields) {
-      if (cfg.isRequired) {
-        const isBuiltIn = ["name", "serialNumber", "purchaseCost", "purchaseDate", "usefulLife", "salvageValue", "fundingSource", "warrantyStartDate", "warrantyEndDate", "expiryDate"].includes(cfg.name);
-        if (isBuiltIn) {
-          if (cfg.name === "name" && !name) return setError("Asset Name is required.");
-          if (cfg.name === "serialNumber" && !serialNumber) return setError("Serial Number is required.");
-          if (cfg.name === "purchaseCost" && !purchaseCost) return setError("Purchase Cost is required.");
-          if (cfg.name === "purchaseDate" && !purchaseDate) return setError("Purchase Date is required.");
-          if (cfg.name === "usefulLife" && !usefulLife) return setError("Useful Life is required.");
-          if (cfg.name === "salvageValue" && !salvageValue) return setError("Salvage Value is required.");
-          if (cfg.name === "warrantyStartDate" && !warrantyStartDate) return setError("Warranty Start Date is required.");
-          if (cfg.name === "warrantyEndDate" && !warrantyEndDate) return setError("Warranty End Date is required.");
-          if (cfg.name === "expiryDate" && !expiryDate) return setError("Expiry Date is required.");
-        } else {
-          const val = dynamicValues[cfg.id];
-          if (val === undefined || val === null || val.trim() === "") {
-            return setError(`${cfg.label} is required.`);
+      const isBuiltIn = ["name", "serialNumber", "purchaseCost", "purchaseDate", "usefulLife", "salvageValue", "fundingSource", "warrantyStartDate", "warrantyEndDate", "expiryDate"].includes(cfg.name);
+      let val = "";
+      
+      if (isBuiltIn) {
+        if (cfg.name === "name") val = name;
+        else if (cfg.name === "serialNumber") val = serialNumber;
+        else if (cfg.name === "purchaseCost") val = purchaseCost;
+        else if (cfg.name === "purchaseDate") val = purchaseDate;
+        else if (cfg.name === "usefulLife") val = usefulLife;
+        else if (cfg.name === "salvageValue") val = salvageValue;
+        else if (cfg.name === "fundingSource") val = fundingSource;
+        else if (cfg.name === "warrantyStartDate") val = warrantyStartDate;
+        else if (cfg.name === "warrantyEndDate") val = warrantyEndDate;
+        else if (cfg.name === "expiryDate") val = expiryDate;
+      } else {
+        val = dynamicValues[cfg.id] || "";
+      }
+
+      // Check required
+      if (cfg.isRequired && (!val || val.trim() === "")) {
+        return setError(`${cfg.label} is required.`);
+      }
+
+      // Range check (numbers)
+      if (val && (["NUMBER", "DECIMAL"].includes(cfg.fieldType) || ["purchaseCost", "salvageValue", "usefulLife"].includes(cfg.name))) {
+        const numVal = Number(val);
+        if (!isNaN(numVal)) {
+          if (cfg.validationMin !== null && cfg.validationMin !== undefined && numVal < cfg.validationMin) {
+            return setError(`${cfg.label} must be at least ${cfg.validationMin}.`);
           }
+          if (cfg.validationMax !== null && cfg.validationMax !== undefined && numVal > cfg.validationMax) {
+            return setError(`${cfg.label} cannot exceed ${cfg.validationMax}.`);
+          }
+        }
+      }
+
+      // Length check (strings)
+      if (val && (["TEXT", "TEXTAREA", "EMAIL", "URL"].includes(cfg.fieldType) || ["name", "serialNumber"].includes(cfg.name))) {
+        if (cfg.validationMinLength !== null && cfg.validationMinLength !== undefined && val.length < cfg.validationMinLength) {
+          return setError(`${cfg.label} must be at least ${cfg.validationMinLength} characters long.`);
+        }
+        if (cfg.validationMaxLength !== null && cfg.validationMaxLength !== undefined && val.length > cfg.validationMaxLength) {
+          return setError(`${cfg.label} cannot exceed ${cfg.validationMaxLength} characters long.`);
         }
       }
     }
@@ -733,11 +791,6 @@ export function AssetRegistrationClient({
               <span className="text-[10px] font-extrabold text-[#0b4a6e] bg-[#0b4a6e]/10 border border-[#0b4a6e]/20 px-3 py-1 rounded-full uppercase tracking-wider">
                 Category: {selectedCategory.name}
               </span>
-              {selectedAssetType && (
-                <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full uppercase tracking-wider">
-                  Type: {selectedAssetType.name}
-                </span>
-              )}
             </div>
 
             <div className="flex items-center space-x-2">
@@ -746,7 +799,12 @@ export function AssetRegistrationClient({
                 required
                 className="p-1.5 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 focus:outline-none"
                 value={assetTypeId}
-                onChange={(e) => setAssetTypeId(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setAssetTypeId(val);
+                  const t = selectedCategory?.assetTypes?.find((x) => x.id === val);
+                  setName(t?.name || "");
+                }}
               >
                 <option value="">-- Choose Type --</option>
                 {selectedCategory?.assetTypes
@@ -791,9 +849,10 @@ export function AssetRegistrationClient({
                   />
                 </div>
 
-                {configuredFields.map((cfg) => {
-                  const isRequired = cfg.isRequired;
-                  const isBuiltIn = ["name", "serialNumber", "purchaseCost", "purchaseDate", "usefulLife", "salvageValue", "fundingSource", "warrantyStartDate", "warrantyEndDate", "expiryDate"].includes(cfg.name);
+                {configuredFields
+                  .map((cfg) => {
+                    const isRequired = cfg.isRequired;
+                    const isBuiltIn = ["name", "serialNumber", "purchaseCost", "purchaseDate", "usefulLife", "salvageValue", "fundingSource", "warrantyStartDate", "warrantyEndDate", "expiryDate"].includes(cfg.name);
 
                   let val = "";
                   let setVal: (v: string) => void = () => {};
@@ -1275,10 +1334,6 @@ export function AssetRegistrationClient({
               </h5>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                 <div className="flex justify-between border-b border-slate-200/40 pb-1">
-                  <span className="text-slate-400">Asset Name:</span>
-                  <span className="font-bold text-slate-800">{name}</span>
-                </div>
-                <div className="flex justify-between border-b border-slate-200/40 pb-1">
                   <span className="text-slate-400">Asset Number (ID):</span>
                   <span className="font-bold text-sky-750 font-mono">{assetCode}</span>
                 </div>
@@ -1287,7 +1342,7 @@ export function AssetRegistrationClient({
                   <span className="font-bold text-slate-800">{selectedCategory.name}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-200/40 pb-1">
-                  <span className="text-slate-400">Asset Type:</span>
+                  <span className="text-slate-400">Asset Type Name:</span>
                   <span className="font-bold text-slate-800">{selectedAssetType?.name || "N/A"}</span>
                 </div>
                 <div className="flex justify-between border-b border-slate-200/40 pb-1">

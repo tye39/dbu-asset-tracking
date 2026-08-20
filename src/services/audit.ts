@@ -10,9 +10,24 @@ export async function createAuditLog(
   newState?: Record<string, unknown> | unknown,
   ipAddress?: string
 ) {
+  let activeUserId: string | null = null;
+  if (userId) {
+    try {
+      const userExists = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true }
+      });
+      if (userExists) {
+        activeUserId = userId;
+      }
+    } catch {
+      // Ignored: fallback to null activeUserId
+    }
+  }
+
   return await prisma.auditLog.create({
     data: {
-      userId,
+      userId: activeUserId,
       action,
       entityType,
       entityId,

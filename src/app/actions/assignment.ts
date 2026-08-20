@@ -1,6 +1,6 @@
 "use server";
 
-import { assignAsset } from "@/services/assignment";
+import { assignAsset, acceptAssignment, rejectAssignment, approveReturnRequest, cancelAssignment } from "@/services/assignment";
 import { requestTransfer, approveTransfer, rejectTransfer } from "@/services/transfer";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
@@ -67,6 +67,62 @@ export async function rejectTransferAction(prevState: unknown, data: { transferI
     return { success: true, rejected };
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : "Failed to reject transfer.";
+    return { error: msg };
+  }
+}
+
+export async function acceptAssignmentAction(prevState: unknown, assignmentId: string) {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Unauthorized." };
+
+  try {
+    const assignment = await acceptAssignment(assignmentId, session.user.id);
+    revalidatePath("/", "layout");
+    return { success: true, assignment };
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : "Failed to accept assignment.";
+    return { error: msg };
+  }
+}
+
+export async function rejectAssignmentAction(prevState: unknown, data: { assignmentId: string; reason: string }) {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Unauthorized." };
+
+  try {
+    const assignment = await rejectAssignment(data.assignmentId, session.user.id, data.reason);
+    revalidatePath("/", "layout");
+    return { success: true, assignment };
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : "Failed to reject/return assignment.";
+    return { error: msg };
+  }
+}
+
+export async function approveReturnRequestAction(prevState: unknown, assignmentId: string) {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Unauthorized." };
+
+  try {
+    await approveReturnRequest(assignmentId, session.user.id);
+    revalidatePath("/", "layout");
+    return { success: true };
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : "Failed to approve return request.";
+    return { error: msg };
+  }
+}
+
+export async function cancelAssignmentAction(prevState: unknown, assignmentId: string) {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Unauthorized." };
+
+  try {
+    await cancelAssignment(assignmentId, session.user.id);
+    revalidatePath("/", "layout");
+    return { success: true };
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : "Failed to cancel assignment.";
     return { error: msg };
   }
 }

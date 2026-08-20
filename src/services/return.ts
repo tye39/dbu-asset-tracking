@@ -10,7 +10,10 @@ export async function returnAsset(data: {
 }, actorId: string) {
   // Find current active assignment
   const activeAssignment = await prisma.assignment.findFirst({
-    where: { assetId: data.assetId, status: AssignmentStatus.ACTIVE },
+    where: {
+      assetId: data.assetId,
+      status: { in: [AssignmentStatus.ACTIVE, AssignmentStatus.ACCEPTED, AssignmentStatus.PENDING_ACCEPTANCE, AssignmentStatus.RETURN_REQUESTED] }
+    },
     include: { asset: true },
   });
 
@@ -37,7 +40,7 @@ export async function returnAsset(data: {
       data: {
         assetId: data.assetId,
         assignmentId: activeAssignment.id,
-        returnedById: activeAssignment.assignedToId || actorId, // original assignee or returner
+        returnedById: activeAssignment.assignedToUserId || actorId, // original assignee or returner
         receivedById: actorId,
         conditionAtReturn: data.conditionAtReturn,
         isDamaged,
@@ -96,9 +99,9 @@ export async function returnAsset(data: {
   }
 
   // Notify original assignee that the return has been registered
-  if (activeAssignment.assignedToId) {
+  if (activeAssignment.assignedToUserId) {
     await createNotification(
-      activeAssignment.assignedToId,
+      activeAssignment.assignedToUserId,
       "Asset Return Registered",
       `The return of '${activeAssignment.asset.name}' has been successfully logged.`
     );

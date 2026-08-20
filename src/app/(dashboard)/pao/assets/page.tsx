@@ -1,9 +1,11 @@
 import React from "react";
 import { getAssets } from "@/services/asset";
 import { prisma } from "@/lib/db";
-import { Search, ChevronLeft, ChevronRight, Eye } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { AssetStatus } from "@prisma/client";
+import { auth } from "@/auth";
+import { PaoAssetActions } from "@/components/pao-asset-actions";
 
 export const revalidate = 0;
 
@@ -20,6 +22,9 @@ interface AssetsPageProps {
 }
 
 export default async function PaoAssetsPage({ searchParams }: AssetsPageProps) {
+  const session = await auth();
+  const userRole = session?.user?.role || "";
+
   const page = Number(searchParams.page) || 1;
   const limit = 10;
   const searchQuery = searchParams.search || "";
@@ -213,13 +218,14 @@ export default async function PaoAssetsPage({ searchParams }: AssetsPageProps) {
                       </span>
                     </td>
                     <td className="py-3 text-right">
-                      <Link
-                        href={`/assets/${asset.id}`}
-                        className="inline-flex items-center space-x-1.5 px-3 py-1 bg-slate-100 hover:bg-sky-50 hover:text-sky-700 text-slate-600 rounded font-bold transition-all text-[11px]"
-                      >
-                        <Eye size={12} />
-                        <span>Details</span>
-                      </Link>
+                      <PaoAssetActions
+                        assetId={asset.id}
+                        assetName={asset.name}
+                        assetCode={asset.assetCode}
+                        assetTypeName={asset.assetType?.name || "General Equipment"}
+                        status={asset.status}
+                        userRole={userRole}
+                      />
                     </td>
                   </tr>
                 ))

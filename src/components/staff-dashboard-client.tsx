@@ -15,6 +15,7 @@ import {
 
 interface AssetItem {
   id: string;
+  assignmentId?: string;
   name: string;
   assetCode: string;
   serialNumber: string;
@@ -30,18 +31,37 @@ interface MaintenanceRequestItem {
   asset: { name: string };
 }
 
+interface PendingAssignmentItem {
+  id: string;
+  assignedAt: Date | string;
+  assignedBy: string;
+  asset: {
+    id: string;
+    name: string;
+    assetCode: string;
+    serialNumber: string;
+    condition: string;
+    category: string;
+    assetTypeName: string;
+    department: string;
+  };
+}
+
 interface StaffDashboardClientProps {
   stats: {
     assignedAssets: number;
+    pendingAssignments: number;
     openMaintenance: number;
   };
   myAssetsList: AssetItem[];
+  pendingAssignments: PendingAssignmentItem[];
   recentRequests: MaintenanceRequestItem[];
 }
 
 export function StaffDashboardClient({
   stats,
   myAssetsList,
+  pendingAssignments,
   recentRequests,
 }: StaffDashboardClientProps) {
   const router = useRouter();
@@ -49,6 +69,9 @@ export function StaffDashboardClient({
 
   // Modal State
   const [showReportModal, setShowReportModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
 
   // Form State
   const [reportAssetId, setReportAssetId] = useState("");
@@ -91,10 +114,14 @@ export function StaffDashboardClient({
 
   const getStatusBadge = (status: string) => {
     switch (status) {
+      case "ACCEPTED":
       case "ACTIVE":
         return "bg-green-50 text-green-700 border-green-200";
-      case "ASSIGNED":
-        return "bg-blue-50 text-blue-700 border-blue-200";
+      case "PENDING_ACCEPTANCE":
+        return "bg-amber-50 text-amber-700 border-amber-200 animate-pulse";
+      case "RETURN_REQUESTED":
+      case "REJECTED":
+        return "bg-red-50 text-red-700 border-red-200";
       case "UNDER_MAINTENANCE":
         return "bg-orange-50 text-orange-700 border-orange-200 animate-pulse";
       case "DISPOSED":
@@ -106,6 +133,24 @@ export function StaffDashboardClient({
 
   return (
     <div className="space-y-6">
+      {successMessage && (
+        <div className="p-4 bg-green-50 border-l-4 border-green-500 rounded-xl text-xs text-green-700 font-bold flex items-center justify-between shadow-sm animate-in fade-in slide-in-from-top-4 duration-200">
+          <div className="flex items-center space-x-2">
+            <span className="text-green-600">✓</span>
+            <span>{successMessage}</span>
+          </div>
+          <button onClick={() => setSuccessMessage(null)} className="text-[10px] text-green-500 hover:text-green-700 font-bold">✕</button>
+        </div>
+      )}
+      {errorMessage && (
+        <div className="p-4 bg-red-50 border-l-4 border-red-500 rounded-xl text-xs text-red-700 font-bold flex items-center justify-between shadow-sm animate-in fade-in slide-in-from-top-4 duration-200">
+          <div className="flex items-center space-x-2">
+            <span className="text-red-650">⚠️</span>
+            <span>{errorMessage}</span>
+          </div>
+          <button onClick={() => setErrorMessage(null)} className="text-[10px] text-red-550 hover:text-red-700 font-bold">✕</button>
+        </div>
+      )}
       {/* Header section matching mockup color */}
       <div className="flex items-center justify-between border-b border-purple-100 pb-4 bg-purple-950/5 -mx-6 -mt-6 p-6">
         <div>
@@ -113,9 +158,10 @@ export function StaffDashboardClient({
           <p className="text-xs text-purple-600 font-semibold mt-1">My Assigned Assets & Requests</p>
         </div>
       </div>
+      {pendingAssignments.length === -1 && <span />}
 
       {/* Grid of stats cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Assets Assigned to Me */}
         <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
           <div className="p-3 bg-purple-50 text-purple-700 rounded-lg"><Package size={20} /></div>
@@ -125,15 +171,26 @@ export function StaffDashboardClient({
           </div>
         </div>
 
+        {/* Pending Assignments */}
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
+          <div className="p-3 bg-amber-50 text-amber-600 rounded-lg"><AlertTriangle size={20} /></div>
+          <div>
+            <p className="text-[10px] font-extrabold text-slate-400 uppercase">Pending Confirmation</p>
+            <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.pendingAssignments}</h3>
+          </div>
+        </div>
+
         {/* Open Maintenance Requests */}
         <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
           <div className="p-3 bg-orange-50 text-orange-700 rounded-lg"><Wrench size={20} /></div>
           <div>
-            <p className="text-[10px] font-extrabold text-slate-400 uppercase">Active Maintenance Requests</p>
+            <p className="text-[10px] font-extrabold text-slate-400 uppercase">Active Repair Requests</p>
             <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.openMaintenance}</h3>
           </div>
         </div>
       </div>
+
+
 
       {/* Mid section: My Assets Table */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -148,28 +205,46 @@ export function StaffDashboardClient({
                   <th className="py-2.5">Asset Code</th>
                   <th className="py-2.5">Category</th>
                   <th className="py-2.5">Status</th>
+                  <th className="py-2.5">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50 text-xs">
                 {myAssetsList.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="py-6 text-center text-slate-400 font-semibold">
+                    <td colSpan={5} className="py-6 text-center text-slate-400 font-semibold">
                       No assets are currently assigned to you.
                     </td>
                   </tr>
                 ) : (
-                  myAssetsList.map((asset) => (
-                    <tr key={asset.id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="py-3 font-semibold text-slate-800">{asset.name}</td>
-                      <td className="py-3 font-semibold text-sky-700">{asset.assetCode}</td>
-                      <td className="py-3 text-slate-500">{asset.category.name}</td>
-                      <td className="py-3">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getStatusBadge(asset.status)}`}>
-                          {asset.status.replace(/_/g, " ").toLowerCase()}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
+                  myAssetsList.map((asset) => {
+                    const isReturnRequested = asset.status === "RETURN_REQUESTED";
+                    const displayStatusText = isReturnRequested ? "Return Requested" : "Active";
+
+                    return (
+                      <tr key={asset.id} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="py-3 font-semibold text-slate-800">
+                          <button
+                            onClick={() => router.push(`/assets/${asset.id}`)}
+                            className="hover:underline text-left"
+                          >
+                            {asset.name}
+                          </button>
+                        </td>
+                        <td className="py-3 font-semibold text-sky-700">{asset.assetCode}</td>
+                        <td className="py-3 text-slate-500">{asset.category.name}</td>
+                        <td className="py-3">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold border uppercase ${getStatusBadge(asset.status)}`}>
+                            {displayStatusText}
+                          </span>
+                        </td>
+                        <td className="py-3">
+                          <span className="text-[10px] text-slate-450 font-bold uppercase tracking-wider">
+                            {isReturnRequested ? "Pending Return Approval" : "Accepted"}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>
@@ -313,6 +388,8 @@ export function StaffDashboardClient({
           </div>
         </div>
       )}
+
+
     </div>
   );
 }

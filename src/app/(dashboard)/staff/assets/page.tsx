@@ -19,8 +19,8 @@ export default async function StaffAssetsPage() {
   // 1. Fetch assigned assets
   const activeAssignments = await prisma.assignment.findMany({
     where: {
-      assignedToId: userId,
-      status: AssignmentStatus.ACTIVE,
+      assignedToUserId: userId,
+      status: { in: [AssignmentStatus.ACTIVE, AssignmentStatus.ACCEPTED, AssignmentStatus.RETURN_REQUESTED] },
     },
     include: {
       asset: {
@@ -34,12 +34,15 @@ export default async function StaffAssetsPage() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
+      case "ACCEPTED":
       case "ACTIVE":
         return "bg-green-50 text-green-700 border-green-200";
-      case "ASSIGNED":
-        return "bg-blue-50 text-blue-700 border-blue-200";
-      case "UNDER_MAINTENANCE":
+      case "PENDING_ACCEPTANCE":
+        return "bg-amber-50 text-amber-700 border-amber-200 animate-pulse";
+      case "RETURN_REQUESTED":
         return "bg-orange-50 text-orange-700 border-orange-200";
+      case "REJECTED":
+        return "bg-red-50 text-red-700 border-red-200";
       default:
         return "bg-slate-50 text-slate-700 border-slate-200";
     }
@@ -87,8 +90,8 @@ export default async function StaffAssetsPage() {
                     <td className="py-3 text-slate-500">{a.asset.category.name}</td>
                     <td className="py-3 text-slate-400">{new Date(a.assignedAt).toLocaleDateString()}</td>
                     <td className="py-3">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getStatusBadge(a.asset.status)}`}>
-                        {a.asset.status.replace(/_/g, " ").toLowerCase()}
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold border uppercase ${getStatusBadge(a.status)}`}>
+                        {a.status.replace(/_/g, " ")}
                       </span>
                     </td>
                     <td className="py-3 text-right">

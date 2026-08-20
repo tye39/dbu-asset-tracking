@@ -28,14 +28,17 @@ export async function requestTransfer(data: {
 
   // Get current state
   const activeAssignment = await prisma.assignment.findFirst({
-    where: { assetId: data.assetId, status: AssignmentStatus.ACTIVE },
+    where: {
+      assetId: data.assetId,
+      status: { in: [AssignmentStatus.ACTIVE, AssignmentStatus.ACCEPTED] }
+    },
   });
 
   const transfer = await prisma.transfer.create({
     data: {
       assetId: data.assetId,
       fromDepartmentId: activeAssignment?.departmentId || asset.departmentId,
-      fromUserId: activeAssignment?.assignedToId || null,
+      fromUserId: activeAssignment?.assignedToUserId || null,
       toDepartmentId: data.toDepartmentId || null,
       toUserId: data.toUserId || null,
       requestedById: actorId,
@@ -104,7 +107,10 @@ export async function approveTransfer(transferId: string, actorId: string) {
 
     // 2. Find and complete previous active assignments
     const activeAssignments = await tx.assignment.findMany({
-      where: { assetId: transfer.assetId, status: AssignmentStatus.ACTIVE },
+      where: {
+        assetId: transfer.assetId,
+        status: { in: [AssignmentStatus.ACTIVE, AssignmentStatus.ACCEPTED, AssignmentStatus.PENDING_ACCEPTANCE] }
+      },
     });
 
     for (const assignment of activeAssignments) {
@@ -121,21 +127,21 @@ export async function approveTransfer(transferId: string, actorId: string) {
     await tx.assignment.create({
       data: {
         assetId: transfer.assetId,
-        assignedToId: transfer.toUserId || null,
+        assignedToUserId: transfer.toUserId || null,
         departmentId: transfer.toDepartmentId || null,
-        assignedById: actorId,
-        status: AssignmentStatus.ACTIVE,
+        assignedByUserId: actorId,
+        status: transfer.toUserId ? AssignmentStatus.PENDING_ACCEPTANCE : AssignmentStatus.ACTIVE,
         notes: `Created via transfer request approval. Original notes: ${transfer.notes || ""}`,
       },
     });
 
-    // 4. Update the asset location (department)
+    // 4. Update the asset location (department) and status
     const newDeptId = transfer.toDepartmentId || transfer.asset.departmentId;
     await tx.asset.update({
       where: { id: transfer.assetId },
       data: {
         departmentId: newDeptId,
-        status: AssetStatus.ASSIGNED,
+        status: transfer.toUserId ? AssetStatus.PENDING_ASSIGNMENT : AssetStatus.ASSIGNED,
       },
     });
 

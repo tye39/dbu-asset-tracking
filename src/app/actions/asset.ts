@@ -90,6 +90,11 @@ export async function deleteAssetAction(prevState: unknown, id: string) {
   const session = await auth();
   if (!session?.user?.id) return { error: "Unauthorized." };
 
+  const role = session.user.role;
+  if (role !== "PROPERTY_ADMINISTRATION_OFFICER" && role !== "SYSTEM_ADMINISTRATOR") {
+    return { error: "Permission denied. Only Property Administration Officers or System Administrators can delete assets." };
+  }
+
   try {
     await softDeleteAsset(id, session.user.id);
     revalidatePath("/", "layout");

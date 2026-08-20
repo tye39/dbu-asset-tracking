@@ -61,13 +61,18 @@ export async function GET(request: NextRequest) {
     const fields = typeFields.map((tf) => ({
       id: tf.field.id,
       name: tf.field.name,
-      label: tf.field.label,
+      label: tf.labelOverride || tf.field.label,
       fieldType: tf.field.fieldType,
-      placeholder: tf.field.placeholder,
-      description: tf.field.description,
+      placeholder: tf.placeholderOverride || tf.field.placeholder,
+      description: tf.descriptionOverride || tf.field.description,
       defaultValue: tf.defaultValue || tf.field.defaultValue,
       options: tf.options || tf.field.options,
-      isRequired: tf.isRequired
+      isRequired: tf.isRequired,
+      isEnabled: tf.isEnabled,
+      validationMin: tf.validationMin,
+      validationMax: tf.validationMax,
+      validationMinLength: tf.validationMinLength,
+      validationMaxLength: tf.validationMaxLength
     }));
 
     const suppliers = Array.from(

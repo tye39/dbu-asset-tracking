@@ -14,13 +14,18 @@ export default async function StaffDashboardPage() {
   }
 
   const userId = session.user.id;
-
   // 1. Fetch Stats
-  const [assignedAssets, openMaintenance] = await Promise.all([
+  const [assignedAssets, pendingCount, openMaintenance] = await Promise.all([
     prisma.assignment.count({
       where: {
-        assignedToId: userId,
-        status: AssignmentStatus.ACTIVE,
+        assignedToUserId: userId,
+        status: { in: [AssignmentStatus.ACTIVE, AssignmentStatus.ACCEPTED] },
+      },
+    }),
+    prisma.assignment.count({
+      where: {
+        assignedToUserId: userId,
+        status: AssignmentStatus.PENDING_ACCEPTANCE,
       },
     }),
     prisma.maintenance.count({
@@ -31,11 +36,11 @@ export default async function StaffDashboardPage() {
     }),
   ]);
 
-  // 2. Fetch My Assigned Assets List
-  const activeAssignments = await prisma.assignment.findMany({
+  // 2. Fetch My Assigned Assignments List (Accepted/Active only)
+  const assignmentsList = await prisma.assignment.findMany({
     where: {
-      assignedToId: userId,
-      status: AssignmentStatus.ACTIVE,
+      assignedToUserId: userId,
+      status: { in: [AssignmentStatus.ACTIVE, AssignmentStatus.ACCEPTED, AssignmentStatus.RETURN_REQUESTED] },
     },
     include: {
       asset: {
@@ -44,9 +49,53 @@ export default async function StaffDashboardPage() {
         },
       },
     },
+    orderBy: { assignedAt: "desc" },
   });
 
-  const myAssetsList = activeAssignments.map((a) => a.asset);
+  const myAssetsList = assignmentsList.map((a) => ({
+    id: a.asset.id,
+    assignmentId: a.id,
+    name: a.asset.name,
+    assetCode: a.asset.assetCode,
+    serialNumber: a.asset.serialNumber,
+    category: { name: a.asset.category.name },
+    status: a.status,
+  }));
+
+  // 2.5 Fetch Pending Assignments
+  const pendingAssignments = await prisma.assignment.findMany({
+    where: {
+      assignedToUserId: userId,
+      status: AssignmentStatus.PENDING_ACCEPTANCE,
+    },
+    include: {
+      asset: {
+        include: {
+          category: true,
+          assetType: true,
+          department: true,
+        },
+      },
+      assignedBy: { select: { name: true } },
+    },
+    orderBy: { assignedAt: "desc" },
+  });
+
+  const pendingList = pendingAssignments.map((pa) => ({
+    id: pa.id,
+    assignedAt: pa.assignedAt,
+    assignedBy: pa.assignedBy?.name || "System",
+    asset: {
+      id: pa.asset.id,
+      name: pa.asset.name,
+      assetCode: pa.asset.assetCode,
+      serialNumber: pa.asset.serialNumber,
+      condition: pa.asset.condition || "N/A",
+      category: pa.asset.category.name,
+      assetTypeName: pa.asset.assetType?.name || "General",
+      department: pa.asset.department.name,
+    },
+  }));
 
   // 3. Fetch Recent Requests (Maintenance) filed by this user
   const recentRequests = await prisma.maintenance.findMany({
@@ -64,9 +113,11 @@ export default async function StaffDashboardPage() {
     <StaffDashboardClient
       stats={{
         assignedAssets,
+        pendingAssignments: pendingCount,
         openMaintenance,
       }}
       myAssetsList={myAssetsList}
+      pendingAssignments={pendingList}
       recentRequests={recentRequests}
     />
   );

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { createAuditLog } from "./audit";
-import { Prisma, AssetStatus, FundingSource } from "@prisma/client";
+import { Prisma, AssetStatus, FundingSource, AssignmentStatus } from "@prisma/client";
 import { calculateAssetFinancials } from "./financials";
 
 export async function registerAsset(data: {
@@ -87,50 +87,98 @@ export async function registerAsset(data: {
 
   const configFieldsMap = new Map(activeConfigs.map(c => [c.field.name, c]));
 
+  interface FieldConfigType {
+    labelOverride?: string | null;
+    validationMin?: number | null;
+    validationMax?: number | null;
+    validationMinLength?: number | null;
+    validationMaxLength?: number | null;
+    field: {
+      name: string;
+      label: string;
+      fieldType: string;
+    };
+  }
+
+  // Helper to validate range and length constraints
+  function validateFieldConstraints(cfg: FieldConfigType, value: string | null | undefined) {
+    if (value === undefined || value === null || value.trim() === "") return;
+    const label = cfg.labelOverride || cfg.field.label;
+
+    const type = cfg.field.fieldType;
+    // Range Checks for Numbers / Decimals
+    if (type === "NUMBER" || type === "DECIMAL" || ["purchaseCost", "salvageValue", "usefulLife"].includes(cfg.field.name)) {
+      const valNum = Number(value);
+      if (!isNaN(valNum)) {
+        if (cfg.validationMin !== null && cfg.validationMin !== undefined && valNum < cfg.validationMin) {
+          throw new Error(`${label} must be at least ${cfg.validationMin}.`);
+        }
+        if (cfg.validationMax !== null && cfg.validationMax !== undefined && valNum > cfg.validationMax) {
+          throw new Error(`${label} cannot exceed ${cfg.validationMax}.`);
+        }
+      }
+    }
+
+    // Length Checks for String Fields
+    if (type === "TEXT" || type === "TEXTAREA" || ["name", "serialNumber"].includes(cfg.field.name)) {
+      if (cfg.validationMinLength !== null && cfg.validationMinLength !== undefined && value.length < cfg.validationMinLength) {
+        throw new Error(`${label} must be at least ${cfg.validationMinLength} characters long.`);
+      }
+      if (cfg.validationMaxLength !== null && cfg.validationMaxLength !== undefined && value.length > cfg.validationMaxLength) {
+        throw new Error(`${label} cannot exceed ${cfg.validationMaxLength} characters long.`);
+      }
+    }
+  }
+
   // Validate Core/Built-in Fields
   const nameCfg = configFieldsMap.get("name");
-  if (nameCfg?.isRequired && !data.name) {
-    throw new Error(`${nameCfg.field.label} is required.`);
+  if (nameCfg?.isRequired && (!data.name || data.name.trim() === "")) {
+    throw new Error(`${nameCfg.labelOverride || nameCfg.field.label} is required.`);
   }
+  if (nameCfg) validateFieldConstraints(nameCfg, data.name);
 
   const serialCfg = configFieldsMap.get("serialNumber");
-  if (serialCfg?.isRequired && !data.serialNumber) {
-    throw new Error(`${serialCfg.field.label} is required.`);
+  if (serialCfg?.isRequired && (!data.serialNumber || data.serialNumber.trim() === "")) {
+    throw new Error(`${serialCfg.labelOverride || serialCfg.field.label} is required.`);
   }
+  if (serialCfg) validateFieldConstraints(serialCfg, data.serialNumber);
 
   const costCfg = configFieldsMap.get("purchaseCost");
-  if (costCfg?.isRequired && !data.purchaseCost) {
-    throw new Error(`${costCfg.field.label} is required.`);
+  if (costCfg?.isRequired && (data.purchaseCost === undefined || data.purchaseCost === null || data.purchaseCost.toString().trim() === "")) {
+    throw new Error(`${costCfg.labelOverride || costCfg.field.label} is required.`);
   }
+  if (costCfg) validateFieldConstraints(costCfg, data.purchaseCost?.toString());
 
   const dateCfg = configFieldsMap.get("purchaseDate");
-  if (dateCfg?.isRequired && !data.purchaseDate) {
-    throw new Error(`${dateCfg.field.label} is required.`);
+  if (dateCfg?.isRequired && (data.purchaseDate === undefined || data.purchaseDate === null || data.purchaseDate.toString().trim() === "")) {
+    throw new Error(`${dateCfg.labelOverride || dateCfg.field.label} is required.`);
   }
 
   const lifeCfg = configFieldsMap.get("usefulLife");
-  if (lifeCfg?.isRequired && !data.usefulLife) {
-    throw new Error(`${lifeCfg.field.label} is required.`);
+  if (lifeCfg?.isRequired && (data.usefulLife === undefined || data.usefulLife === null || data.usefulLife.toString().trim() === "")) {
+    throw new Error(`${lifeCfg.labelOverride || lifeCfg.field.label} is required.`);
   }
+  if (lifeCfg) validateFieldConstraints(lifeCfg, data.usefulLife?.toString());
 
   const salvageCfg = configFieldsMap.get("salvageValue");
-  if (salvageCfg?.isRequired && !data.salvageValue) {
-    throw new Error(`${salvageCfg.field.label} is required.`);
+  if (salvageCfg?.isRequired && (data.salvageValue === undefined || data.salvageValue === null || data.salvageValue.toString().trim() === "")) {
+    throw new Error(`${salvageCfg.labelOverride || salvageCfg.field.label} is required.`);
   }
+  if (salvageCfg) validateFieldConstraints(salvageCfg, data.salvageValue?.toString());
 
   const fundingCfg = configFieldsMap.get("fundingSource");
-  if (fundingCfg?.isRequired && !data.fundingSource) {
-    throw new Error(`${fundingCfg.field.label} is required.`);
+  if (fundingCfg?.isRequired && (!data.fundingSource || data.fundingSource.trim() === "")) {
+    throw new Error(`${fundingCfg.labelOverride || fundingCfg.field.label} is required.`);
   }
 
   const wStartCfg = configFieldsMap.get("warrantyStartDate");
-  if (wStartCfg?.isRequired && !data.warrantyStartDate) {
-    throw new Error(`${wStartCfg.field.label} is required.`);
+  if (wStartCfg?.isRequired && (!data.warrantyStartDate || data.warrantyStartDate.toString().trim() === "")) {
+    throw new Error(`${wStartCfg.labelOverride || wStartCfg.field.label} is required.`);
   }
 
   const wEndCfg = configFieldsMap.get("warrantyEndDate");
-  if (wEndCfg?.isRequired && !data.warrantyEndDate) {
-    throw new Error(`${wEndCfg.field.label} is required.`);
+  if (wEndCfg?.isRequired && (!data.warrantyEndDate || data.warrantyEndDate.toString().trim() === "")) {
+    throw new Error(`${wEndCfg.labelOverride || wEndCfg.field.label} is required.`);
   }
 
   // Cost and number range checks
@@ -166,7 +214,7 @@ export async function registerAsset(data: {
   for (const cfg of activeCustomConfigs) {
     const value = submittedDynamicValues[cfg.field.id];
     if (cfg.isRequired && (value === undefined || value === null || value.trim() === "")) {
-      throw new Error(`${cfg.field.label} is required.`);
+      throw new Error(`${cfg.labelOverride || cfg.field.label} is required.`);
     }
 
     if (value !== undefined && value !== null && value.trim() !== "") {
@@ -174,27 +222,30 @@ export async function registerAsset(data: {
       if (type === "NUMBER") {
         const valNum = Number(value);
         if (isNaN(valNum) || !Number.isInteger(valNum)) {
-          throw new Error(`${cfg.field.label} must be a valid integer.`);
+          throw new Error(`${cfg.labelOverride || cfg.field.label} must be a valid integer.`);
         }
       } else if (type === "DECIMAL") {
         const valNum = Number(value);
         if (isNaN(valNum)) {
-          throw new Error(`${cfg.field.label} must be a valid decimal number.`);
+          throw new Error(`${cfg.labelOverride || cfg.field.label} must be a valid decimal number.`);
         }
       } else if (type === "DATE") {
         const valDate = new Date(value);
         if (isNaN(valDate.getTime())) {
-          throw new Error(`${cfg.field.label} must be a valid date.`);
+          throw new Error(`${cfg.labelOverride || cfg.field.label} must be a valid date.`);
         }
       } else if (type === "DROPDOWN" || type === "RADIO") {
         const options = cfg.options || cfg.field.options;
         if (options) {
           const allowed = options.split(",").map(o => o.trim());
           if (!allowed.includes(value.trim())) {
-            throw new Error(`${cfg.field.label} value "${value}" is not in configured options list.`);
+            throw new Error(`${cfg.labelOverride || cfg.field.label} value "${value}" is not in configured options list.`);
           }
         }
       }
+
+      // Enforce overrides range & length checks on custom fields
+      validateFieldConstraints(cfg, value);
     }
   }
 
@@ -235,7 +286,7 @@ export async function registerAsset(data: {
         description: data.description || null,
         categoryId: data.categoryId,
         departmentId: data.departmentId,
-        status: AssetStatus.ACTIVE,
+        status: data.assignedToId ? AssetStatus.PENDING_ASSIGNMENT : AssetStatus.ACTIVE,
         purchaseDate: data.purchaseDate || null,
         purchaseCost: new Prisma.Decimal(cost),
         procurementCost: new Prisma.Decimal(cost), // sync for legacy
@@ -310,11 +361,11 @@ export async function registerAsset(data: {
       await tx.assignment.create({
         data: {
           assetId: newAsset.id,
-          assignedToId: data.assignedToId,
+          assignedToUserId: data.assignedToId,
           departmentId: data.departmentId || null,
-          assignedById: actorId,
+          assignedByUserId: actorId,
           notes: "Assigned automatically during asset registration",
-          status: "ACTIVE"
+          status: AssignmentStatus.PENDING_ACCEPTANCE
         }
       });
     }
@@ -408,17 +459,38 @@ export async function softDeleteAsset(id: string, actorId: string) {
   if (!previous) throw new Error("Asset not found");
 
   const result = await prisma.$transaction(async (tx) => {
+    // 1. Soft delete the asset
     const updated = await tx.asset.update({
       where: { id },
       data: { deletedAt: new Date() }
     });
 
+    // 2. Terminate any active/pending assignments
+    await tx.assignment.updateMany({
+      where: {
+        assetId: id,
+        status: { in: ["ACTIVE", "ACCEPTED", "PENDING_ACCEPTANCE", "RETURN_REQUESTED"] }
+      },
+      data: {
+        status: "RETURNED"
+      }
+    });
 
+    // 3. Cancel any pending transfers
+    await tx.transfer.updateMany({
+      where: {
+        assetId: id,
+        status: "PENDING"
+      },
+      data: {
+        status: "REJECTED"
+      }
+    });
 
     return updated;
   });
 
-  await createAuditLog(actorId, "DELETE", "Asset", id, previous, { deletedAt: new Date() });
+  await createAuditLog(actorId, "ASSET_DELETED", "Asset", id, { id: previous.id, name: previous.name, assetCode: previous.assetCode }, { deletedAt: new Date() });
   return result;
 }
 
@@ -521,7 +593,8 @@ export async function getAssets(filters: {
       include: {
         category: true,
         department: true,
-        qrCode: true
+        qrCode: true,
+        assetType: true
       },
     }),
     prisma.asset.count({ where }),

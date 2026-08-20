@@ -289,6 +289,129 @@ export async function deleteFieldAction(id: string) {
    4. ASSET TYPE FIELD CONFIGURATIONS
    ========================================== */
 
+export async function updateAssetTypeFieldAction(
+  assetTypeId: string,
+  fieldId: string,
+  data: {
+    isEnabled: boolean;
+    isRequired: boolean;
+    labelOverride?: string;
+    placeholderOverride?: string;
+    descriptionOverride?: string;
+    defaultValue?: string;
+    options?: string;
+    validationMin?: number | null;
+    validationMax?: number | null;
+    validationMinLength?: number | null;
+    validationMaxLength?: number | null;
+  }
+) {
+  try {
+    await verifyAdmin();
+
+    const updated = await prisma.assetTypeField.upsert({
+      where: {
+        assetTypeId_fieldId: { assetTypeId, fieldId }
+      },
+      update: {
+        isEnabled: data.isEnabled,
+        isRequired: data.isRequired,
+        labelOverride: data.labelOverride || null,
+        placeholderOverride: data.placeholderOverride || null,
+        descriptionOverride: data.descriptionOverride || null,
+        defaultValue: data.defaultValue || null,
+        options: data.options || null,
+        validationMin: data.validationMin,
+        validationMax: data.validationMax,
+        validationMinLength: data.validationMinLength,
+        validationMaxLength: data.validationMaxLength
+      },
+      create: {
+        assetTypeId,
+        fieldId,
+        isEnabled: data.isEnabled,
+        isRequired: data.isRequired,
+        labelOverride: data.labelOverride || null,
+        placeholderOverride: data.placeholderOverride || null,
+        descriptionOverride: data.descriptionOverride || null,
+        defaultValue: data.defaultValue || null,
+        options: data.options || null,
+        validationMin: data.validationMin,
+        validationMax: data.validationMax,
+        validationMinLength: data.validationMinLength,
+        validationMaxLength: data.validationMaxLength
+      }
+    });
+
+    revalidatePath("/admin/asset-form-builder");
+    return { success: true, updated };
+  } catch (error: unknown) {
+    const err = error as Error;
+    return { error: err.message || "Failed to update field configuration." };
+  }
+}
+
+export async function createCustomFieldAction(
+  assetTypeId: string,
+  data: {
+    name: string;
+    label: string;
+    fieldType: string;
+    placeholder?: string;
+    description?: string;
+    options?: string;
+    defaultValue?: string;
+    isRequired: boolean;
+    isEnabled: boolean;
+  }
+) {
+  try {
+    await verifyAdmin();
+    
+    // Generate a unique field name for this asset type to prevent global collisions
+    const formattedName = data.name.trim().toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "");
+    const uniqueFieldName = `custom_${assetTypeId.slice(0, 8)}_${formattedName}`;
+
+    // Create the global RegistrationField
+    const field = await prisma.registrationField.create({
+      data: {
+        name: uniqueFieldName,
+        label: data.label,
+        fieldType: data.fieldType,
+        placeholder: data.placeholder || null,
+        description: data.description || null,
+        options: data.options || null,
+        defaultValue: data.defaultValue || null,
+        isActive: true
+      }
+    });
+
+    // Determine the next display order
+    const maxOrder = await prisma.assetTypeField.aggregate({
+      where: { assetTypeId },
+      _max: { displayOrder: true }
+    });
+    const nextOrder = (maxOrder._max.displayOrder || 0) + 1;
+
+    // Create the mapping record linking it only to this asset type
+    const mapping = await prisma.assetTypeField.create({
+      data: {
+        assetTypeId,
+        fieldId: field.id,
+        isEnabled: data.isEnabled,
+        isRequired: data.isRequired,
+        displayOrder: nextOrder
+      }
+    });
+
+    revalidatePath("/admin/asset-form-builder");
+    return { success: true, field, mapping };
+  } catch (error: unknown) {
+    const err = error as Error;
+    return { error: err.message || "Failed to create custom field." };
+  }
+}
+
 export async function saveAssetTypeConfigAction(
   assetTypeId: string,
   fieldsConfig: {

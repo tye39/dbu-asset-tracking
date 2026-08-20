@@ -1,7 +1,7 @@
 import React from "react";
 import { prisma } from "@/lib/db";
 import { PaoDashboardClient } from "@/components/pao-dashboard-client";
-import { AssetStatus, TransferStatus, MaintenanceStatus, RoleName } from "@prisma/client";
+import { AssetStatus, TransferStatus, MaintenanceStatus } from "@prisma/client";
 
 export const revalidate = 0; // Disable caching to ensure real-time dashboard data
 
@@ -68,7 +68,6 @@ export default async function PaoDashboardPage() {
 
   const staffUsers = await prisma.user.findMany({
     where: {
-      role: { name: RoleName.STAFF_MEMBER },
       deletedAt: null
     },
     select: {
