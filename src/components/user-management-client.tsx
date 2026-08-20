@@ -127,14 +127,14 @@ export function UserManagementClient({ users, roles, departments }: UserManageme
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-blue-100 pb-4 bg-blue-950/5 -mx-6 -mt-6 p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-blue-100 pb-4 bg-blue-950/5 -mx-3 -mt-3 sm:-mx-6 sm:-mt-6 p-4 sm:p-6 gap-2">
         <div>
-          <h2 className="text-xl font-bold text-blue-900">Manage Users</h2>
-          <p className="text-xs text-blue-600 font-semibold mt-1">Configure account access, credentials, and institutional roles</p>
+          <h2 className="text-lg sm:text-xl font-bold text-blue-900">Manage Users</h2>
+          <p className="text-[11px] sm:text-xs text-blue-600 font-semibold mt-0.5">Configure account access, credentials, and institutional roles</p>
         </div>
         <button
           onClick={handleOpenCreate}
-          className="px-4 py-2 bg-[#0b4a6e] hover:bg-sky-800 text-white rounded-lg text-xs font-bold transition-all shadow-md flex items-center space-x-1.5"
+          className="px-4 py-2 bg-[#0b4a6e] hover:bg-sky-800 text-white rounded-lg text-xs font-bold transition-all shadow-md flex items-center space-x-1.5 self-start sm:self-auto"
         >
           <Plus size={14} />
           <span>Add User</span>
@@ -142,9 +142,9 @@ export function UserManagementClient({ users, roles, departments }: UserManageme
       </div>
 
       {/* Users Table */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+      <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full min-w-[650px] text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-100 text-[10px] text-slate-400 font-bold uppercase">
                 <th className="py-2.5">Name</th>
@@ -188,8 +188,8 @@ export function UserManagementClient({ users, roles, departments }: UserManageme
 
       {/* Modal: CREATE/EDIT USER */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6 border border-slate-200 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-3 sm:p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6 border border-slate-200 shadow-2xl relative">
             <button
               onClick={() => setShowModal(false)}
               className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"

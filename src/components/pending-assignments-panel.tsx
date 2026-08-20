@@ -125,7 +125,7 @@ export function PendingAssignmentsPanel({ pendingAssignments }: PendingAssignmen
         </p>
 
         <div className="overflow-x-auto bg-white rounded-xl border border-amber-100/60 p-2">
-          <table className="w-full text-left border-collapse text-xs">
+          <table className="w-full min-w-[750px] text-left border-collapse text-xs">
             <thead>
               <tr className="border-b border-slate-100 text-[10px] text-slate-400 font-bold uppercase">
                 <th className="py-2.5 px-3">Asset Name</th>

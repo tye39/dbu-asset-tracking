@@ -723,21 +723,21 @@ export function AssetRegistrationClient({
   return (
     <div className="space-y-6 select-none">
       {/* Wizard Header Bar */}
-      <div className="flex items-center justify-between border-b border-blue-100 pb-4 bg-blue-950/5 -mx-6 -mt-6 p-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-blue-100 pb-4 bg-blue-950/5 -mx-3 -mt-3 sm:-mx-6 sm:-mt-6 p-4 sm:p-6 gap-3">
         <div>
-          <h2 className="text-xl font-bold text-blue-900">Register New Asset</h2>
-          <p className="text-xs text-blue-600 font-semibold mt-1">
+          <h2 className="text-lg sm:text-xl font-bold text-blue-900">Register New Asset</h2>
+          <p className="text-[11px] sm:text-xs text-blue-600 font-semibold mt-0.5">
             Dynamic Asset Registration and QR Code Tag Generation Wizard
           </p>
         </div>
-        <div className="flex items-center space-x-2 text-xs font-bold">
-          <span className={`px-2.5 py-1 rounded-full ${step === 1 ? "bg-[#0b4a6e] text-white" : "bg-slate-200 text-slate-600"}`}>1. Category</span>
-          <ChevronRight size={12} className="text-slate-300" />
-          <span className={`px-2.5 py-1 rounded-full ${step === 2 ? "bg-[#0b4a6e] text-white" : "bg-slate-200 text-slate-600"}`}>2. Setup Details</span>
-          <ChevronRight size={12} className="text-slate-300" />
-          <span className={`px-2.5 py-1 rounded-full ${step === 3 ? "bg-[#0b4a6e] text-white" : "bg-slate-200 text-slate-600"}`}>3. Review</span>
-          <ChevronRight size={12} className="text-slate-300" />
-          <span className={`px-2.5 py-1 rounded-full ${step === 4 ? "bg-emerald-600 text-white" : "bg-slate-200 text-slate-600"}`}>4. Completed</span>
+        <div className="flex items-center space-x-1 sm:space-x-2 text-[10px] sm:text-xs font-bold overflow-x-auto max-w-full pb-1 shrink-0">
+          <span className={`px-2 sm:px-2.5 py-1 rounded-full whitespace-nowrap ${step === 1 ? "bg-[#0b4a6e] text-white" : "bg-slate-200 text-slate-600"}`}>1. Category</span>
+          <ChevronRight size={12} className="text-slate-300 shrink-0" />
+          <span className={`px-2 sm:px-2.5 py-1 rounded-full whitespace-nowrap ${step === 2 ? "bg-[#0b4a6e] text-white" : "bg-slate-200 text-slate-600"}`}>2. Setup Details</span>
+          <ChevronRight size={12} className="text-slate-300 shrink-0" />
+          <span className={`px-2 sm:px-2.5 py-1 rounded-full whitespace-nowrap ${step === 3 ? "bg-[#0b4a6e] text-white" : "bg-slate-200 text-slate-600"}`}>3. Review</span>
+          <ChevronRight size={12} className="text-slate-300 shrink-0" />
+          <span className={`px-2 sm:px-2.5 py-1 rounded-full whitespace-nowrap ${step === 4 ? "bg-emerald-600 text-white" : "bg-slate-200 text-slate-600"}`}>4. Completed</span>
         </div>
       </div>
 

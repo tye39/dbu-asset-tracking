@@ -101,7 +101,7 @@ export function DashboardFinancialClient({
   return (
     <div className="space-y-6">
       {/* 7 Summary Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         
         {/* Card 1: Total Asset Value */}
         <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-2">

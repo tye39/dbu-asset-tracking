@@ -70,14 +70,14 @@ export default async function PaoAssetsPage({ searchParams }: AssetsPageProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-sky-100 pb-4 bg-sky-900/5 -mx-6 -mt-6 p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-sky-100 pb-4 bg-sky-900/5 -mx-3 -mt-3 sm:-mx-6 sm:-mt-6 p-4 sm:p-6 gap-2">
         <div>
-          <h2 className="text-xl font-bold text-sky-900">Asset Inventory</h2>
-          <p className="text-xs text-sky-600 font-semibold mt-1">Full database records, state logging, and tracking details</p>
+          <h2 className="text-lg sm:text-xl font-bold text-sky-900">Asset Inventory</h2>
+          <p className="text-[11px] sm:text-xs text-sky-600 font-semibold mt-0.5">Full database records, state logging, and tracking details</p>
         </div>
         <Link
           href="/pao/assets/new"
-          className="px-4 py-2 bg-[#0b4a6e] hover:bg-sky-800 text-white rounded-lg text-xs font-bold transition-all shadow-md"
+          className="px-4 py-2 bg-[#0b4a6e] hover:bg-sky-800 text-white rounded-lg text-xs font-bold transition-all shadow-md self-start sm:self-auto"
         >
           Register Asset
         </Link>
@@ -182,9 +182,9 @@ export default async function PaoAssetsPage({ searchParams }: AssetsPageProps) {
       </div>
 
       {/* Assets Table */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+      <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full min-w-[700px] text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-100 text-[10px] text-slate-400 font-bold uppercase">
                 <th className="py-2.5">Asset Code</th>

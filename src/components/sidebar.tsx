@@ -17,7 +17,8 @@ import {
   Settings,
   ClipboardList,
   UserCheck,
-  LucideIcon
+  LucideIcon,
+  X
 } from "lucide-react";
 
 interface SidebarProps {
@@ -28,9 +29,11 @@ interface SidebarProps {
     departmentName?: string | null;
     isInventoryPerson?: boolean;
   };
+  isMobileOpen?: boolean;
+  onClose?: () => void;
 }
 
-export function Sidebar({ user }: SidebarProps) {
+export function Sidebar({ user, isMobileOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
 
   const getNavItems = () => {
@@ -119,19 +122,32 @@ export function Sidebar({ user }: SidebarProps) {
   };
 
   return (
-    <aside className="w-64 bg-[#0b4a6e] text-white flex flex-col justify-between shadow-2xl z-20 shrink-0 select-none border-r border-sky-950">
-      <div className="flex flex-col">
+    <aside
+      className={`fixed inset-y-0 left-0 z-50 lg:static lg:z-auto w-64 bg-[#0b4a6e] text-white flex flex-col justify-between shadow-2xl shrink-0 select-none border-r border-sky-950 transform transition-transform duration-300 ease-in-out ${
+        isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      }`}
+    >
+      <div className="flex flex-col h-full overflow-y-auto">
         {/* Logo and Brand Title Header */}
-        <div className="flex items-center space-x-3 p-6 border-b border-sky-950/50 bg-sky-950/10">
-          <DbuLogo className="w-10 h-10 shrink-0" />
-          <div className="overflow-hidden">
-            <h1 className="font-bold text-sm tracking-wider text-white whitespace-nowrap leading-none">
-              DEBRE BERHAN
-            </h1>
-            <p className="text-[9px] text-yellow-400 font-semibold tracking-widest mt-1">
-              ASSET TRACKING
-            </p>
+        <div className="flex items-center justify-between p-6 border-b border-sky-950/50 bg-sky-950/10">
+          <div className="flex items-center space-x-3">
+            <DbuLogo className="w-10 h-10 shrink-0" />
+            <div className="overflow-hidden">
+              <h1 className="font-bold text-sm tracking-wider text-white whitespace-nowrap leading-none">
+                DEBRE BERHAN
+              </h1>
+              <p className="text-[9px] text-yellow-400 font-semibold tracking-widest mt-1">
+                ASSET TRACKING
+              </p>
+            </div>
           </div>
+          <button
+            onClick={onClose}
+            className="lg:hidden text-sky-200 hover:text-white p-1 rounded-lg focus:outline-none"
+            aria-label="Close menu"
+          >
+            <X size={20} />
+          </button>
         </div>
 
         {/* User Card */}
@@ -178,6 +194,7 @@ export function Sidebar({ user }: SidebarProps) {
               <Link
                 key={item.name}
                 href={item.href}
+                onClick={onClose}
                 className={`flex items-center space-x-3 px-4 py-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all ${
                   isActive
                     ? "bg-yellow-500 text-slate-900 shadow-md transform translate-x-1"

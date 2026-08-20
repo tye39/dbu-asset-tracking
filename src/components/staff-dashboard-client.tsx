@@ -151,17 +151,18 @@ export function StaffDashboardClient({
           <button onClick={() => setErrorMessage(null)} className="text-[10px] text-red-550 hover:text-red-700 font-bold">✕</button>
         </div>
       )}
+
       {/* Header section matching mockup color */}
-      <div className="flex items-center justify-between border-b border-purple-100 pb-4 bg-purple-950/5 -mx-6 -mt-6 p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-purple-100 pb-4 bg-purple-950/5 -mx-3 -mt-3 sm:-mx-6 sm:-mt-6 p-4 sm:p-6 gap-2">
         <div>
-          <h2 className="text-xl font-bold text-purple-900">STAFF MEMBER PORTAL</h2>
-          <p className="text-xs text-purple-600 font-semibold mt-1">My Assigned Assets & Requests</p>
+          <h2 className="text-lg sm:text-xl font-bold text-purple-900">STAFF MEMBER PORTAL</h2>
+          <p className="text-[11px] sm:text-xs text-purple-600 font-semibold mt-0.5">My Assigned Assets & Requests</p>
         </div>
       </div>
       {pendingAssignments.length === -1 && <span />}
 
       {/* Grid of stats cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
         {/* Assets Assigned to Me */}
         <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
           <div className="p-3 bg-purple-50 text-purple-700 rounded-lg"><Package size={20} /></div>
@@ -190,15 +191,13 @@ export function StaffDashboardClient({
         </div>
       </div>
 
-
-
       {/* Mid section: My Assets Table */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Table Card */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm lg:col-span-2">
+        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm lg:col-span-2">
           <h4 className="text-xs font-extrabold text-slate-700 uppercase mb-4">My Assigned Assets</h4>
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full min-w-[600px] text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-100 text-[10px] text-slate-400 font-bold uppercase">
                   <th className="py-2.5">Asset Name</th>

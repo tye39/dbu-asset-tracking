@@ -175,15 +175,15 @@ export function PaoDashboardClient({
   return (
     <div className="space-y-6">
       {/* Header section matching mockup color */}
-      <div className="flex items-center justify-between border-b border-sky-100 pb-4 bg-sky-900/5 -mx-6 -mt-6 p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-sky-100 pb-4 bg-sky-900/5 -mx-3 -mt-3 sm:-mx-6 sm:-mt-6 p-4 sm:p-6 gap-2">
         <div>
-          <h2 className="text-xl font-bold text-sky-900">PROPERTY ADMINISTRATION OFFICER</h2>
-          <p className="text-xs text-sky-600 font-semibold mt-1">Management Hub & Asset Lifecycle Controller</p>
+          <h2 className="text-lg sm:text-xl font-bold text-sky-900">PROPERTY ADMINISTRATION OFFICER</h2>
+          <p className="text-[11px] sm:text-xs text-sky-600 font-semibold mt-0.5">Management Hub & Asset Lifecycle Controller</p>
         </div>
       </div>
 
       {/* Grid of 8 stats cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
           <div className="p-3 bg-sky-50 text-sky-600 rounded-lg"><Package size={20} /></div>
           <div>
@@ -328,8 +328,8 @@ export function PaoDashboardClient({
 
       {/* Modal: ASSIGN ASSET */}
       {showAssignModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6 border border-slate-200 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-3 sm:p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6 border border-slate-200 shadow-2xl relative">
             <button
               onClick={() => setShowAssignModal(false)}
               className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"
@@ -450,8 +450,8 @@ export function PaoDashboardClient({
 
       {/* Modal: TRANSFER ASSET */}
       {showTransferModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6 border border-slate-200 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-3 sm:p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6 border border-slate-200 shadow-2xl relative">
             <button
               onClick={() => setShowTransferModal(false)}
               className="absolute top-4 right-4 text-slate-400 hover:text-slate-600"

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, Search, Check, Loader2, ChevronDown, User, Lock, LogOut, Settings } from "lucide-react";
+import { Bell, Search, Check, Loader2, ChevronDown, User, Lock, LogOut, Settings, Menu } from "lucide-react";
 import { fetchNotificationsAction, markAllReadAction, markOneReadAction } from "@/app/actions/notification";
 import { logoutAction } from "@/app/actions/auth";
 
@@ -13,6 +13,7 @@ interface HeaderProps {
     email: string;
     role: string;
   };
+  onToggleMobileMenu?: () => void;
 }
 
 interface NotificationItem {
@@ -23,7 +24,7 @@ interface NotificationItem {
   createdAt: Date | string;
 }
 
-export function Header({ user }: HeaderProps) {
+export function Header({ user, onToggleMobileMenu }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
@@ -107,14 +108,21 @@ export function Header({ user }: HeaderProps) {
   const breadcrumbs = getBreadcrumbs();
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shadow-sm relative z-30 select-none">
-      {/* Left side: Breadcrumbs */}
-      <div className="flex items-center space-x-2 text-xs font-semibold text-slate-500">
-        <span className="hover:text-[#0b4a6e] cursor-pointer" onClick={() => router.push("/")}>DBU</span>
+    <header className="h-16 bg-white border-b border-slate-200 px-3 sm:px-6 flex items-center justify-between shadow-sm relative z-30 select-none max-w-full">
+      {/* Left side: Mobile Menu Toggle & Breadcrumbs */}
+      <div className="flex items-center space-x-2 text-xs font-semibold text-slate-500 overflow-hidden">
+        <button
+          onClick={onToggleMobileMenu}
+          className="lg:hidden text-slate-600 hover:text-slate-900 p-1.5 rounded-lg hover:bg-slate-100 transition-colors mr-1 shrink-0"
+          aria-label="Toggle Navigation Menu"
+        >
+          <Menu size={20} />
+        </button>
+        <span className="hover:text-[#0b4a6e] cursor-pointer shrink-0" onClick={() => router.push("/")}>DBU</span>
         {breadcrumbs.map((crumb, idx) => (
           <React.Fragment key={idx}>
-            <span className="text-slate-300">/</span>
-            <span className={idx === breadcrumbs.length - 1 ? "text-slate-800 font-bold" : ""}>
+            <span className="text-slate-300 shrink-0">/</span>
+            <span className={`truncate max-w-[100px] sm:max-w-[160px] md:max-w-none ${idx === breadcrumbs.length - 1 ? "text-slate-800 font-bold" : ""}`}>
               {crumb}
             </span>
           </React.Fragment>
@@ -122,13 +130,13 @@ export function Header({ user }: HeaderProps) {
       </div>
 
       {/* Right side: Search, Notifications, Profile */}
-      <div className="flex items-center space-x-6">
+      <div className="flex items-center space-x-2 sm:space-x-4 md:space-x-6 shrink-0">
         {/* Global Asset Search Form */}
         <form onSubmit={handleSearchSubmit} className="relative hidden md:block">
           <input
             type="text"
             placeholder="Global search assets..."
-            className="w-64 pl-9 pr-4 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-600 focus:bg-white transition-all"
+            className="w-48 lg:w-64 pl-9 pr-4 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-600 focus:bg-white transition-all"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -150,7 +158,7 @@ export function Header({ user }: HeaderProps) {
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 mt-3 w-80 bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden py-1 z-40">
+            <div className="absolute right-0 mt-3 w-[calc(100vw-2rem)] sm:w-80 max-w-xs sm:max-w-none bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden py-1 z-40">
               <div className="flex items-center justify-between px-4 py-2 border-b border-slate-100 bg-slate-50/50">
                 <span className="text-xs font-bold text-slate-700">Notifications</span>
                 {unreadCount > 0 && (

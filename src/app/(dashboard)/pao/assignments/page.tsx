@@ -70,10 +70,10 @@ export default async function PaoAssignmentsPage({ searchParams }: AssignmentsPa
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-sky-100 pb-4 bg-sky-900/5 -mx-6 -mt-6 p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-sky-100 pb-4 bg-sky-900/5 -mx-3 -mt-3 sm:-mx-6 sm:-mt-6 p-4 sm:p-6 gap-2">
         <div>
-          <h2 className="text-xl font-bold text-sky-900">Asset Assignments Registry</h2>
-          <p className="text-xs text-sky-600 font-semibold mt-1">Track allocations of university properties to staff members and departments</p>
+          <h2 className="text-lg sm:text-xl font-bold text-sky-900">Asset Assignments Registry</h2>
+          <p className="text-[11px] sm:text-xs text-sky-600 font-semibold mt-0.5">Track allocations of university properties to staff members and departments</p>
         </div>
       </div>
 
@@ -122,7 +122,7 @@ export default async function PaoAssignmentsPage({ searchParams }: AssignmentsPa
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex border-b border-slate-200">
+      <div className="flex border-b border-slate-200 overflow-x-auto pb-0.5 space-x-1 max-w-full whitespace-nowrap">
         <Link
           href={`/pao/assignments?tab=PENDING&search=${searchQuery}`}
           className={`px-4 py-2 text-xs font-bold border-b-2 transition-all ${
@@ -166,10 +166,10 @@ export default async function PaoAssignmentsPage({ searchParams }: AssignmentsPa
       </div>
 
       {/* Table Card */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+      <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
         <div className="overflow-x-auto">
           {activeTab === "RETURNS" ? (
-            <table className="w-full text-left border-collapse">
+            <table className="w-full min-w-[750px] text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-100 text-[10px] text-slate-400 font-bold uppercase">
                   <th className="py-2.5">Asset</th>
@@ -232,7 +232,7 @@ export default async function PaoAssignmentsPage({ searchParams }: AssignmentsPa
               </tbody>
             </table>
           ) : (
-            <table className="w-full text-left border-collapse">
+            <table className="w-full min-w-[750px] text-left border-collapse">
               <thead>
                 <tr className="border-b border-slate-100 text-[10px] text-slate-400 font-bold uppercase">
                   <th className="py-2.5">Asset</th>

@@ -103,7 +103,7 @@ async function main() {
 
   // 5. Seed Users
   console.log("Seeding users...");
-  await prisma.user.upsert({
+  const adminUser = await prisma.user.upsert({
     where: { email: "admin@dbu.edu.et" },
     update: {},
     create: {
@@ -111,10 +111,11 @@ async function main() {
       email: "admin@dbu.edu.et",
       passwordHash,
       roleId: roles[RoleName.SYSTEM_ADMINISTRATOR].id,
+      departmentId: deptSE.id,
     },
   });
 
-  await prisma.user.upsert({
+  const paoUser = await prisma.user.upsert({
     where: { email: "pao@dbu.edu.et" },
     update: {},
     create: {
@@ -122,6 +123,67 @@ async function main() {
       email: "pao@dbu.edu.et",
       passwordHash,
       roleId: roles[RoleName.PROPERTY_ADMINISTRATION_OFFICER].id,
+      departmentId: deptSE.id,
+    },
+  });
+
+  const headUser = await prisma.user.upsert({
+    where: { email: "head@dbu.edu.et" },
+    update: {},
+    create: {
+      name: "Abebe Kebede (Dept Head)",
+      email: "head@dbu.edu.et",
+      passwordHash,
+      roleId: roles[RoleName.DEPARTMENT_HEAD].id,
+      departmentId: deptSE.id,
+    },
+  });
+
+  const staffUser = await prisma.user.upsert({
+    where: { email: "staff@dbu.edu.et" },
+    update: {},
+    create: {
+      name: "Abreham Kebede",
+      email: "staff@dbu.edu.et",
+      passwordHash,
+      roleId: roles[RoleName.STAFF_MEMBER].id,
+      departmentId: deptSE.id,
+    },
+  });
+
+  const techUser = await prisma.user.upsert({
+    where: { email: "tech@dbu.edu.et" },
+    update: {},
+    create: {
+      name: "Tadesse Tech",
+      email: "tech@dbu.edu.et",
+      passwordHash,
+      roleId: roles[RoleName.MAINTENANCE_TECHNICIAN].id,
+      departmentId: deptSE.id,
+    },
+  });
+
+  const auditorUser = await prisma.user.upsert({
+    where: { email: "auditor@dbu.edu.et" },
+    update: {},
+    create: {
+      name: "Almaz Auditor",
+      email: "auditor@dbu.edu.et",
+      passwordHash,
+      roleId: roles[RoleName.INTERNAL_AUDITOR].id,
+      departmentId: deptSE.id,
+    },
+  });
+
+  const inventoryUser = await prisma.user.upsert({
+    where: { email: "inventory@dbu.edu.et" },
+    update: {},
+    create: {
+      name: "Isaac Inventory",
+      email: "inventory@dbu.edu.et",
+      passwordHash,
+      roleId: roles[RoleName.INVENTORY_PERSON].id,
+      departmentId: deptSE.id,
     },
   });
 
@@ -208,58 +270,69 @@ async function main() {
   const assetTypes: Record<string, any> = {};
   for (const t of typesData) {
     const cat = categories[t.categoryCode];
-    const dbType = await prisma.assetType.create({
-      data: {
-        name: t.name,
-        categoryId: cat.id,
-        isActive: true,
-        displayOrder: t.displayOrder,
-        description: `Standard ${t.name} type`
-      }
+    let dbType = await prisma.assetType.findFirst({
+      where: { name: t.name, categoryId: cat.id }
     });
+    if (!dbType) {
+      dbType = await prisma.assetType.create({
+        data: {
+          name: t.name,
+          categoryId: cat.id,
+          isActive: true,
+          displayOrder: t.displayOrder,
+          description: `Standard ${t.name} type`
+        }
+      });
+    }
     assetTypes[t.name] = dbType;
   }
 
   // 8. Seed Suppliers
   console.log("Seeding suppliers...");
-  const supplierIT = await prisma.supplier.create({
-    data: { name: "IT Technology PLC", contactPerson: "Yohannes Abera", email: "yohannes@it-tech.com", phone: "+251911223344", address: "Addis Ababa" }
+  const supplierIT = await prisma.supplier.upsert({
+    where: { name: "IT Technology PLC" },
+    update: {},
+    create: { name: "IT Technology PLC", contactPerson: "Yohannes Abera", email: "yohannes@it-tech.com", phone: "+251911223344", address: "Addis Ababa" }
   });
-  const supplierABC = await prisma.supplier.create({
-    data: { name: "ABC Computer Supplier", contactPerson: "Sintayehu Kebede", email: "info@abccomputers.com", phone: "+251911334455", address: "Addis Ababa" }
+  const supplierABC = await prisma.supplier.upsert({
+    where: { name: "ABC Computer Supplier" },
+    update: {},
+    create: { name: "ABC Computer Supplier", contactPerson: "Sintayehu Kebede", email: "info@abccomputers.com", phone: "+251911334455", address: "Addis Ababa" }
   });
-  const supplierModern = await prisma.supplier.create({
-    data: { name: "Modern Furniture PLC", contactPerson: "Lensa Tolosa", email: "contact@modernfurniture.com", phone: "+251911445566", address: "Adama" }
+  const supplierModern = await prisma.supplier.upsert({
+    where: { name: "Modern Furniture PLC" },
+    update: {},
+    create: { name: "Modern Furniture PLC", contactPerson: "Lensa Tolosa", email: "contact@modernfurniture.com", phone: "+251911445566", address: "Adama" }
   });
-  const supplierToyota = await prisma.supplier.create({
-    data: { name: "Toyota Ethiopia", contactPerson: "Bekele Megersa", email: "sales@toyota-ethiopia.com", phone: "+251911556677", address: "Addis Ababa" }
+  const supplierToyota = await prisma.supplier.upsert({
+    where: { name: "Toyota Ethiopia" },
+    update: {},
+    create: { name: "Toyota Ethiopia", contactPerson: "Bekele Megersa", email: "sales@toyota-ethiopia.com", phone: "+251911556677", address: "Addis Ababa" }
   });
-  const supplierElectronics = await prisma.supplier.create({
-    data: { name: "Electronics Supplier A", contactPerson: "Martha Gebru", email: "martha@elecsupplier.com", phone: "+251911667788", address: "Hawassa" }
+  const supplierElectronics = await prisma.supplier.upsert({
+    where: { name: "Electronics Supplier A" },
+    update: {},
+    create: { name: "Electronics Supplier A", contactPerson: "Martha Gebru", email: "martha@elecsupplier.com", phone: "+251911667788", address: "Hawassa" }
   });
 
   // Seed Supplier Assignments (Section 9)
   console.log("Seeding supplier assignments...");
-  // IT Technology PLC to ICT Equipment category
-  await prisma.supplierAssignment.create({
-    data: { supplierId: supplierIT.id, categoryId: categories["ICT"].id }
-  });
-  // ABC Computer Supplier to ICT Equipment category
-  await prisma.supplierAssignment.create({
-    data: { supplierId: supplierABC.id, categoryId: categories["ICT"].id }
-  });
-  // Modern Furniture to Furniture category
-  await prisma.supplierAssignment.create({
-    data: { supplierId: supplierModern.id, categoryId: categories["FURN"].id }
-  });
-  // Toyota Ethiopia to Vehicle category
-  await prisma.supplierAssignment.create({
-    data: { supplierId: supplierToyota.id, categoryId: categories["VEH"].id }
-  });
-  // Electronics Supplier A to Electronics category
-  await prisma.supplierAssignment.create({
-    data: { supplierId: supplierElectronics.id, categoryId: categories["ELEC"].id }
-  });
+  const assignmentsList = [
+    { supplierId: supplierIT.id, categoryId: categories["ICT"].id },
+    { supplierId: supplierABC.id, categoryId: categories["ICT"].id },
+    { supplierId: supplierModern.id, categoryId: categories["FURN"].id },
+    { supplierId: supplierToyota.id, categoryId: categories["VEH"].id },
+    { supplierId: supplierElectronics.id, categoryId: categories["ELEC"].id },
+  ];
+
+  for (const assign of assignmentsList) {
+    const existing = await prisma.supplierAssignment.findFirst({
+      where: { supplierId: assign.supplierId, categoryId: assign.categoryId }
+    });
+    if (!existing) {
+      await prisma.supplierAssignment.create({ data: assign });
+    }
+  }
 
   // 9. Seed dynamic RegistrationFields (Section 5)
   console.log("Seeding dynamic registration fields...");
@@ -473,6 +546,152 @@ async function main() {
         }
       }
     }
+  }
+
+  // 11. Seed Sample Assets & Assignments
+  console.log("Seeding sample assets, assignments, and maintenance...");
+  
+  const laptopAsset = await prisma.asset.upsert({
+    where: { assetCode: "DBU-ICT-001" },
+    update: {},
+    create: {
+      name: "Dell Latitude 5420 Laptop",
+      assetCode: "DBU-ICT-001",
+      serialNumber: "SN-DELL-5420-01",
+      description: "Core i7 11th Gen, 16GB RAM, 512GB SSD for Software Engineering lab",
+      status: "ACTIVE",
+      categoryId: categories["ICT"].id,
+      assetTypeId: assetTypes["Laptop"]?.id,
+      departmentId: deptSE.id,
+      purchaseCost: 45000,
+      procurementCost: 45000,
+      purchaseDate: new Date(),
+    }
+  });
+
+  const desktopAsset = await prisma.asset.upsert({
+    where: { assetCode: "DBU-ICT-002" },
+    update: {},
+    create: {
+      name: "HP EliteDesk 800 G6",
+      assetCode: "DBU-ICT-002",
+      serialNumber: "SN-HP-800G6-01",
+      description: "Workstation for Software Development",
+      status: "PENDING_ASSIGNMENT",
+      categoryId: categories["ICT"].id,
+      assetTypeId: assetTypes["Desktop Computer"]?.id,
+      departmentId: deptSE.id,
+      purchaseCost: 52000,
+      procurementCost: 52000,
+      purchaseDate: new Date(),
+    }
+  });
+
+  const vehicleAsset = await prisma.asset.upsert({
+    where: { assetCode: "DBU-VEH-001" },
+    update: {},
+    create: {
+      name: "Toyota Hilux Double Cab",
+      assetCode: "DBU-VEH-001",
+      serialNumber: "SN-TOYOTA-HLX-01",
+      description: "Department Field Service Vehicle",
+      status: "ASSIGNED",
+      categoryId: categories["VEH"].id,
+      assetTypeId: assetTypes["Car"]?.id,
+      departmentId: deptSE.id,
+      purchaseCost: 3500000,
+      procurementCost: 3500000,
+      purchaseDate: new Date(),
+    }
+  });
+
+  const chairAsset = await prisma.asset.upsert({
+    where: { assetCode: "DBU-FURN-001" },
+    update: {},
+    create: {
+      name: "Ergonomic High-Back Executive Chair",
+      assetCode: "DBU-FURN-001",
+      serialNumber: "SN-FURN-CHAIR-01",
+      description: "Office Chair for Department Office",
+      status: "ACTIVE",
+      categoryId: categories["FURN"].id,
+      assetTypeId: assetTypes["Chair"]?.id,
+      departmentId: deptSE.id,
+      purchaseCost: 12000,
+      procurementCost: 12000,
+      purchaseDate: new Date(),
+    }
+  });
+
+  const projectorAsset = await prisma.asset.upsert({
+    where: { assetCode: "DBU-ELEC-001" },
+    update: {},
+    create: {
+      name: "Epson EB-X41 3600-Lumen Projector",
+      assetCode: "DBU-ELEC-001",
+      serialNumber: "SN-EPSON-X41-01",
+      description: "Classroom Presentation Projector",
+      status: "UNDER_MAINTENANCE",
+      categoryId: categories["ELEC"].id,
+      assetTypeId: assetTypes["Projector"]?.id,
+      departmentId: deptSE.id,
+      purchaseCost: 38000,
+      procurementCost: 38000,
+      purchaseDate: new Date(),
+    }
+  });
+
+  // Seed Pending Assignment for staff member
+  const pendingAssign = await prisma.assignment.findFirst({
+    where: { assetId: desktopAsset.id, assignedToUserId: staffUser.id, status: "PENDING_ACCEPTANCE" }
+  });
+  if (!pendingAssign) {
+    await prisma.assignment.create({
+      data: {
+        assetId: desktopAsset.id,
+        assignedToUserId: staffUser.id,
+        assignedByUserId: paoUser.id,
+        departmentId: deptSE.id,
+        status: "PENDING_ACCEPTANCE",
+        notes: "Pending confirmation by staff member",
+      }
+    });
+  }
+
+  // Seed Accepted Assignment for department head
+  const acceptedAssign = await prisma.assignment.findFirst({
+    where: { assetId: vehicleAsset.id, assignedToUserId: headUser.id, status: "ACCEPTED" }
+  });
+  if (!acceptedAssign) {
+    await prisma.assignment.create({
+      data: {
+        assetId: vehicleAsset.id,
+        assignedToUserId: headUser.id,
+        assignedByUserId: paoUser.id,
+        departmentId: deptSE.id,
+        status: "ACCEPTED",
+        acceptedAt: new Date(),
+        acceptedById: headUser.id,
+        notes: "Official department head transport allocation",
+      }
+    });
+  }
+
+  // Seed Maintenance Record
+  const existingMaint = await prisma.maintenance.findFirst({
+    where: { assetId: projectorAsset.id }
+  });
+  if (!existingMaint) {
+    await prisma.maintenance.create({
+      data: {
+        assetId: projectorAsset.id,
+        reportedById: staffUser.id,
+        assignedToId: techUser.id,
+        description: "Projector lamp flickers and overheats after 10 minutes.",
+        status: "PENDING",
+        priority: "HIGH",
+      }
+    });
   }
 
   console.log("Seeding completed successfully!");

@@ -1,10 +1,8 @@
 import React from "react";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { Sidebar } from "@/components/sidebar";
-import { Header } from "@/components/header";
+import { DashboardShell } from "@/components/dashboard-shell";
 import { prisma } from "@/lib/db";
-import { PendingAssignmentsPanel } from "@/components/pending-assignments-panel";
 
 export default async function DashboardLayout({
   children,
@@ -66,21 +64,8 @@ export default async function DashboardLayout({
   }));
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-slate-50">
-      {/* Sidebar navigation panel */}
-      <Sidebar user={user} />
-
-      {/* Main Workspace Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Header toolbar */}
-        <Header user={user} />
-
-        {/* Scrollable page body */}
-        <main className="flex-1 overflow-y-auto p-6 focus:outline-none">
-          <PendingAssignmentsPanel pendingAssignments={pendingList} />
-          {children}
-        </main>
-      </div>
-    </div>
+    <DashboardShell user={user} pendingList={pendingList}>
+      {children}
+    </DashboardShell>
   );
 }
