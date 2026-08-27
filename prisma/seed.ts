@@ -104,11 +104,11 @@ async function main() {
   // 5. Seed Users
   console.log("Seeding users...");
   const adminUser = await prisma.user.upsert({
-    where: { email: "admin@dbu.edu.et" },
+    where: { email: "administer2345@gmail.com" },
     update: {},
     create: {
       name: "System Admin",
-      email: "admin@dbu.edu.et",
+      email: "administer2345@gmail.com",
       passwordHash,
       roleId: roles[RoleName.SYSTEM_ADMINISTRATOR].id,
       departmentId: deptSE.id,

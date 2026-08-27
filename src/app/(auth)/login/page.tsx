@@ -1,17 +1,22 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useTransition, Suspense } from "react";
 import { loginAction } from "@/app/actions/auth";
 import { DbuLogo } from "@/components/dbu-logo";
 import Image from "next/image";
-import { Eye, EyeOff, Lock, Mail, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Eye, EyeOff, Lock, Mail, Loader2, CheckCircle2 } from "lucide-react";
 
-export default function LoginPage() {
+function LoginForm() {
+  const searchParams = useSearchParams();
+  const resetSuccess = searchParams.get("reset") === "success";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const handleLogin = (e: React.FormEvent) => {
@@ -20,9 +25,8 @@ export default function LoginPage() {
 
     if (!email || !password) {
       setError("Please fill in all fields.");
-      return;
+      return; 
     }
-
     startTransition(async () => {
       const formData = new FormData();
       formData.append("email", email);
@@ -89,6 +93,13 @@ export default function LoginPage() {
             <p className="text-xs text-slate-500 mt-1.5">Sign in to continue to DBU Asset Tracking System</p>
           </div>
 
+          {resetSuccess && (
+            <div className="mb-6 p-3 bg-emerald-50 border-l-4 border-emerald-500 rounded text-xs font-semibold text-emerald-700 flex items-center space-x-2">
+              <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+              <span>Password reset successfully! Please sign in with your new password.</span>
+            </div>
+          )}
+
           {error && (
             <div className="mb-6 p-3 bg-red-50 border-l-4 border-red-500 rounded text-xs font-semibold text-red-700">
               {error}
@@ -124,9 +135,12 @@ export default function LoginPage() {
                 <label className="block text-xs font-semibold text-slate-600" htmlFor="password">
                   Password
                 </label>
-                <a href="#" className="text-xs font-medium text-sky-700 hover:underline">
+                <Link
+                  href="/forgot-password"
+                  className="text-xs font-medium text-sky-700 hover:underline"
+                >
                   Forgot password?
-                </a>
+                </Link>
               </div>
               <div className="relative">
                 <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
@@ -189,10 +203,21 @@ export default function LoginPage() {
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-slate-200" />
             </div>
-            
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 size={24} className="animate-spin text-sky-700" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

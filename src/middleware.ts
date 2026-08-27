@@ -10,14 +10,18 @@ export default auth((req) => {
   const userRole = req.auth?.user?.role;
 
   const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth");
-  const isPublicRoute = nextUrl.pathname === "/login" || nextUrl.pathname.startsWith("/assets/");
+  const isPublicRoute =
+    nextUrl.pathname === "/login" ||
+    nextUrl.pathname === "/forgot-password" ||
+    nextUrl.pathname === "/reset-password" ||
+    nextUrl.pathname.startsWith("/assets/");
 
   if (isApiAuthRoute) {
     return NextResponse.next();
   }
 
   if (isPublicRoute) {
-    if (isLoggedIn && nextUrl.pathname === "/login") {
+    if (isLoggedIn && (nextUrl.pathname === "/login" || nextUrl.pathname === "/forgot-password" || nextUrl.pathname === "/reset-password")) {
       return NextResponse.redirect(new URL(getRoleDashboardRedirect(userRole), nextUrl));
     }
     return NextResponse.next();

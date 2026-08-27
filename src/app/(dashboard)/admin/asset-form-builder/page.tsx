@@ -1,11 +1,10 @@
 import React from "react";
-import { prisma } from "@/lib/db";
+import { prisma } from "@/lib/db";//importing the prisma database
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { AssetFormBuilderClient } from "@/components/asset-form-builder-client";
 
-export const revalidate = 0;
-
+export const revalidate = 0;//helps ensure the page gets fresh data.
 export default async function AssetFormBuilderPage() {
   const session = await auth();
   if (!session?.user?.id || session.user.role !== "SYSTEM_ADMINISTRATOR") {
