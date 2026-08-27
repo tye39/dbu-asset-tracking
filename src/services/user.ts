@@ -84,46 +84,25 @@ export async function updateUser(id: string, data: {
 }
 
 export async function deleteUser(id: string, actorId: string) {
-  // Check business rule: Users with historical transactions cannot be deleted
   const user = await prisma.user.findUnique({
     where: { id },
-    include: {
-      assignmentsCreated: { take: 1 },
-      assignmentsTo: { take: 1 },
-      transfersRequested: { take: 1 },
-      transfersApproved: { take: 1 },
-      returnsMade: { take: 1 },
-      returnsReceived: { take: 1 },
-      maintenanceFiled: { take: 1 },
-      maintenanceDone: { take: 1 },
-      disposals: { take: 1 },
-    },
   });
 
   if (!user) throw new Error("User not found");
 
-  const hasHistory =
-    user.assignmentsCreated.length > 0 ||
-    user.assignmentsTo.length > 0 ||
-    user.transfersRequested.length > 0 ||
-    user.transfersApproved.length > 0 ||
-    user.returnsMade.length > 0 ||
-    user.returnsReceived.length > 0 ||
-    user.maintenanceFiled.length > 0 ||
-    user.maintenanceDone.length > 0 ||
-    user.disposals.length > 0;
-
-  if (hasHistory) {
-    throw new Error("Cannot delete user: user has historical transactions in the system.");
-  }
-
-  // Soft delete user
+  // Soft delete user by setting deletedAt timestamp (preserves historical transaction references)
   const deletedUser = await prisma.user.update({
     where: { id },
     data: { deletedAt: new Date() },
   });
 
-  await createAuditLog(actorId, "DELETE", "User", id, { name: user.name, email: user.email }, { deleted: true });
+  // Deactivate InventoryPerson profile if one exists
+  await prisma.inventoryPerson.updateMany({
+    where: { userId: id },
+    data: { isActive: false },
+  });
+
+  await createAuditLog(actorId, "DELETE", "User", id, { name: user.name, email: user.email }, { deletedAt: new Date() });
   return deletedUser;
 }
 
