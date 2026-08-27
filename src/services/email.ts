@@ -30,11 +30,13 @@ export async function sendPasswordResetEmail(
 
       <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 40px 20px;">
         <div style="max-width: 560px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; padding: 40px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0;">
-
-          <div style="text-align: center; margin-bottom: 30px;">
-            <div style="background-color: #0b4a6e; display: inline-block; width: 56px; height: 56px; border-radius: 12px; line-height: 56px; color: #ffffff; font-weight: bold; font-size: 20px;">
-              DBU
-            </div>
+<img
+  src="https://dbu-asset-tracking.vercel.app/dbu-logo.png"
+  alt="Debre Berhan University"
+  width="64"
+  height="64"
+  style="display:block;margin:0 auto;"
+/>
 
             <h1 style="color: #0f172a; font-size: 20px; font-weight: 800; margin-top: 16px; margin-bottom: 4px;">
               Debre Berhan University
