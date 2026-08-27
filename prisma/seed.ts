@@ -104,11 +104,14 @@ async function main() {
   // 5. Seed Users
   console.log("Seeding users...");
   const adminUser = await prisma.user.upsert({
-    where: { email: "administer2345@gmail.com" },
-    update: {},
+    where: { email: "admin@dbu.edu.et" },
+    update: {
+      roleId: roles[RoleName.SYSTEM_ADMINISTRATOR].id,
+      deletedAt: null,
+    },
     create: {
       name: "System Admin",
-      email: "administer2345@gmail.com",
+      email: "admin@dbu.edu.et",
       passwordHash,
       roleId: roles[RoleName.SYSTEM_ADMINISTRATOR].id,
       departmentId: deptSE.id,
@@ -117,7 +120,10 @@ async function main() {
 
   const paoUser = await prisma.user.upsert({
     where: { email: "pao@dbu.edu.et" },
-    update: {},
+    update: {
+      roleId: roles[RoleName.PROPERTY_ADMINISTRATION_OFFICER].id,
+      deletedAt: null,
+    },
     create: {
       name: "Property Admin Officer",
       email: "pao@dbu.edu.et",

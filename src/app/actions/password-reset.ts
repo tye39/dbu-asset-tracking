@@ -21,9 +21,6 @@ export async function requestPasswordResetAction(prevState: unknown, formData: F
   }
 
   try {
-    // Security Best Practice: Never reveal whether an email exists in the system
-    const genericSuccessMessage = "If an account with that email exists, we have sent a password reset link.";
-
     const user = await prisma.user.findFirst({
       where: {
         email: { equals: email, mode: "insensitive" },
@@ -31,57 +28,60 @@ export async function requestPasswordResetAction(prevState: unknown, formData: F
       },
     });
 
-    if (user) {
-      // 1. Generate cryptographically secure random token (raw token sent in email, NEVER stored in DB)
-      const rawToken = crypto.randomBytes(32).toString("hex");
-
-      // 2. Hash token using SHA-256 for secure database storage
-      const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
-
-      // 3. Expiration time (1 hour from now)
-      const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
-
-      // 4. Invalidate old active reset tokens for this user
-      await prisma.passwordResetToken.updateMany({
-        where: {
-          userId: user.id,
-          usedAt: null,
-          expiresAt: { gt: new Date() },
-        },
-        data: {
-          usedAt: new Date(),
-        },
-      });
-
-      // 5. Store hashed token in database
-      await prisma.passwordResetToken.create({
-        data: {
-          tokenHash,
-          userId: user.id,
-          expiresAt,
-        },
-      });
-
-      // 6. Build reset URL
-      const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
-      const resetUrl = `${baseUrl.replace(/\/$/, "")}/reset-password?token=${rawToken}`;
-
-     await sendPasswordResetEmail("administer2345@gmail.com", resetUrl);
-
-      // 8. Create audit log
-      await createAuditLog(
-        user.id,
-        "PASSWORD_RESET_REQUESTED",
-        "User",
-        user.id,
-        null,
-        { email: user.email }
-      );
+    if (!user) {
+      return { error: "This email address is not registered in the system." };
     }
+
+    // 1. Generate cryptographically secure random token (raw token sent in email, NEVER stored in DB)
+    const rawToken = crypto.randomBytes(32).toString("hex");
+
+    // 2. Hash token using SHA-256 for secure database storage
+    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+
+    // 3. Expiration time (1 hour from now)
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+    // 4. Invalidate old active reset tokens for this user
+    await prisma.passwordResetToken.updateMany({
+      where: {
+        userId: user.id,
+        usedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+      data: {
+        usedAt: new Date(),
+      },
+    });
+
+    // 5. Store hashed token in database
+    await prisma.passwordResetToken.create({
+      data: {
+        tokenHash,
+        userId: user.id,
+        expiresAt,
+      },
+    });
+
+    // 6. Build reset URL
+    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const resetUrl = `${baseUrl.replace(/\/$/, "")}/reset-password?token=${rawToken}`;
+
+    // 7. Send email via email service
+    await sendPasswordResetEmail(user.email, resetUrl);
+
+    // 8. Create audit log
+    await createAuditLog(
+      user.id,
+      "PASSWORD_RESET_REQUESTED",
+      "User",
+      user.id,
+      null,
+      { email: user.email }
+    );
 
     return {
       success: true,
-      message: genericSuccessMessage,
+      message: "We have sent a password reset link to your email address.",
     };
   } catch (err: unknown) {
     console.error("requestPasswordResetAction error:", err);
