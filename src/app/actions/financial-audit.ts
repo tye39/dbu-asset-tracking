@@ -40,7 +40,8 @@ export async function getFinancialAuditDashboard(): Promise<FinancialStats> {
       totalProcurementCost += cost;
     }
 
-    if (cost > 0 && a.purchaseDate) {
+    const isValidDate = a.purchaseDate instanceof Date && !isNaN(a.purchaseDate.getTime());
+    if (cost > 0 && a.purchaseDate && isValidDate) {
       const depr = calculateDepreciation(cost, a.purchaseDate, a.expectedLifecycleYears || 5, a.salvageValue ? Number(a.salvageValue) : 0);
       totalDepreciation += depr.totalDepreciation;
       currentBookValue += depr.currentValue;
@@ -60,7 +61,8 @@ export async function getFinancialAuditDashboard(): Promise<FinancialStats> {
     const cost = d.asset?.procurementCost ? Number(d.asset.procurementCost) : 0;
     const salvage = d.asset?.salvageValue ? Number(d.asset.salvageValue) : 0;
     const purchaseDate = d.asset?.purchaseDate;
-    if (cost > 0 && purchaseDate) {
+    const isValidDate = purchaseDate instanceof Date && !isNaN(purchaseDate.getTime());
+    if (cost > 0 && purchaseDate && isValidDate) {
       const depr = calculateDepreciation(cost, purchaseDate, d.asset.expectedLifecycleYears || 5, salvage);
       totalDisposalValue += depr.currentValue; // Book value at write-off
     }
@@ -172,7 +174,8 @@ export async function getFinancialDiscrepancies(): Promise<DiscrepancyReport> {
     }
 
     // 6. Missing Depreciation params
-    if (!a.purchaseDate || !a.expectedLifecycleYears) {
+    const isValidDate = a.purchaseDate instanceof Date && !isNaN(a.purchaseDate.getTime());
+    if (!a.purchaseDate || !isValidDate || !a.expectedLifecycleYears) {
       report.missingDeprData.push(a);
       hasIssue = true;
     }
@@ -221,7 +224,7 @@ export async function getMaintenanceCostAudit(): Promise<MaintenanceAuditItem[]>
       id: a.id,
       name: a.name,
       assetCode: a.assetCode,
-      departmentName: a.department.name,
+      departmentName: a.department?.name || "Unassigned",
       procurementCost: cost,
       maintenanceCost: maintCost,
       costRatioPct: Math.round(pct),

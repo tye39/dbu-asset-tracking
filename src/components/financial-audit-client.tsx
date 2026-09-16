@@ -539,7 +539,11 @@ export function FinancialAuditClient({
                         {isDuplicate && <span className="block text-[8px] text-amber-500 font-black uppercase">Duplicate Invoice</span>}
                       </td>
                       <td className="py-3 px-3">{p.supplierName}</td>
-                      <td className="py-3 px-3">{p.purchaseDate ? new Date(p.purchaseDate).toLocaleDateString() : "-"}</td>
+                      <td className="py-3 px-3">
+                        {p.purchaseDate && !isNaN(new Date(p.purchaseDate).getTime())
+                          ? new Date(p.purchaseDate).toLocaleDateString()
+                          : "-"}
+                      </td>
                       <td className="py-3 px-3 font-bold">{formatCurrency(p.procurementCost)}</td>
                       <td className="py-3 px-3 text-right">
                         {p.approved ? (
@@ -798,8 +802,12 @@ export function FinancialAuditClient({
                   ) : (
                     history.map((h) => (
                       <tr key={h.id} className="hover:bg-slate-50/50">
-                        <td className="py-3 px-3">{new Date(h.auditDate).toLocaleDateString()}</td>
-                        <td className="py-3 px-3 font-bold text-slate-800">{h.auditor.name}</td>
+                        <td className="py-3 px-3">
+                          {h.auditDate && !isNaN(new Date(h.auditDate).getTime())
+                            ? new Date(h.auditDate).toLocaleDateString()
+                            : "-"}
+                        </td>
+                        <td className="py-3 px-3 font-bold text-slate-800">{h.auditor?.name || "Internal Auditor"}</td>
                         <td className="py-3 px-3 uppercase text-[10px] font-bold text-slate-500">
                           {h.fiscalYear} {h.department ? `(${h.department.name})` : "(University)"}
                         </td>

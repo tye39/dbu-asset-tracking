@@ -216,7 +216,10 @@ export function AuditManagementClient({ sessions }: AuditManagementClientProps) 
                 </span>
                 <h3 className="text-sm font-bold text-slate-800 uppercase mt-2">{activeSession.title}</h3>
                 <p className="text-[10px] text-slate-400 mt-1">
-                  Audited by {activeSession.auditor.name} | Started: {new Date(activeSession.startDate).toLocaleDateString()}
+                  Audited by {activeSession.auditor?.name || "Internal Auditor"} | Started:{" "}
+                  {activeSession.startDate && !isNaN(new Date(activeSession.startDate).getTime())
+                    ? new Date(activeSession.startDate).toLocaleDateString()
+                    : "-"}
                 </p>
               </div>
 

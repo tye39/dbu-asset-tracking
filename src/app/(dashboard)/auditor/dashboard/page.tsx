@@ -15,6 +15,37 @@ import Link from "next/link";
 
 export const revalidate = 0;
 
+function toSafeISOString(date: Date | string | null | undefined): string {
+  if (!date) return "";
+  try {
+    const d = date instanceof Date ? date : new Date(date);
+    return isNaN(d.getTime()) ? "" : d.toISOString();
+  } catch {
+    return "";
+  }
+}
+
+function toSafeDate(date: Date | string | null | undefined): Date | null {
+  if (!date) return null;
+  try {
+    const d = date instanceof Date ? date : new Date(date);
+    return isNaN(d.getTime()) ? null : d;
+  } catch {
+    return null;
+  }
+}
+
+function formatDateTime(date: Date | string | null | undefined): string {
+  if (!date) return "-";
+  try {
+    const d = date instanceof Date ? date : new Date(date);
+    if (isNaN(d.getTime())) return "-";
+    return `${d.toLocaleDateString()} at ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+  } catch {
+    return "-";
+  }
+}
+
 interface AuditorDashboardProps {
   searchParams: {
     search?: string;
@@ -123,18 +154,18 @@ export default async function AuditorDashboardPage({ searchParams }: AuditorDash
     status: session.status,
     startDate: session.startDate,
     endDate: session.endDate,
-    auditor: { name: session.auditor.name },
-    items: session.items.map((item) => ({
+    auditor: { name: session.auditor?.name || "Internal Auditor" },
+    items: (session.items || []).map((item) => ({
       id: item.id,
       status: item.status,
       physicalCondition: item.physicalCondition,
       scannedAt: item.scannedAt,
       notes: item.notes,
       asset: {
-        name: item.asset.name,
-        assetCode: item.asset.assetCode,
-        serialNumber: item.asset.serialNumber,
-        status: item.asset.status,
+        name: item.asset?.name || "Unnamed Asset",
+        assetCode: item.asset?.assetCode || "N/A",
+        serialNumber: item.asset?.serialNumber || "N/A",
+        status: item.asset?.status || "ACTIVE",
       }
     }))
   }));
@@ -155,7 +186,7 @@ export default async function AuditorDashboardPage({ searchParams }: AuditorDash
     id: a.id,
     assetCode: a.assetCode,
     name: a.name,
-    purchaseDate: a.purchaseDate ? a.purchaseDate.toISOString() : "",
+    purchaseDate: toSafeISOString(a.purchaseDate),
     procurementCost: a.procurementCost ? Number(a.procurementCost) : 0,
     invoiceNumber: a.invoiceNumber || "",
     supplierName: a.supplier?.name || "Direct / Internal",
@@ -166,8 +197,8 @@ export default async function AuditorDashboardPage({ searchParams }: AuditorDash
   const depreciations = rawAssets.map((a) => {
     const cost = a.procurementCost ? Number(a.procurementCost) : 0;
     const salvage = a.salvageValue ? Number(a.salvageValue) : 0;
-    const lifecycle = a.expectedLifecycleYears || 5;
-    const deprVal = calculateDepreciation(cost, a.purchaseDate, lifecycle, salvage);
+    const lifecycle = (a.expectedLifecycleYears && a.expectedLifecycleYears > 0) ? a.expectedLifecycleYears : 5;
+    const deprVal = calculateDepreciation(cost, toSafeDate(a.purchaseDate), lifecycle, salvage);
     const annual = (cost - salvage) / lifecycle;
     return {
       assetCode: a.assetCode,
@@ -184,14 +215,14 @@ export default async function AuditorDashboardPage({ searchParams }: AuditorDash
   // Map Audit History log
   const history = rawHistory.map((h) => ({
     id: h.id,
-    auditDate: h.auditDate.toISOString(),
+    auditDate: toSafeISOString(h.auditDate),
     fiscalYear: h.fiscalYear,
     findings: h.findings,
     recommendations: h.recommendations,
     financialStatus: h.financialStatus,
-    totalAssetValue: Number(h.totalAssetValue),
-    budgetAudited: Number(h.budgetAudited),
-    auditor: { name: h.auditor.name },
+    totalAssetValue: Number(h.totalAssetValue) || 0,
+    budgetAudited: Number(h.budgetAudited) || 0,
+    auditor: { name: h.auditor?.name || "Internal Auditor" },
     department: h.department ? { name: h.department.name } : null
   }));
 
@@ -353,13 +384,13 @@ export default async function AuditorDashboardPage({ searchParams }: AuditorDash
                       <tr key={log.id} className="hover:bg-slate-50/50 transition-colors">
                         <td className="py-3">
                           <span className="font-semibold text-slate-800">{log.user?.name || "System"}</span>
-                          <span className="block text-[10px] text-slate-400 font-bold uppercase">{log.user?.role?.name.replace(/_/g, " ") || "SYSTEM"}</span>
+                          <span className="block text-[10px] text-slate-400 font-bold uppercase">{log.user?.role?.name ? log.user.role.name.replace(/_/g, " ") : "SYSTEM"}</span>
                         </td>
                         <td className="py-3">
                           <span className={`px-2 py-0.5 rounded text-[9px] font-bold border ${
-                            log.action.includes("CREATE") ? "bg-green-50 text-green-700 border-green-100" :
-                            log.action.includes("DELETE") ? "bg-red-50 text-red-700 border-red-100" :
-                            log.action.includes("TRANSFER") ? "bg-yellow-50 text-yellow-700 border-yellow-100" : "bg-sky-50 text-sky-700 border-sky-100"
+                            (log.action || "").includes("CREATE") ? "bg-green-50 text-green-700 border-green-100" :
+                            (log.action || "").includes("DELETE") ? "bg-red-50 text-red-700 border-red-100" :
+                            (log.action || "").includes("TRANSFER") ? "bg-yellow-50 text-yellow-700 border-yellow-100" : "bg-sky-50 text-sky-700 border-sky-100"
                           }`}>
                             {log.action}
                           </span>
@@ -380,8 +411,7 @@ export default async function AuditorDashboardPage({ searchParams }: AuditorDash
                           </div>
                         </td>
                         <td className="py-3 text-slate-400">
-                          {new Date(log.createdAt).toLocaleDateString()} at{" "}
-                          {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {formatDateTime(log.createdAt)}
                         </td>
                         <td className="py-3 text-right">
                           <span className="text-[10px] text-slate-500 font-mono" title={log.newState ? JSON.stringify(log.newState) : ""}>

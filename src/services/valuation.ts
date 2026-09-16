@@ -19,9 +19,11 @@ export function calculateDepreciation(
 ): ValuationResult {
   const cost = procurementCost || 0;
   const salvage = salvageValueInput || 0;
-  const lifecycleYears = expectedLifecycleYears || 5;
+  const lifecycleYears = (expectedLifecycleYears && expectedLifecycleYears > 0) ? expectedLifecycleYears : 5;
 
-  if (cost === 0 || !purchaseDate) {
+  const isValidDate = purchaseDate instanceof Date && !isNaN(purchaseDate.getTime());
+
+  if (cost === 0 || !purchaseDate || !isValidDate) {
     return {
       originalCost: cost,
       currentValue: cost,
@@ -84,14 +86,15 @@ export async function calculateReplacementScore(assetId: string): Promise<Replac
   let conditionScore = 0;
 
   // 1. Age Factor (Max 30 points)
-  if (purchaseDate) {
+  const isValidPurchaseDate = purchaseDate instanceof Date && !isNaN(purchaseDate.getTime());
+  if (isValidPurchaseDate) {
     const yearsAge = (new Date().getTime() - purchaseDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
-    const ageRatio = Math.min(1.5, yearsAge / lifecycleYears);
+    const ageRatio = lifecycleYears > 0 ? Math.min(1.5, yearsAge / lifecycleYears) : 0;
     ageScore = ageRatio * 30; // Max 45, capped later at total
   }
 
   // 2. Depreciation / Value Factor (Max 20 points)
-  if (cost > 0 && purchaseDate) {
+  if (cost > 0 && isValidPurchaseDate) {
     const metrics = calculateDepreciation(cost, purchaseDate, lifecycleYears, asset.salvageValue ? Number(asset.salvageValue) : 0);
     deprScore = (metrics.totalDepreciation / cost) * 20;
   }
