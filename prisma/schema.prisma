@@ -1,12 +1,529 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model Role {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        RoleName @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  users       User[]
+}
+
+model Faculty {
+  id          String               @id @default(uuid()) @db.Uuid
+  name        String               @unique
+  code        String               @unique
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  deletedAt   DateTime?
+  departments OrganizationalUnit[]
+}
+
+model OrganizationalUnit {
+  id                String               @id @default(uuid()) @db.Uuid
+  name              String               @unique
+  code              String               @unique
+  type              String               @default("DEPARTMENT")
+  parentId          String?              @db.Uuid
+  headOfUnit        String?
+  officeLocation    String?
+  contactInfo       String?
+  description       String?
+  status            String               @default("ACTIVE")
+  facultyId         String?              @db.Uuid
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  deletedAt         DateTime?
+  assets            Asset[]
+  assignments       Assignment[]
+  financialAudits   FinancialAudit[]
+  inventorySessions InventorySession[]
+  faculty           Faculty?             @relation(fields: [facultyId], references: [id])
+  parent            OrganizationalUnit?  @relation("ParentChild", fields: [parentId], references: [id])
+  children          OrganizationalUnit[] @relation("ParentChild")
+  transfersFrom     Transfer[]           @relation("FromDepartment")
+  transfersTo       Transfer[]           @relation("ToDepartment")
+  users             User[]
+}
+
+model User {
+  id                         String                  @id @default(uuid()) @db.Uuid
+  name                       String
+  email                      String                  @unique
+  passwordHash               String
+  username                   String?                 @unique
+  phoneNumber                String?
+  employeeId                 String?                 @unique
+  roleId                     String                  @db.Uuid
+  departmentId               String?                 @db.Uuid
+  createdAt                  DateTime                @default(now())
+  updatedAt                  DateTime                @updatedAt
+  deletedAt                  DateTime?
+  assignmentsAccepted        Assignment[]            @relation("AcceptedBy")
+  assignmentsCreated         Assignment[]            @relation("AssignedBy")
+  assignmentsTo              Assignment[]            @relation("AssignedTo")
+  assignmentsRejected        Assignment[]            @relation("RejectedBy")
+  auditLogs                  AuditLog[]
+  auditSessions              AuditSession[]
+  disposals                  Disposal[]
+  financialAudits            FinancialAudit[]
+  registeredInventoryPersons InventoryPerson[]       @relation("RegisteredPersons")
+  inventoryPersonProfile     InventoryPerson?        @relation("InventoryPersonProfile")
+  inventoryAssignedBy        InventorySession[]      @relation("AssignedBy")
+  inventoryCompleted         InventorySession[]      @relation("CompletedBy")
+  verificationsDone          InventoryVerification[]
+  maintenanceDone            Maintenance[]           @relation("AssignedTo")
+  maintenanceFiled           Maintenance[]           @relation("ReportedBy")
+  notifications              Notification[]
+  passwordResetTokens        PasswordResetToken[]
+  returnsReceived            Return[]                @relation("ReceivedBy")
+  returnsMade                Return[]                @relation("ReturnedBy")
+  transfersApproved          Transfer[]              @relation("ApprovedBy")
+  transfersFromUser          Transfer[]              @relation("FromUser")
+  transfersRequested         Transfer[]              @relation("RequestedBy")
+  transfersToUser            Transfer[]              @relation("ToUser")
+  department                 OrganizationalUnit?     @relation(fields: [departmentId], references: [id])
+  role                       Role                    @relation(fields: [roleId], references: [id])
+}
+
+model AssetCategory {
+  id                  String               @id @default(uuid()) @db.Uuid
+  name                String               @unique
+  code                String               @unique
+  description         String?
+  icon                String?
+  isActive            Boolean              @default(true)
+  displayOrder        Int                  @default(0)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  deletedAt           DateTime?
+  assets              Asset[]
+  assetTypes          AssetType[]
+  supplierAssignments SupplierAssignment[]
+}
+
+model AssetType {
+  id                  String               @id @default(uuid()) @db.Uuid
+  name                String
+  description         String?
+  icon                String?
+  isActive            Boolean              @default(true)
+  displayOrder        Int                  @default(0)
+  categoryId          String               @db.Uuid
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  assets              Asset[]
+  category            AssetCategory        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  formFields          AssetTypeField[]
+  supplierAssignments SupplierAssignment[]
+}
+
+model Asset {
+  id                      String                  @id @default(uuid()) @db.Uuid
+  name                    String
+  assetCode               String                  @unique
+  serialNumber            String                  @unique
+  description             String?
+  status                  AssetStatus             @default(ACTIVE)
+  categoryId              String                  @db.Uuid
+  assetTypeId             String?                 @db.Uuid
+  departmentId            String                  @db.Uuid
+  purchaseDate            DateTime?
+  purchaseCost            Decimal?                @db.Decimal(10, 2)
+  procurementCost         Decimal?                @db.Decimal(10, 2)
+  expectedLifecycleYears  Int?                    @default(5)
+  usefulLife              Int?
+  salvageValue            Decimal?                @db.Decimal(10, 2)
+  annualDepreciation      Decimal?                @db.Decimal(10, 2)
+  monthlyDepreciation     Decimal?                @db.Decimal(10, 2)
+  accumulatedDepreciation Decimal?                @db.Decimal(10, 2)
+  currentBookValue        Decimal?                @db.Decimal(10, 2)
+  totalMaintenanceCost    Decimal?                @db.Decimal(10, 2)
+  totalAssetInvestment    Decimal?                @db.Decimal(10, 2)
+  fundingSource           FundingSource?
+  currency                String                  @default("ETB")
+  warrantyStartDate       DateTime?
+  warrantyEndDate         DateTime?
+  warrantyExpiry          DateTime?
+  invoiceNumber           String?
+  purchaseApproved        Boolean                 @default(true)
+  supplierId              String?                 @db.Uuid
+  insuranceProvider       String?
+  insurancePolicyNumber   String?
+  insuranceCoverage       Decimal?                @db.Decimal(10, 2)
+  insurancePremium        Decimal?                @db.Decimal(10, 2)
+  insuranceExpiry         DateTime?
+  building                String?
+  roomNumber              String?
+  campus                  String?
+  quantity                Int                     @default(1)
+  condition               String?
+  attachmentUrl           String?
+  remarks                 String?
+  createdAt               DateTime                @default(now())
+  updatedAt               DateTime                @updatedAt
+  deletedAt               DateTime?
+  assetType               AssetType?              @relation(fields: [assetTypeId], references: [id])
+  category                AssetCategory           @relation(fields: [categoryId], references: [id])
+  department              OrganizationalUnit      @relation(fields: [departmentId], references: [id])
+  supplier                Supplier?               @relation(fields: [supplierId], references: [id])
+  fieldValues             AssetFieldValue[]
+  images                  AssetImage[]
+  assignments             Assignment[]
+  auditLogs               AuditLog[]
+  auditSessionItems       AuditSessionItem[]
+  disposals               Disposal[]
+  inventoryVerifications  InventoryVerification[]
+  maintenances            Maintenance[]
+  qrCode                  QRCode?
+  returns                 Return[]
+  transfers               Transfer[]
+
+  @@index([purchaseDate])
+}
+
+model AssetImage {
+  id        String   @id @default(uuid()) @db.Uuid
+  assetId   String   @db.Uuid
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  asset     Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+}
+
+model QRCode {
+  id            String   @id @default(uuid()) @db.Uuid
+  assetId       String   @unique @db.Uuid
+  qrCodeString  String
+  barcodeString String
+  labelUrl      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  asset         Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+}
+
+model Assignment {
+  id               String              @id @default(uuid()) @db.Uuid
+  assetId          String              @db.Uuid
+  assignedToUserId String?             @map("assignedToId") @db.Uuid
+  departmentId     String?             @db.Uuid
+  assignedByUserId String              @map("assignedById") @db.Uuid
+  status           AssignmentStatus    @default(PENDING_ACCEPTANCE)
+  notes            String?
+  assignedAt       DateTime            @default(now())
+  returnedAt       DateTime?
+  acceptedAt       DateTime?
+  acceptedById     String?             @db.Uuid
+  rejectedAt       DateTime?
+  rejectedById     String?             @db.Uuid
+  rejectionReason  String?             @map("rejectReason")
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  acceptedBy       User?               @relation("AcceptedBy", fields: [acceptedById], references: [id])
+  asset            Asset               @relation(fields: [assetId], references: [id])
+  assignedBy       User                @relation("AssignedBy", fields: [assignedByUserId], references: [id])
+  assignedTo       User?               @relation("AssignedTo", fields: [assignedToUserId], references: [id])
+  department       OrganizationalUnit? @relation(fields: [departmentId], references: [id])
+  rejectedBy       User?               @relation("RejectedBy", fields: [rejectedById], references: [id])
+  returns          Return[]
+}
+
+model Transfer {
+  id               String              @id @default(uuid()) @db.Uuid
+  assetId          String              @db.Uuid
+  fromDepartmentId String?             @db.Uuid
+  toDepartmentId   String?             @db.Uuid
+  fromUserId       String?             @db.Uuid
+  toUserId         String?             @db.Uuid
+  requestedById    String              @db.Uuid
+  approvedById     String?             @db.Uuid
+  status           TransferStatus      @default(PENDING)
+  notes            String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  approvedBy       User?               @relation("ApprovedBy", fields: [approvedById], references: [id])
+  asset            Asset               @relation(fields: [assetId], references: [id])
+  fromDepartment   OrganizationalUnit? @relation("FromDepartment", fields: [fromDepartmentId], references: [id])
+  fromUser         User?               @relation("FromUser", fields: [fromUserId], references: [id])
+  requestedBy      User                @relation("RequestedBy", fields: [requestedById], references: [id])
+  toDepartment     OrganizationalUnit? @relation("ToDepartment", fields: [toDepartmentId], references: [id])
+  toUser           User?               @relation("ToUser", fields: [toUserId], references: [id])
+}
+
+model Return {
+  id                String          @id @default(uuid()) @db.Uuid
+  assetId           String          @db.Uuid
+  assignmentId      String          @db.Uuid
+  returnedById      String          @db.Uuid
+  receivedById      String          @db.Uuid
+  conditionAtReturn ReturnCondition @default(GOOD)
+  isDamaged         Boolean         @default(false)
+  notes             String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  asset             Asset           @relation(fields: [assetId], references: [id])
+  assignment        Assignment      @relation(fields: [assignmentId], references: [id])
+  receivedBy        User            @relation("ReceivedBy", fields: [receivedById], references: [id])
+  returnedBy        User            @relation("ReturnedBy", fields: [returnedById], references: [id])
+}
+
+model Maintenance {
+  id              String              @id @default(uuid()) @db.Uuid
+  assetId         String              @db.Uuid
+  reportedById    String              @db.Uuid
+  assignedToId    String?             @db.Uuid
+  description     String
+  status          MaintenanceStatus   @default(PENDING)
+  priority        MaintenancePriority @default(MEDIUM)
+  cost            Decimal?            @db.Decimal(10, 2)
+  maintenanceCost Decimal?            @db.Decimal(10, 2)
+  notes           String?
+  completedAt     DateTime?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  asset           Asset               @relation(fields: [assetId], references: [id])
+  assignedTo      User?               @relation("AssignedTo", fields: [assignedToId], references: [id])
+  reportedBy      User                @relation("ReportedBy", fields: [reportedById], references: [id])
+}
+
+model Disposal {
+  id           String   @id @default(uuid()) @db.Uuid
+  assetId      String   @db.Uuid
+  disposedById String   @db.Uuid
+  reason       String
+  method       String
+  disposalDate DateTime @default(now())
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  asset        Asset    @relation(fields: [assetId], references: [id])
+  disposedBy   User     @relation(fields: [disposedById], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String?  @db.Uuid
+  assetId       String?  @db.Uuid
+  action        String
+  entityType    String
+  entityId      String
+  previousState Json?
+  newState      Json?
+  ipAddress     String?
+  userAgent     String?
+  createdAt     DateTime @default(now())
+  asset         Asset?   @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  user          User?    @relation(fields: [userId], references: [id])
+}
+
+model Supplier {
+  id            String               @id @default(uuid()) @db.Uuid
+  name          String               @unique
+  contactPerson String?
+  email         String?
+  phone         String?
+  address       String?
+  isActive      Boolean              @default(true)
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  assets        Asset[]
+  assignments   SupplierAssignment[]
+}
+
+model AuditSession {
+  id        String             @id @default(uuid()) @db.Uuid
+  title     String
+  status    AuditSessionStatus @default(PENDING)
+  auditorId String             @db.Uuid
+  startDate DateTime           @default(now())
+  endDate   DateTime?
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  auditor   User               @relation(fields: [auditorId], references: [id])
+  items     AuditSessionItem[]
+}
+
+model AuditSessionItem {
+  id                String          @id @default(uuid()) @db.Uuid
+  auditSessionId    String          @db.Uuid
+  assetId           String          @db.Uuid
+  status            AuditItemStatus @default(PENDING)
+  physicalCondition ReturnCondition @default(GOOD)
+  scannedAt         DateTime?
+  notes             String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  asset             Asset           @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  auditSession      AuditSession    @relation(fields: [auditSessionId], references: [id], onDelete: Cascade)
+}
+
+model FinancialAudit {
+  id              String              @id @default(uuid()) @db.Uuid
+  auditDate       DateTime            @default(now())
+  auditorId       String              @db.Uuid
+  departmentId    String?             @db.Uuid
+  fiscalYear      String
+  totalAssetValue Decimal             @db.Decimal(15, 2)
+  budgetAudited   Decimal             @db.Decimal(15, 2)
+  financialStatus String
+  findings        String
+  recommendations String
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  auditor         User                @relation(fields: [auditorId], references: [id])
+  department      OrganizationalUnit? @relation(fields: [departmentId], references: [id])
+}
+
+model RegistrationField {
+  id           String            @id @default(uuid()) @db.Uuid
+  name         String            @unique
+  label        String
+  fieldType    String
+  placeholder  String?
+  description  String?
+  isActive     Boolean           @default(true)
+  defaultValue String?
+  options      String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  values       AssetFieldValue[]
+  assetTypes   AssetTypeField[]
+}
+
+model AssetTypeField {
+  id                  String            @id @default(uuid()) @db.Uuid
+  assetTypeId         String            @db.Uuid
+  fieldId             String            @db.Uuid
+  isEnabled           Boolean           @default(true)
+  isRequired          Boolean           @default(false)
+  displayOrder        Int               @default(0)
+  defaultValue        String?
+  options             String?
+  labelOverride       String?
+  placeholderOverride String?
+  descriptionOverride String?
+  validationMin       Float?
+  validationMax       Float?
+  validationMinLength Int?
+  validationMaxLength Int?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  assetType           AssetType         @relation(fields: [assetTypeId], references: [id], onDelete: Cascade)
+  field               RegistrationField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@unique([assetTypeId, fieldId])
+}
+
+model AssetFieldValue {
+  id        String            @id @default(uuid()) @db.Uuid
+  assetId   String            @db.Uuid
+  fieldId   String            @db.Uuid
+  value     String
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  asset     Asset             @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  field     RegistrationField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@unique([assetId, fieldId])
+}
+
+model SupplierAssignment {
+  id          String         @id @default(uuid()) @db.Uuid
+  supplierId  String         @db.Uuid
+  categoryId  String?        @db.Uuid
+  assetTypeId String?        @db.Uuid
+  isActive    Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  assetType   AssetType?     @relation(fields: [assetTypeId], references: [id], onDelete: Cascade)
+  category    AssetCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  supplier    Supplier       @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+
+  @@unique([supplierId, categoryId, assetTypeId])
+}
+
+model InventoryPerson {
+  id             String             @id @default(uuid()) @db.Uuid
+  userId         String             @unique @db.Uuid
+  isActive       Boolean            @default(true)
+  registeredById String             @db.Uuid
+  registeredAt   DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  registeredBy   User               @relation("RegisteredPersons", fields: [registeredById], references: [id])
+  user           User               @relation("InventoryPersonProfile", fields: [userId], references: [id])
+  sessions       InventorySession[]
+}
+
+model InventorySession {
+  id                String                  @id @default(uuid()) @db.Uuid
+  sessionNumber     String                  @unique
+  departmentId      String                  @db.Uuid
+  inventoryPersonId String                  @db.Uuid
+  assignedById      String                  @db.Uuid
+  completedById     String?                 @db.Uuid
+  status            InventorySessionStatus  @default(ASSIGNED)
+  notes             String?
+  startDate         DateTime
+  dueDate           DateTime
+  completedAt       DateTime?
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+  assignedBy        User                    @relation("AssignedBy", fields: [assignedById], references: [id])
+  completedBy       User?                   @relation("CompletedBy", fields: [completedById], references: [id])
+  department        OrganizationalUnit      @relation(fields: [departmentId], references: [id])
+  inventoryPerson   InventoryPerson         @relation(fields: [inventoryPersonId], references: [id])
+  verifications     InventoryVerification[]
+}
+
+model InventoryVerification {
+  id                 String           @id @default(uuid()) @db.Uuid
+  inventorySessionId String           @db.Uuid
+  assetId            String           @db.Uuid
+  scannedById        String           @db.Uuid
+  scannedAt          DateTime         @default(now())
+  verificationStatus String
+  notes              String?
+  createdAt          DateTime         @default(now())
+  asset              Asset            @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  inventorySession   InventorySession @relation(fields: [inventorySessionId], references: [id], onDelete: Cascade)
+  scannedBy          User             @relation(fields: [scannedById], references: [id])
+
+  @@unique([inventorySessionId, assetId])
+  @@index([inventorySessionId])
+  @@index([assetId])
+  @@index([scannedById])
+  @@index([scannedAt])
+  @@index([verificationStatus])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  tokenHash String    @unique
+  userId    String    @db.Uuid
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tokenHash])
+  @@index([userId])
 }
 
 enum RoleName {
@@ -61,356 +578,6 @@ enum MaintenancePriority {
   HIGH
 }
 
-model Role {
-  id          String   @id @default(uuid()) @db.Uuid
-  name        RoleName @unique
-  description String?
-  users       User[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model Faculty {
-  id          String               @id @default(uuid()) @db.Uuid
-  name        String               @unique
-  code        String               @unique
-  departments OrganizationalUnit[]
-  createdAt   DateTime             @default(now())
-  updatedAt   DateTime             @updatedAt
-  deletedAt   DateTime?            // Soft delete
-}
-
-model OrganizationalUnit {
-  id             String               @id @default(uuid()) @db.Uuid
-  name           String               @unique
-  code           String               @unique
-  type           String               @default("DEPARTMENT") // COLLEGE, SCHOOL, INSTITUTE, DEPARTMENT, RESEARCH_CENTER, LABORATORY, LIBRARY, ADMINISTRATIVE_OFFICE, DIRECTORATE, CLINIC, CAFETRIA, STORE, WAREHOUSE, OTHER
-  
-  parentId       String?              @db.Uuid
-  parent         OrganizationalUnit?  @relation("ParentChild", fields: [parentId], references: [id])
-  children       OrganizationalUnit[] @relation("ParentChild")
-  
-  headOfUnit     String?
-  officeLocation String?
-  contactInfo    String?
-  description    String?
-  status         String               @default("ACTIVE") // ACTIVE, INACTIVE
-
-  facultyId      String?              @db.Uuid
-  faculty        Faculty?             @relation(fields: [facultyId], references: [id])
-
-  users          User[]
-  assets         Asset[]
-  transfersFrom  Transfer[]           @relation("FromDepartment")
-  transfersTo    Transfer[]           @relation("ToDepartment")
-  assignments    Assignment[]
-  financialAudits FinancialAudit[]
-  inventorySessions InventorySession[]
-
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
-  deletedAt      DateTime?            // Soft delete
-}
-
-model User {
-  id                 String              @id @default(uuid()) @db.Uuid
-  name               String
-  email              String              @unique
-  passwordHash       String
-  username           String?             @unique
-  phoneNumber        String?
-  employeeId         String?             @unique
-  roleId             String              @db.Uuid
-  role               Role                @relation(fields: [roleId], references: [id])
-  departmentId       String?             @db.Uuid
-  department         OrganizationalUnit? @relation(fields: [departmentId], references: [id])
-  // Relations
-  assignmentsCreated Assignment[] @relation("AssignedBy")
-  assignmentsTo      Assignment[] @relation("AssignedTo")
-  transfersRequested Transfer[]   @relation("RequestedBy")
-  transfersApproved  Transfer[]   @relation("ApprovedBy")
-  transfersToUser    Transfer[]   @relation("ToUser")
-  transfersFromUser  Transfer[]   @relation("FromUser")
-  returnsMade        Return[]     @relation("ReturnedBy")
-  returnsReceived    Return[]     @relation("ReceivedBy")
-  assignmentsAccepted Assignment[] @relation("AcceptedBy")
-  assignmentsRejected Assignment[] @relation("RejectedBy")
-  maintenanceFiled   Maintenance[] @relation("ReportedBy")
-  maintenanceDone    Maintenance[] @relation("AssignedTo")
-  disposals          Disposal[]
-  notifications      Notification[]
-  auditLogs          AuditLog[]
-  auditSessions      AuditSession[]
-  financialAudits    FinancialAudit[]
-  inventoryPersonProfile       InventoryPerson?        @relation("InventoryPersonProfile")
-  registeredInventoryPersons   InventoryPerson[]       @relation("RegisteredPersons")
-  inventoryAssignedBy          InventorySession[]      @relation("AssignedBy")
-  inventoryCompleted           InventorySession[]      @relation("CompletedBy")
-  verificationsDone            InventoryVerification[]
-  passwordResetTokens          PasswordResetToken[]
-  
-  createdAt          DateTime     @default(now())
-  updatedAt          DateTime     @updatedAt
-  deletedAt          DateTime?    // Soft delete
-}
-
-model AssetCategory {
-  id                  String               @id @default(uuid()) @db.Uuid
-  name                String               @unique
-  code                String               @unique
-  description         String?
-  icon                String?
-  isActive            Boolean              @default(true)
-  displayOrder        Int                  @default(0)
-  assets              Asset[]
-  assetTypes          AssetType[]
-  supplierAssignments SupplierAssignment[]
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  deletedAt           DateTime?            // Soft delete
-}
-
-model AssetType {
-  id                  String               @id @default(uuid()) @db.Uuid
-  name                String
-  description         String?
-  icon                String?
-  isActive            Boolean              @default(true)
-  displayOrder        Int                  @default(0)
-  categoryId          String               @db.Uuid
-  category            AssetCategory        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  assets              Asset[]
-  formFields          AssetTypeField[]
-  supplierAssignments SupplierAssignment[]
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-}
-
-model Asset {
-  id             String         @id @default(uuid()) @db.Uuid
-  name           String
-  assetCode      String         @unique
-  serialNumber   String         @unique
-  description    String?
-  status         AssetStatus    @default(ACTIVE)
-  categoryId     String         @db.Uuid
-  category       AssetCategory  @relation(fields: [categoryId], references: [id])
-  assetTypeId    String?        @db.Uuid
-  assetType      AssetType?     @relation(fields: [assetTypeId], references: [id])
-  departmentId   String             @db.Uuid
-  department     OrganizationalUnit @relation(fields: [departmentId], references: [id])
-  
-  images         AssetImage[]
-  qrCode         QRCode?
-  assignments    Assignment[]
-  transfers      Transfer[]
-  returns        Return[]
-  maintenances   Maintenance[]
-  disposals      Disposal[]
-  auditLogs      AuditLog[]
-  inventoryVerifications InventoryVerification[]
-
-  // Financial, Warranty & Insurance fields
-  purchaseDate            DateTime?
-  purchaseCost            Decimal?           @db.Decimal(10, 2)
-  procurementCost         Decimal?           @db.Decimal(10, 2)
-  expectedLifecycleYears  Int?               @default(5)
-  usefulLife              Int?
-  salvageValue            Decimal?           @db.Decimal(10, 2)
-  annualDepreciation      Decimal?           @db.Decimal(10, 2)
-  monthlyDepreciation     Decimal?           @db.Decimal(10, 2)
-  accumulatedDepreciation Decimal?           @db.Decimal(10, 2)
-  currentBookValue        Decimal?           @db.Decimal(10, 2)
-  totalMaintenanceCost    Decimal?           @db.Decimal(10, 2)
-  totalAssetInvestment    Decimal?           @db.Decimal(10, 2)
-  fundingSource           FundingSource?
-  currency                String             @default("ETB")
-  warrantyStartDate       DateTime?
-  warrantyEndDate         DateTime?
-  warrantyExpiry          DateTime?
-  invoiceNumber           String?
-  purchaseApproved        Boolean            @default(true)
-  
-  supplierId              String?            @db.Uuid
-  supplier                Supplier?          @relation(fields: [supplierId], references: [id])
-  
-  insuranceProvider       String?
-  insurancePolicyNumber   String?
-  insuranceCoverage       Decimal?           @db.Decimal(10, 2)
-  insurancePremium        Decimal?           @db.Decimal(10, 2)
-  insuranceExpiry         DateTime?
-
-  // Reusable Common Fields
-  building                String?
-  roomNumber              String?
-  campus                  String?
-  quantity                Int                @default(1)
-  condition               String?
-  attachmentUrl           String?
-  remarks                 String?            @db.Text
-  
-  auditSessionItems       AuditSessionItem[]
-  fieldValues             AssetFieldValue[]
-
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  deletedAt      DateTime?      // Soft delete
-
-  @@index([purchaseDate])
-}
-
-model AssetImage {
-  id        String   @id @default(uuid()) @db.Uuid
-  assetId   String   @db.Uuid
-  asset     Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
-  url       String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model QRCode {
-  id             String   @id @default(uuid()) @db.Uuid
-  assetId        String   @unique @db.Uuid
-  asset          Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
-  qrCodeString   String   // URL or identifier
-  barcodeString  String   // Code-128 or serial
-  labelUrl       String?  // Optional generated static image path
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-}
-
-model Assignment {
-  id               String           @id @default(uuid()) @db.Uuid
-  assetId          String           @db.Uuid
-  asset            Asset            @relation(fields: [assetId], references: [id])
-  assignedToUserId String?          @db.Uuid @map("assignedToId") // Optional (can be assigned to department only)
-  assignedTo       User?            @relation("AssignedTo", fields: [assignedToUserId], references: [id])
-  departmentId     String?             @db.Uuid // Optional (can be assigned to staff only)
-  department       OrganizationalUnit? @relation(fields: [departmentId], references: [id])
-  assignedByUserId String           @db.Uuid @map("assignedById")
-  assignedBy       User             @relation("AssignedBy", fields: [assignedByUserId], references: [id])
-  status           AssignmentStatus @default(PENDING_ACCEPTANCE)
-  notes            String?
-  assignedAt       DateTime         @default(now())
-  returnedAt       DateTime?
-  returns          Return[]
-
-  // Acceptance & Return Workflow fields
-  acceptedAt       DateTime?
-  acceptedById     String?          @db.Uuid
-  acceptedBy       User?            @relation("AcceptedBy", fields: [acceptedById], references: [id])
-  rejectedAt       DateTime?
-  rejectedById     String?          @db.Uuid
-  rejectedBy       User?            @relation("RejectedBy", fields: [rejectedById], references: [id])
-  rejectionReason  String?          @map("rejectReason")
-
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-}
-
-model Transfer {
-  id                String         @id @default(uuid()) @db.Uuid
-  assetId           String         @db.Uuid
-  asset             Asset          @relation(fields: [assetId], references: [id])
-  
-  fromDepartmentId  String?             @db.Uuid
-  fromDepartment    OrganizationalUnit? @relation("FromDepartment", fields: [fromDepartmentId], references: [id])
-  toDepartmentId    String?             @db.Uuid
-  toDepartment      OrganizationalUnit? @relation("ToDepartment", fields: [toDepartmentId], references: [id])
-  
-  fromUserId        String?        @db.Uuid
-  fromUser          User?          @relation("FromUser", fields: [fromUserId], references: [id])
-  toUserId          String?        @db.Uuid
-  toUser            User?          @relation("ToUser", fields: [toUserId], references: [id])
-  
-  requestedById     String         @db.Uuid
-  requestedBy       User           @relation("RequestedBy", fields: [requestedById], references: [id])
-  approvedById      String?        @db.Uuid
-  approvedBy        User?          @relation("ApprovedBy", fields: [approvedById], references: [id])
-  
-  status            TransferStatus @default(PENDING)
-  notes             String?
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-}
-
-model Return {
-  id               String          @id @default(uuid()) @db.Uuid
-  assetId          String          @db.Uuid
-  asset            Asset           @relation(fields: [assetId], references: [id])
-  assignmentId     String          @db.Uuid
-  assignment       Assignment      @relation(fields: [assignmentId], references: [id])
-  returnedById     String          @db.Uuid
-  returnedBy       User            @relation("ReturnedBy", fields: [returnedById], references: [id])
-  receivedById     String          @db.Uuid
-  receivedBy       User            @relation("ReceivedBy", fields: [receivedById], references: [id])
-  conditionAtReturn ReturnCondition @default(GOOD)
-  isDamaged        Boolean         @default(false)
-  notes            String?
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-}
-
-model Maintenance {
-  id            String            @id @default(uuid()) @db.Uuid
-  assetId       String            @db.Uuid
-  asset         Asset             @relation(fields: [assetId], references: [id])
-  reportedById  String            @db.Uuid
-  reportedBy    User              @relation("ReportedBy", fields: [reportedById], references: [id])
-  assignedToId  String?           @db.Uuid // Technician
-  assignedTo    User?             @relation("AssignedTo", fields: [assignedToId], references: [id])
-  description   String
-  status        MaintenanceStatus @default(PENDING)
-  priority      MaintenancePriority @default(MEDIUM)
-  cost            Decimal?          @db.Decimal(10, 2)
-  maintenanceCost Decimal?          @db.Decimal(10, 2)
-  notes           String?
-  completedAt   DateTime?
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-}
-
-model Disposal {
-  id           String    @id @default(uuid()) @db.Uuid
-  assetId      String    @db.Uuid
-  asset        Asset     @relation(fields: [assetId], references: [id])
-  disposedById String    @db.Uuid
-  disposedBy   User      @relation(fields: [disposedById], references: [id])
-  reason       String
-  method       String
-  disposalDate DateTime  @default(now())
-  notes        String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-}
-
-model Notification {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @db.Uuid
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  message   String
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model AuditLog {
-  id            String   @id @default(uuid()) @db.Uuid
-  userId        String?  @db.Uuid // Nullable for system-level actions
-  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  assetId       String?  @db.Uuid
-  asset         Asset?   @relation(fields: [assetId], references: [id], onDelete: Cascade)
-  action        String   // CREATE, UPDATE, DELETE, ASSIGN, TRANSFER, RETURN, DISPOSE, MAINTENANCE_START, etc.
-  entityType    String   // Asset, User, Department, Category, etc.
-  entityId      String   // UUID of target record
-  previousState Json?    // Snapshot before
-  newState      Json?    // Snapshot after
-  ipAddress     String?
-  userAgent     String?
-  createdAt     DateTime @default(now())
-}
-
 enum AuditSessionStatus {
   PENDING
   IN_PROGRESS
@@ -422,137 +589,6 @@ enum AuditItemStatus {
   MATCHED
   MISSING
   DISCREPANCY
-}
-
-model Supplier {
-  id            String               @id @default(uuid()) @db.Uuid
-  name          String               @unique
-  contactPerson String?
-  email         String?
-  phone         String?
-  address       String?
-  isActive      Boolean              @default(true)
-  assets        Asset[]
-  assignments   SupplierAssignment[]
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
-}
-
-// Legacy simple Budget removed
-
-model AuditSession {
-  id           String             @id @default(uuid()) @db.Uuid
-  title        String
-  status       AuditSessionStatus @default(PENDING)
-  auditorId    String             @db.Uuid
-  auditor      User               @relation(fields: [auditorId], references: [id])
-  items        AuditSessionItem[]
-  startDate    DateTime           @default(now())
-  endDate      DateTime?
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-}
-
-model AuditSessionItem {
-  id                String          @id @default(uuid()) @db.Uuid
-  auditSessionId    String          @db.Uuid
-  auditSession      AuditSession    @relation(fields: [auditSessionId], references: [id], onDelete: Cascade)
-  assetId           String          @db.Uuid
-  asset             Asset           @relation(fields: [assetId], references: [id], onDelete: Cascade)
-  status            AuditItemStatus @default(PENDING)
-  physicalCondition ReturnCondition @default(GOOD)
-  scannedAt         DateTime?
-  notes             String?
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-}
-
-model FinancialAudit {
-  id               String              @id @default(uuid()) @db.Uuid
-  auditDate        DateTime            @default(now())
-  auditorId        String              @db.Uuid
-  auditor          User                @relation(fields: [auditorId], references: [id])
-  departmentId     String?             @db.Uuid
-  department       OrganizationalUnit? @relation(fields: [departmentId], references: [id])
-  fiscalYear       String
-  totalAssetValue  Decimal     @db.Decimal(15, 2)
-  budgetAudited    Decimal     @db.Decimal(15, 2)
-  financialStatus  String      // e.g. STABLE, OVER_BUDGET, CRITICAL_DISCREPANCY
-  findings         String      @db.Text
-  recommendations  String      @db.Text
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
-}
-
-model RegistrationField {
-  id            String           @id @default(uuid()) @db.Uuid
-  name          String           @unique
-  label         String
-  fieldType     String           // TEXT, NUMBER, DECIMAL, DATE, DROPDOWN, RADIO, CHECKBOX, TEXTAREA, FILE_UPLOAD, BOOLEAN
-  placeholder   String?
-  description   String?
-  isActive      Boolean          @default(true)
-  defaultValue  String?
-  options       String?
-  assetTypes    AssetTypeField[]
-  values        AssetFieldValue[]
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-}
-
-model AssetTypeField {
-  id                  String            @id @default(uuid()) @db.Uuid
-  assetTypeId         String            @db.Uuid
-  assetType           AssetType         @relation(fields: [assetTypeId], references: [id], onDelete: Cascade)
-  fieldId             String            @db.Uuid
-  field               RegistrationField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
-  isEnabled           Boolean           @default(true)
-  isRequired          Boolean           @default(false)
-  displayOrder        Int               @default(0)
-  defaultValue        String?
-  options             String?
-
-  // Overrides and Validations
-  labelOverride       String?
-  placeholderOverride String?
-  descriptionOverride String?
-  validationMin       Float?
-  validationMax       Float?
-  validationMinLength Int?
-  validationMaxLength Int?
-
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
-
-  @@unique([assetTypeId, fieldId])
-}
-
-model AssetFieldValue {
-  id        String            @id @default(uuid()) @db.Uuid
-  assetId   String            @db.Uuid
-  asset     Asset             @relation(fields: [assetId], references: [id], onDelete: Cascade)
-  fieldId   String            @db.Uuid
-  field     RegistrationField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
-  value     String            @db.Text
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
-
-  @@unique([assetId, fieldId])
-}
-
-model SupplierAssignment {
-  id          String         @id @default(uuid()) @db.Uuid
-  supplierId  String         @db.Uuid
-  supplier    Supplier       @relation(fields: [supplierId], references: [id], onDelete: Cascade)
-  categoryId  String?        @db.Uuid
-  category    AssetCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  assetTypeId String?        @db.Uuid
-  assetType   AssetType?     @relation(fields: [assetTypeId], references: [id], onDelete: Cascade)
-  isActive    Boolean        @default(true)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-
-  @@unique([supplierId, categoryId, assetTypeId])
 }
 
 enum FundingSource {
@@ -571,71 +607,3 @@ enum InventorySessionStatus {
   CANCELLED
   REOPENED
 }
-
-model InventoryPerson {
-  id             String             @id @default(uuid()) @db.Uuid
-  userId         String             @unique @db.Uuid
-  user           User               @relation("InventoryPersonProfile", fields: [userId], references: [id])
-  isActive       Boolean            @default(true)
-  registeredById String             @db.Uuid
-  registeredBy   User               @relation("RegisteredPersons", fields: [registeredById], references: [id])
-  sessions       InventorySession[]
-  registeredAt   DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
-}
-
-model InventorySession {
-  id                String                 @id @default(uuid()) @db.Uuid
-  sessionNumber     String                 @unique
-  departmentId      String                 @db.Uuid
-  department        OrganizationalUnit     @relation(fields: [departmentId], references: [id])
-  inventoryPersonId String                 @db.Uuid
-  inventoryPerson   InventoryPerson        @relation(fields: [inventoryPersonId], references: [id])
-  assignedById      String                 @db.Uuid
-  assignedBy        User                   @relation("AssignedBy", fields: [assignedById], references: [id])
-  completedById     String?                @db.Uuid
-  completedBy       User?                  @relation("CompletedBy", fields: [completedById], references: [id])
-  status            InventorySessionStatus @default(ASSIGNED)
-  notes             String?                @db.Text
-  startDate         DateTime
-  dueDate           DateTime
-  completedAt       DateTime?
-  verifications     InventoryVerification[]
-  createdAt         DateTime               @default(now())
-  updatedAt         DateTime               @updatedAt
-}
-
-model InventoryVerification {
-  id                 String           @id @default(uuid()) @db.Uuid
-  inventorySessionId String           @db.Uuid
-  inventorySession   InventorySession @relation(fields: [inventorySessionId], references: [id], onDelete: Cascade)
-  assetId            String           @db.Uuid
-  asset              Asset            @relation(fields: [assetId], references: [id], onDelete: Cascade)
-  scannedById        String           @db.Uuid
-  scannedBy          User             @relation(fields: [scannedById], references: [id])
-  scannedAt          DateTime         @default(now())
-  verificationStatus String           // e.g. VERIFIED
-  notes              String?
-  createdAt          DateTime         @default(now())
-
-  @@unique([inventorySessionId, assetId])
-  @@index([inventorySessionId])
-  @@index([assetId])
-  @@index([scannedById])
-  @@index([scannedAt])
-  @@index([verificationStatus])
-}
-
-model PasswordResetToken {
-  id        String    @id @default(uuid()) @db.Uuid
-  tokenHash String    @unique
-  userId    String    @db.Uuid
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  expiresAt DateTime
-  usedAt    DateTime?
-  createdAt DateTime  @default(now())
-
-  @@index([tokenHash])
-  @@index([userId])
-}
-
