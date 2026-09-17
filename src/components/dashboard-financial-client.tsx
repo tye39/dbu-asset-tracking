@@ -16,9 +16,9 @@ import {
   LineChart,
   Line
 } from "recharts";
+import Link from "next/link";
 import {
   DollarSign,
-  TrendingUp,
   AlertTriangle,
   FileSpreadsheet,
   Printer,
@@ -28,7 +28,12 @@ import {
   Layers,
   Calendar,
   Clock,
-  ShieldAlert
+  ShieldAlert,
+  ArrowUpRight,
+  CheckCircle2,
+  FileText,
+  Building2,
+  Users
 } from "lucide-react";
 
 interface DashboardFinancialClientProps {
@@ -39,7 +44,13 @@ interface DashboardFinancialClientProps {
     totalMaintenanceCost: number;
     totalAssetInvestment: number;
     warrantyExpiringCount: number;
+    expiredAssetsCount: number;
     endOfLifeCount: number;
+    totalAssetsCount: number;
+    activeAssetsCount: number;
+    assignedAssetsCount: number;
+    pendingRequestsCount: number;
+    maintenanceCount: number;
     totalUsers: number;
     totalDepartments: number;
   };
@@ -100,97 +111,242 @@ export function DashboardFinancialClient({
 
   return (
     <div className="space-y-6">
-      {/* 7 Summary Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        
-        {/* Card 1: Total Asset Value */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-2">
-          <div className="flex justify-between items-center">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Total Asset Value</span>
-            <Package size={16} className="text-sky-700" />
-          </div>
-          <div>
-            <h3 className="text-lg font-black text-slate-800">{stats.totalAssetValue.toLocaleString()} ETB</h3>
-            <p className="text-[9px] text-slate-400 font-semibold mt-1">Acquisition value of all assets</p>
-          </div>
+      {/* Operational Quick Navigation Cards Grid (9 Clickable Cards) */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+            <Package size={14} className="text-sky-700" />
+            Asset Portfolio & Operations Overview
+          </h3>
+          <span className="text-[10px] text-slate-400 font-semibold">Click any card to open detailed view</span>
         </div>
 
-        {/* Card 2: Current Book Value */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-2">
-          <div className="flex justify-between items-center">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Current Book Value</span>
-            <DollarSign size={16} className="text-emerald-700" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-3.5">
+          {/* Card 1: Total Assets */}
+          <Link
+            href="/pao/assets"
+            className="group bg-white p-4 rounded-xl border border-slate-200 hover:border-sky-400 hover:shadow-md hover:-translate-y-0.5 transition-all space-y-2 block relative overflow-hidden"
+          >
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Total Assets</span>
+              <div className="flex items-center gap-1">
+                <Package size={16} className="text-sky-700" />
+                <ArrowUpRight size={13} className="text-slate-300 group-hover:text-sky-600 transition-colors" />
+              </div>
+            </div>
+            <div>
+              <h3 className="text-xl font-black text-slate-800 group-hover:text-sky-700 transition-colors">
+                {stats.totalAssetsCount.toLocaleString()}
+              </h3>
+              <p className="text-[10px] text-slate-400 font-medium mt-0.5">All registered university items</p>
+            </div>
+          </Link>
+
+          {/* Card 2: Active Assets */}
+          <Link
+            href="/pao/assets?status=ACTIVE"
+            className="group bg-white p-4 rounded-xl border border-slate-200 hover:border-emerald-400 hover:shadow-md hover:-translate-y-0.5 transition-all space-y-2 block relative overflow-hidden"
+          >
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Active Assets</span>
+              <div className="flex items-center gap-1">
+                <CheckCircle2 size={16} className="text-emerald-600" />
+                <ArrowUpRight size={13} className="text-slate-300 group-hover:text-emerald-600 transition-colors" />
+              </div>
+            </div>
+            <div>
+              <h3 className="text-xl font-black text-emerald-700">
+                {stats.activeAssetsCount.toLocaleString()}
+              </h3>
+              <p className="text-[10px] text-slate-400 font-medium mt-0.5">In storage or operational condition</p>
+            </div>
+          </Link>
+
+          {/* Card 3: Expired Warranty Assets */}
+          <Link
+            href="/admin/assets/expired"
+            className="group bg-white p-4 rounded-xl border border-slate-200 hover:border-rose-400 hover:shadow-md hover:-translate-y-0.5 transition-all space-y-2 block relative overflow-hidden"
+          >
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Expired Assets</span>
+              <div className="flex items-center gap-1">
+                <ShieldAlert size={16} className="text-rose-600" />
+                <ArrowUpRight size={13} className="text-slate-300 group-hover:text-rose-600 transition-colors" />
+              </div>
+            </div>
+            <div>
+              <h3 className={`text-xl font-black ${stats.expiredAssetsCount > 0 ? "text-rose-700" : "text-slate-800"}`}>
+                {stats.expiredAssetsCount.toLocaleString()}
+              </h3>
+              <p className="text-[10px] text-slate-400 font-medium mt-0.5">Warranty lapsed & expired</p>
+            </div>
+          </Link>
+
+          {/* Card 4: Near Warranty Expiry */}
+          <Link
+            href="/admin/assets/near-warranty-expiry"
+            className="group bg-white p-4 rounded-xl border border-slate-200 hover:border-amber-400 hover:shadow-md hover:-translate-y-0.5 transition-all space-y-2 block relative overflow-hidden"
+          >
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Near Warranty Expiry</span>
+              <div className="flex items-center gap-1">
+                <Clock size={16} className="text-amber-600" />
+                <ArrowUpRight size={13} className="text-slate-300 group-hover:text-amber-600 transition-colors" />
+              </div>
+            </div>
+            <div>
+              <h3 className={`text-xl font-black ${stats.warrantyExpiringCount > 0 ? "text-amber-700" : "text-slate-800"}`}>
+                {stats.warrantyExpiringCount.toLocaleString()}
+              </h3>
+              <p className="text-[10px] text-slate-400 font-medium mt-0.5">Expiring within the next 30 days</p>
+            </div>
+          </Link>
+
+          {/* Card 5: Useful Life Exceeded */}
+          <Link
+            href="/admin/assets/useful-life-exceeded"
+            className="group bg-white p-4 rounded-xl border border-slate-200 hover:border-indigo-400 hover:shadow-md hover:-translate-y-0.5 transition-all space-y-2 block relative overflow-hidden"
+          >
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Useful Life Exceeded</span>
+              <div className="flex items-center gap-1">
+                <AlertTriangle size={16} className="text-indigo-600" />
+                <ArrowUpRight size={13} className="text-slate-300 group-hover:text-indigo-600 transition-colors" />
+              </div>
+            </div>
+            <div>
+              <h3 className={`text-xl font-black ${stats.endOfLifeCount > 0 ? "text-indigo-700" : "text-slate-800"}`}>
+                {stats.endOfLifeCount.toLocaleString()}
+              </h3>
+              <p className="text-[10px] text-slate-400 font-medium mt-0.5">Accounting age exceeds useful life</p>
+            </div>
+          </Link>
+
+          {/* Card 6: Pending Requests */}
+          <Link
+            href="/pao/asset-requests"
+            className="group bg-white p-4 rounded-xl border border-slate-200 hover:border-blue-400 hover:shadow-md hover:-translate-y-0.5 transition-all space-y-2 block relative overflow-hidden"
+          >
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Pending Requests</span>
+              <div className="flex items-center gap-1">
+                <FileText size={16} className="text-blue-600" />
+                <ArrowUpRight size={13} className="text-slate-300 group-hover:text-blue-600 transition-colors" />
+              </div>
+            </div>
+            <div>
+              <h3 className={`text-xl font-black ${stats.pendingRequestsCount > 0 ? "text-blue-700" : "text-slate-800"}`}>
+                {stats.pendingRequestsCount.toLocaleString()}
+              </h3>
+              <p className="text-[10px] text-slate-400 font-medium mt-0.5">Department requests awaiting action</p>
+            </div>
+          </Link>
+
+          {/* Card 7: Active Maintenance */}
+          <Link
+            href="/tech/maintenance"
+            className="group bg-white p-4 rounded-xl border border-slate-200 hover:border-amber-500 hover:shadow-md hover:-translate-y-0.5 transition-all space-y-2 block relative overflow-hidden"
+          >
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Maintenance</span>
+              <div className="flex items-center gap-1">
+                <Wrench size={16} className="text-amber-600" />
+                <ArrowUpRight size={13} className="text-slate-300 group-hover:text-amber-600 transition-colors" />
+              </div>
+            </div>
+            <div>
+              <h3 className={`text-xl font-black ${stats.maintenanceCount > 0 ? "text-amber-700" : "text-slate-800"}`}>
+                {stats.maintenanceCount.toLocaleString()}
+              </h3>
+              <p className="text-[10px] text-slate-400 font-medium mt-0.5">Active or reported repair tasks</p>
+            </div>
+          </Link>
+
+          {/* Card 8: Assigned Assets */}
+          <Link
+            href="/pao/assignments"
+            className="group bg-white p-4 rounded-xl border border-slate-200 hover:border-sky-500 hover:shadow-md hover:-translate-y-0.5 transition-all space-y-2 block relative overflow-hidden"
+          >
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Assigned Assets</span>
+              <div className="flex items-center gap-1">
+                <Users size={16} className="text-sky-700" />
+                <ArrowUpRight size={13} className="text-slate-300 group-hover:text-sky-700 transition-colors" />
+              </div>
+            </div>
+            <div>
+              <h3 className="text-xl font-black text-slate-800 group-hover:text-sky-700 transition-colors">
+                {stats.assignedAssetsCount.toLocaleString()}
+              </h3>
+              <p className="text-[10px] text-slate-400 font-medium mt-0.5">Assigned to university staff</p>
+            </div>
+          </Link>
+
+          {/* Card 9: Departments */}
+          <Link
+            href="/admin/departments"
+            className="group bg-white p-4 rounded-xl border border-slate-200 hover:border-teal-500 hover:shadow-md hover:-translate-y-0.5 transition-all space-y-2 block relative overflow-hidden"
+          >
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Departments</span>
+              <div className="flex items-center gap-1">
+                <Building2 size={16} className="text-teal-600" />
+                <ArrowUpRight size={13} className="text-slate-300 group-hover:text-teal-600 transition-colors" />
+              </div>
+            </div>
+            <div>
+              <h3 className="text-xl font-black text-slate-800 group-hover:text-teal-700 transition-colors">
+                {stats.totalDepartments.toLocaleString()}
+              </h3>
+              <p className="text-[10px] text-slate-400 font-medium mt-0.5">Faculties and academic units</p>
+            </div>
+          </Link>
+        </div>
+      </div>
+
+      {/* Financial Valuation Summary Section */}
+      <div className="space-y-3 pt-2">
+        <h3 className="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+          <DollarSign size={14} className="text-emerald-700" />
+          University Capital Valuation & Financial Summary
+        </h3>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+          {/* Total Asset Value */}
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1.5">
+            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Total Value</span>
+            <h3 className="text-base font-black text-slate-800">{stats.totalAssetValue.toLocaleString()} ETB</h3>
+            <p className="text-[9px] text-slate-400 font-medium">Acquisition cost of all items</p>
           </div>
-          <div>
-            <h3 className="text-lg font-black text-emerald-700">{stats.currentBookValue.toLocaleString()} ETB</h3>
-            <p className="text-[9px] text-slate-400 font-semibold mt-1">Value after straight-line depreciation</p>
+
+          {/* Current Book Value */}
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1.5">
+            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Book Value</span>
+            <h3 className="text-base font-black text-emerald-700">{stats.currentBookValue.toLocaleString()} ETB</h3>
+            <p className="text-[9px] text-slate-400 font-medium">After straight-line depreciation</p>
+          </div>
+
+          {/* Total Depreciation */}
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1.5">
+            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Depreciation</span>
+            <h3 className="text-base font-black text-indigo-700">{stats.totalDepreciation.toLocaleString()} ETB</h3>
+            <p className="text-[9px] text-slate-400 font-medium">Cumulative book depreciation</p>
+          </div>
+
+          {/* Total Maintenance Cost */}
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1.5">
+            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Repairs Cost</span>
+            <h3 className="text-base font-black text-amber-700">{stats.totalMaintenanceCost.toLocaleString()} ETB</h3>
+            <p className="text-[9px] text-slate-400 font-medium">Sum of all completed repairs</p>
+          </div>
+
+          {/* Total Asset Investment */}
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1.5">
+            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Total Invested</span>
+            <h3 className="text-base font-black text-violet-700">{stats.totalAssetInvestment.toLocaleString()} ETB</h3>
+            <p className="text-[9px] text-slate-400 font-medium">Acquisition + Repairs combined</p>
           </div>
         </div>
-
-        {/* Card 3: Total Depreciation */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-2">
-          <div className="flex justify-between items-center">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Total Depreciation</span>
-            <Activity size={16} className="text-indigo-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-black text-indigo-700">{stats.totalDepreciation.toLocaleString()} ETB</h3>
-            <p className="text-[9px] text-slate-400 font-semibold mt-1">Cumulative accumulated depreciation</p>
-          </div>
-        </div>
-
-        {/* Card 4: Total Maintenance Cost */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-2">
-          <div className="flex justify-between items-center">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Total Maintenance Cost</span>
-            <Wrench size={16} className="text-amber-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-black text-amber-700">{stats.totalMaintenanceCost.toLocaleString()} ETB</h3>
-            <p className="text-[9px] text-slate-400 font-semibold mt-1">Sum of completed repairs cost</p>
-          </div>
-        </div>
-
-        {/* Card 5: Total Asset Investment */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-2">
-          <div className="flex justify-between items-center">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Total Asset Investment</span>
-            <TrendingUp size={16} className="text-violet-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-black text-violet-700">{stats.totalAssetInvestment.toLocaleString()} ETB</h3>
-            <p className="text-[9px] text-slate-400 font-semibold mt-1">Total Cost + Maintenance Expense</p>
-          </div>
-        </div>
-
-        {/* Card 6: Assets Near Warranty Expiration */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-2">
-          <div className="flex justify-between items-center">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Near Warranty Expiry</span>
-            <ShieldAlert size={16} className="text-rose-600" />
-          </div>
-          <div>
-            <h3 className={`text-lg font-black ${stats.warrantyExpiringCount > 0 ? "text-rose-700" : "text-slate-800"}`}>
-              {stats.warrantyExpiringCount} Assets
-            </h3>
-            <p className="text-[9px] text-slate-400 font-semibold mt-1">Warranties expiring in next 30 days</p>
-          </div>
-        </div>
-
-        {/* Card 7: Assets Near End of Useful Life */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-2">
-          <div className="flex justify-between items-center">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Useful Life Exceeded</span>
-            <AlertTriangle size={16} className="text-amber-500" />
-          </div>
-          <div>
-            <h3 className={`text-lg font-black ${stats.endOfLifeCount > 0 ? "text-amber-700" : "text-slate-800"}`}>
-              {stats.endOfLifeCount} Assets
-            </h3>
-            <p className="text-[9px] text-slate-400 font-semibold mt-1">Elapsed age exceeds useful life limit</p>
-          </div>
-        </div>
-
       </div>
 
       {/* 6 Charts Grid Layout */}

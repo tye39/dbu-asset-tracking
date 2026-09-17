@@ -17,7 +17,10 @@ import {
   Building,
   TrendingUp,
   Loader2,
-  X
+  X,
+  PackageCheck,
+  Scale,
+  ArrowRight
 } from "lucide-react";
 
 interface ActivityLogItem {
@@ -56,6 +59,8 @@ interface PaoDashboardClientProps {
     disposedAssets: number;
     pendingMaintenances: number;
     totalCategories: number;
+    pendingAssetRequests?: number;
+    pendingAppeals?: number;
   };
   chartData: { category: string; count: number }[];
   recentActivities: ActivityLogItem[];
@@ -240,6 +245,38 @@ export function PaoDashboardClient({
           </div>
         </div>
 
+        <div
+          onClick={() => router.push("/pao/asset-requests")}
+          className="bg-white p-4 rounded-xl shadow-sm border border-amber-200/80 hover:border-amber-400 cursor-pointer transition-all flex items-center space-x-4 group"
+        >
+          <div className="p-3 bg-amber-50 text-amber-600 rounded-lg group-hover:scale-105 transition-transform"><PackageCheck size={20} /></div>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <p className="text-[10px] font-extrabold text-slate-400 uppercase">Requests to Fulfill</p>
+              {(stats.pendingAssetRequests ?? 0) > 0 && (
+                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+              )}
+            </div>
+            <h3 className="text-lg font-bold text-amber-700 mt-0.5">{stats.pendingAssetRequests ?? 0}</h3>
+          </div>
+        </div>
+
+        <div
+          onClick={() => router.push("/pao/appeals")}
+          className="bg-white p-4 rounded-xl shadow-sm border border-purple-200/80 hover:border-purple-400 cursor-pointer transition-all flex items-center space-x-4 group"
+        >
+          <div className="p-3 bg-purple-50 text-purple-600 rounded-lg group-hover:scale-105 transition-transform"><Scale size={20} /></div>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <p className="text-[10px] font-extrabold text-slate-400 uppercase">Active Appeals</p>
+              {(stats.pendingAppeals ?? 0) > 0 && (
+                <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+              )}
+            </div>
+            <h3 className="text-lg font-bold text-purple-700 mt-0.5">{stats.pendingAppeals ?? 0}</h3>
+          </div>
+        </div>
+
         <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
           <div className="p-3 bg-teal-50 text-teal-600 rounded-lg"><Building size={20} /></div>
           <div>
@@ -262,10 +299,44 @@ export function PaoDashboardClient({
         <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
           <div>
             <h4 className="text-xs font-extrabold text-slate-700 uppercase mb-4">Quick Actions</h4>
-            <div className="space-y-3">
+            <div className="space-y-2.5">
+              <button
+                onClick={() => router.push("/pao/asset-requests")}
+                className="w-full flex items-center justify-between p-2.5 bg-amber-50/80 border border-amber-200 text-amber-900 rounded-xl text-xs font-semibold hover:bg-amber-100 transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <PackageCheck size={16} className="text-amber-700" />
+                  <span>Fulfill Asset Requests</span>
+                </span>
+                {(stats.pendingAssetRequests ?? 0) > 0 ? (
+                  <span className="text-[10px] bg-amber-600 text-white px-1.5 py-0.5 rounded-full font-bold">
+                    {stats.pendingAssetRequests}
+                  </span>
+                ) : (
+                  <ArrowRight size={13} className="text-amber-500" />
+                )}
+              </button>
+
+              <button
+                onClick={() => router.push("/pao/appeals")}
+                className="w-full flex items-center justify-between p-2.5 bg-purple-50/80 border border-purple-200 text-purple-900 rounded-xl text-xs font-semibold hover:bg-purple-100 transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <Scale size={16} className="text-purple-700" />
+                  <span>Review Department Appeals</span>
+                </span>
+                {(stats.pendingAppeals ?? 0) > 0 ? (
+                  <span className="text-[10px] bg-purple-600 text-white px-1.5 py-0.5 rounded-full font-bold">
+                    {stats.pendingAppeals}
+                  </span>
+                ) : (
+                  <ArrowRight size={13} className="text-purple-500" />
+                )}
+              </button>
+
               <button
                 onClick={() => router.push("/pao/assets/new")}
-                className="w-full flex items-center space-x-3 p-3 bg-sky-50 border border-sky-100 text-sky-800 rounded-xl text-xs font-semibold hover:bg-sky-100 transition-colors"
+                className="w-full flex items-center space-x-3 p-2.5 bg-sky-50 border border-sky-100 text-sky-800 rounded-xl text-xs font-semibold hover:bg-sky-100 transition-colors"
               >
                 <Plus size={16} className="text-sky-600" />
                 <span>Register New Asset</span>
@@ -273,7 +344,7 @@ export function PaoDashboardClient({
 
               <button
                 onClick={() => setShowAssignModal(true)}
-                className="w-full flex items-center space-x-3 p-3 bg-blue-50 border border-blue-100 text-blue-800 rounded-xl text-xs font-semibold hover:bg-blue-100 transition-colors"
+                className="w-full flex items-center space-x-3 p-2.5 bg-blue-50 border border-blue-100 text-blue-800 rounded-xl text-xs font-semibold hover:bg-blue-100 transition-colors"
               >
                 <UserCheck size={16} className="text-blue-600" />
                 <span>Assign Asset to User/Dept</span>
@@ -281,7 +352,7 @@ export function PaoDashboardClient({
 
               <button
                 onClick={() => setShowTransferModal(true)}
-                className="w-full flex items-center space-x-3 p-3 bg-yellow-50 border border-yellow-100 text-yellow-800 rounded-xl text-xs font-semibold hover:bg-yellow-100 transition-colors"
+                className="w-full flex items-center space-x-3 p-2.5 bg-yellow-50 border border-yellow-100 text-yellow-800 rounded-xl text-xs font-semibold hover:bg-yellow-100 transition-colors"
               >
                 <Send size={16} className="text-yellow-600" />
                 <span>Initiate Asset Transfer</span>

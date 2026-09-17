@@ -38,7 +38,12 @@ export async function updateUserAction(prevState: unknown, data: {
   const session = await auth();
   if (!session?.user?.id) return { error: "Unauthorized." };
 
+  if (data.password) {
+    return { error: "Administrators cannot modify user passwords. Users must manage their own password via /profile/security." };
+  }
+
   const { id, ...updateData } = data;
+  delete updateData.password;
   try {
     const user = await updateUser(id, updateData, session.user.id);
     revalidatePath("/", "layout");

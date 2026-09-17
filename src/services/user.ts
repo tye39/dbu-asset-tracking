@@ -19,6 +19,7 @@ export async function createUser(data: {
       passwordHash,
       roleId: data.roleId,
       departmentId: data.departmentId || null,
+      mustChangePassword: true,
     },
     include: {
       role: true,
@@ -45,6 +46,10 @@ export async function updateUser(id: string, data: {
   roleId?: string;
   departmentId?: string | null;
 }, actorId: string) {
+  if (data.password) {
+    throw new Error("Direct password modification by administrator is disabled for security. Users must manage their own password via Security Settings.");
+  }
+
   const previousUser = await prisma.user.findUnique({
     where: { id },
     include: { role: true, department: true }
@@ -58,9 +63,6 @@ export async function updateUser(id: string, data: {
     roleId: data.roleId,
     departmentId: data.departmentId,
   };
-  if (data.password) {
-    updateData.passwordHash = await bcrypt.hash(data.password, 10);
-  }
 
   const user = await prisma.user.update({
     where: { id },

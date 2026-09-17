@@ -81,7 +81,10 @@ export async function changePasswordAction(
     // Save user update in transaction
     await prisma.user.update({
       where: { id: userId },
-      data: { passwordHash: newPasswordHash }
+      data: {
+        passwordHash: newPasswordHash,
+        mustChangePassword: false,
+      },
     });
 
     // Create Audit Log (Section 30 & 31 - Never log passwords, hashes, etc.)
@@ -95,6 +98,8 @@ export async function changePasswordAction(
     );
 
     revalidatePath("/profile");
+    revalidatePath("/profile/security");
+    revalidatePath("/", "layout");
     return { success: true };
   } catch (error: unknown) {
     console.error("Error changing password:", error);

@@ -2,7 +2,13 @@ import React from "react";
 import { prisma } from "@/lib/db";
 import { HeadDashboardClient } from "@/components/head-dashboard-client";
 import { auth } from "@/auth";
-import { AssetStatus, TransferStatus, RoleName } from "@prisma/client";
+import {
+  AssetStatus,
+  TransferStatus,
+  RoleName,
+  AssetRequestStatus,
+  PropertyAppealStatus,
+} from "@prisma/client";
 
 export const revalidate = 0;
 
@@ -25,7 +31,16 @@ export default async function HeadDashboardPage() {
   const deptId = session.user.departmentId;
 
   // 1. Fetch Stats
-  const [departmentAssets, pendingTransfers, staffWithAssets] = await Promise.all([
+  const [
+    departmentAssets,
+    pendingTransfers,
+    staffWithAssets,
+    pendingRequests,
+    approvedRequests,
+    rejectedRequests,
+    openAppeals,
+    resolvedAppeals,
+  ] = await Promise.all([
     prisma.asset.count({ where: { departmentId: deptId, deletedAt: null } }),
     prisma.transfer.count({
       where: {
@@ -45,6 +60,21 @@ export default async function HeadDashboardPage() {
         },
         deletedAt: null
       }
+    }),
+    prisma.assetRequest.count({
+      where: { departmentId: deptId, status: AssetRequestStatus.PENDING_DEPARTMENT_HEAD }
+    }),
+    prisma.assetRequest.count({
+      where: { departmentId: deptId, status: { in: [AssetRequestStatus.APPROVED_BY_DEPARTMENT_HEAD, AssetRequestStatus.FULFILLED] } }
+    }),
+    prisma.assetRequest.count({
+      where: { departmentId: deptId, status: { in: [AssetRequestStatus.REJECTED_BY_DEPARTMENT_HEAD, AssetRequestStatus.REJECTED_BY_PROPERTY_MANAGEMENT] } }
+    }),
+    prisma.propertyAppeal.count({
+      where: { departmentId: deptId, status: { in: [PropertyAppealStatus.PENDING_PROPERTY_MANAGEMENT, PropertyAppealStatus.UNDER_REVIEW, PropertyAppealStatus.ADDITIONAL_INFORMATION_REQUIRED] } }
+    }),
+    prisma.propertyAppeal.count({
+      where: { departmentId: deptId, status: { in: [PropertyAppealStatus.RESOLVED, PropertyAppealStatus.CLOSED] } }
     }),
   ]);
 
@@ -105,7 +135,12 @@ export default async function HeadDashboardPage() {
       stats={{
         departmentAssets,
         pendingTransfers,
-        staffWithAssets
+        staffWithAssets,
+        pendingRequests,
+        approvedRequests,
+        rejectedRequests,
+        openAppeals,
+        resolvedAppeals,
       }}
       chartData={chartData}
       recentActivities={recentActivities}

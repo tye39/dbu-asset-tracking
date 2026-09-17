@@ -11,7 +11,13 @@ import {
   CheckCircle,
   History,
   X,
-  Loader2
+  Loader2,
+  FileQuestion,
+  FileCheck,
+  FileX,
+  Scale,
+  ShieldCheck,
+  ArrowRight
 } from "lucide-react";
 
 interface ActivityItem {
@@ -47,6 +53,11 @@ interface HeadDashboardClientProps {
     departmentAssets: number;
     pendingTransfers: number;
     staffWithAssets: number;
+    pendingRequests?: number;
+    approvedRequests?: number;
+    rejectedRequests?: number;
+    openAppeals?: number;
+    resolvedAppeals?: number;
   };
   chartData: { status: string; count: number }[];
   recentActivities: ActivityItem[];
@@ -127,28 +138,79 @@ export function HeadDashboardClient({
       </div>
 
       {/* Grid of stats cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
-          <div className="p-3 bg-green-50 text-green-700 rounded-lg"><Package size={20} /></div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-3">
+          <div className="p-2.5 bg-green-50 text-green-700 rounded-lg"><Package size={20} /></div>
           <div>
             <p className="text-[10px] font-extrabold text-slate-400 uppercase">Department Assets</p>
             <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.departmentAssets}</h3>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
-          <div className="p-3 bg-yellow-50 text-yellow-600 rounded-lg"><Send size={20} /></div>
-          <div>
-            <p className="text-[10px] font-extrabold text-slate-400 uppercase">Pending Transfers</p>
-            <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.pendingTransfers}</h3>
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
-          <div className="p-3 bg-sky-50 text-sky-600 rounded-lg"><Users size={20} /></div>
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-3">
+          <div className="p-2.5 bg-sky-50 text-sky-600 rounded-lg"><Users size={20} /></div>
           <div>
             <p className="text-[10px] font-extrabold text-slate-400 uppercase">Staff with Assets</p>
             <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.staffWithAssets}</h3>
+          </div>
+        </div>
+
+        <div
+          onClick={() => router.push("/head/asset-requests")}
+          className="bg-white p-4 rounded-xl shadow-sm border border-amber-200/80 hover:border-amber-400 cursor-pointer transition-all flex items-center space-x-3 group"
+        >
+          <div className="p-2.5 bg-amber-50 text-amber-600 rounded-lg group-hover:scale-105 transition-transform"><FileQuestion size={20} /></div>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <p className="text-[10px] font-extrabold text-slate-400 uppercase">Pending Requests</p>
+              {(stats.pendingRequests ?? 0) > 0 && (
+                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+              )}
+            </div>
+            <h3 className="text-lg font-bold text-amber-700 mt-0.5">{stats.pendingRequests ?? 0}</h3>
+          </div>
+        </div>
+
+        <div
+          onClick={() => router.push("/head/appeals")}
+          className="bg-white p-4 rounded-xl shadow-sm border border-purple-200/80 hover:border-purple-400 cursor-pointer transition-all flex items-center space-x-3 group"
+        >
+          <div className="p-2.5 bg-purple-50 text-purple-600 rounded-lg group-hover:scale-105 transition-transform"><Scale size={20} /></div>
+          <div>
+            <p className="text-[10px] font-extrabold text-slate-400 uppercase">Active Appeals</p>
+            <h3 className="text-lg font-bold text-purple-700 mt-0.5">{stats.openAppeals ?? 0}</h3>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-3">
+          <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-lg"><FileCheck size={20} /></div>
+          <div>
+            <p className="text-[10px] font-extrabold text-slate-400 uppercase">Approved / Fulfilled</p>
+            <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.approvedRequests ?? 0}</h3>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-3">
+          <div className="p-2.5 bg-red-50 text-red-600 rounded-lg"><FileX size={20} /></div>
+          <div>
+            <p className="text-[10px] font-extrabold text-slate-400 uppercase">Rejected Requests</p>
+            <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.rejectedRequests ?? 0}</h3>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-3">
+          <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-lg"><CheckCircle size={20} /></div>
+          <div>
+            <p className="text-[10px] font-extrabold text-slate-400 uppercase">Resolved Appeals</p>
+            <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.resolvedAppeals ?? 0}</h3>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-3">
+          <div className="p-2.5 bg-yellow-50 text-yellow-600 rounded-lg"><Send size={20} /></div>
+          <div>
+            <p className="text-[10px] font-extrabold text-slate-400 uppercase">Pending Transfers</p>
+            <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.pendingTransfers}</h3>
           </div>
         </div>
       </div>
@@ -165,26 +227,68 @@ export function HeadDashboardClient({
 
         <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
           <div>
-            <h4 className="text-xs font-extrabold text-slate-700 uppercase mb-4">Quick Actions</h4>
-            <div className="space-y-3">
+            <h4 className="text-xs font-extrabold text-slate-700 uppercase mb-3">Management Consoles</h4>
+            <div className="space-y-2">
               <button
-                onClick={() => setShowTransferModal(true)}
-                className="w-full flex items-center space-x-3 p-3 bg-green-50 border border-green-100 text-green-800 rounded-xl text-xs font-semibold hover:bg-green-100/80 transition-colors"
+                onClick={() => router.push("/head/asset-requests")}
+                className="w-full flex items-center justify-between p-2.5 bg-amber-50/70 border border-amber-200/60 text-amber-900 rounded-xl text-xs font-semibold hover:bg-amber-100/70 transition-colors"
               >
-                <Send size={16} className="text-green-700" />
-                <span>Request Asset Transfer</span>
+                <span className="flex items-center gap-2">
+                  <FileQuestion size={16} className="text-amber-700" />
+                  <span>Review Staff Requests</span>
+                </span>
+                {(stats.pendingRequests ?? 0) > 0 && (
+                  <span className="text-[10px] bg-amber-600 text-white px-1.5 py-0.5 rounded-full font-bold">
+                    {stats.pendingRequests}
+                  </span>
+                )}
               </button>
 
               <button
-                onClick={() => router.push("/head/assets")}
-                className="w-full flex items-center space-x-3 p-3 bg-slate-50 border border-slate-100 text-slate-700 rounded-xl text-xs font-semibold hover:bg-slate-100 transition-colors"
+                onClick={() => router.push("/head/staff")}
+                className="w-full flex items-center justify-between p-2.5 bg-sky-50/70 border border-sky-200/60 text-sky-900 rounded-xl text-xs font-semibold hover:bg-sky-100/70 transition-colors"
               >
-                <Package size={16} className="text-slate-500" />
-                <span>View Department Assets</span>
+                <span className="flex items-center gap-2">
+                  <Users size={16} className="text-sky-700" />
+                  <span>Staff Directory & Assets</span>
+                </span>
+                <ArrowRight size={14} className="text-sky-400" />
+              </button>
+
+              <button
+                onClick={() => router.push("/head/audit-logs")}
+                className="w-full flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold hover:bg-slate-100 transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <ShieldCheck size={16} className="text-slate-600" />
+                  <span>Staff Audit Logs</span>
+                </span>
+                <ArrowRight size={14} className="text-slate-400" />
+              </button>
+
+              <button
+                onClick={() => router.push("/head/appeals")}
+                className="w-full flex items-center justify-between p-2.5 bg-purple-50/70 border border-purple-200/60 text-purple-900 rounded-xl text-xs font-semibold hover:bg-purple-100/70 transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <Scale size={16} className="text-purple-700" />
+                  <span>Appeals & Escalations</span>
+                </span>
+                <ArrowRight size={14} className="text-purple-400" />
+              </button>
+
+              <button
+                onClick={() => setShowTransferModal(true)}
+                className="w-full flex items-center justify-between p-2.5 bg-green-50/70 border border-green-200/60 text-green-900 rounded-xl text-xs font-semibold hover:bg-green-100/70 transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <Send size={16} className="text-green-700" />
+                  <span>Request Asset Transfer</span>
+                </span>
               </button>
             </div>
           </div>
-          <div className="mt-6 border-t border-slate-100 pt-4 text-[10px] text-slate-400 font-semibold uppercase flex items-center space-x-1.5">
+          <div className="mt-4 border-t border-slate-100 pt-3 text-[10px] text-slate-400 font-semibold uppercase flex items-center space-x-1.5">
             <CheckCircle size={12} className="text-green-500" />
             <span>DBU Resource Management</span>
           </div>

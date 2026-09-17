@@ -35,40 +35,67 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/login", nextUrl));
   }
 
-  const pathname = nextUrl.pathname;
+  // First login enforcement: If user must change password, redirect to /profile/security
+  const mustChangePassword = (req.auth?.user as { mustChangePassword?: boolean })?.mustChangePassword === true;
+  if (mustChangePassword && nextUrl.pathname !== "/profile/security" && nextUrl.pathname !== "/logout") {
+    return NextResponse.redirect(new URL("/profile/security", nextUrl));
+  }
+
+  let effectivePath = nextUrl.pathname;
+  let isRewrite = false;
+  if (effectivePath.startsWith("/department-head/")) {
+    effectivePath = effectivePath.replace("/department-head/", "/head/");
+    isRewrite = true;
+  } else if (effectivePath === "/department-head") {
+    effectivePath = "/head/dashboard";
+    isRewrite = true;
+  } else if (effectivePath === "/staff/asset-requests") {
+    effectivePath = "/staff/requests";
+    isRewrite = true;
+  } else if (effectivePath === "/admin/property-management/appeals") {
+    effectivePath = "/pao/appeals";
+    isRewrite = true;
+  } else if (effectivePath === "/admin/property-management/requests") {
+    effectivePath = "/pao/asset-requests";
+    isRewrite = true;
+  }
 
   // Root path redirect to user's dedicated dashboard
-  if (pathname === "/") {
+  if (effectivePath === "/") {
     const destination = getRoleDashboard(userRole);
     return NextResponse.redirect(new URL(destination, nextUrl));
   }
 
   // Enforce role-based access control for dashboard sub-paths
-  if (pathname.startsWith("/admin") && userRole !== ROLES.SYSTEM_ADMINISTRATOR) {
+  if (effectivePath.startsWith("/admin") && userRole !== ROLES.SYSTEM_ADMINISTRATOR) {
     return NextResponse.redirect(new URL(getRoleDashboard(userRole), nextUrl));
   }
-  if (pathname.startsWith("/pao") && userRole !== ROLES.PROPERTY_ADMINISTRATION_OFFICER && userRole !== ROLES.SYSTEM_ADMINISTRATOR) {
+  if (effectivePath.startsWith("/pao") && userRole !== ROLES.PROPERTY_ADMINISTRATION_OFFICER && userRole !== ROLES.SYSTEM_ADMINISTRATOR) {
     return NextResponse.redirect(new URL(getRoleDashboard(userRole), nextUrl));
   }
-  if (pathname.startsWith("/head") && userRole !== ROLES.DEPARTMENT_HEAD) {
+  if (effectivePath.startsWith("/head") && userRole !== ROLES.DEPARTMENT_HEAD) {
     return NextResponse.redirect(new URL(getRoleDashboard(userRole), nextUrl));
   }
-  if (pathname.startsWith("/staff") && userRole !== ROLES.STAFF_MEMBER) {
+  if (effectivePath.startsWith("/staff") && userRole !== ROLES.STAFF_MEMBER) {
     return NextResponse.redirect(new URL(getRoleDashboard(userRole), nextUrl));
   }
-  if (pathname.startsWith("/tech") && userRole !== ROLES.MAINTENANCE_TECHNICIAN) {
+  if (effectivePath.startsWith("/tech") && userRole !== ROLES.MAINTENANCE_TECHNICIAN) {
     return NextResponse.redirect(new URL(getRoleDashboard(userRole), nextUrl));
   }
-  if (pathname.startsWith("/auditor") && userRole !== ROLES.INTERNAL_AUDITOR) {
+  if (effectivePath.startsWith("/auditor") && userRole !== ROLES.INTERNAL_AUDITOR) {
     return NextResponse.redirect(new URL(getRoleDashboard(userRole), nextUrl));
   }
   if (
-    pathname.startsWith("/inventory") &&
+    effectivePath.startsWith("/inventory") &&
     userRole !== ROLES.INVENTORY_PERSON &&
     userRole !== ROLES.SYSTEM_ADMINISTRATOR &&
     userRole !== ROLES.PROPERTY_ADMINISTRATION_OFFICER
   ) {
     return NextResponse.redirect(new URL(getRoleDashboard(userRole), nextUrl));
+  }
+
+  if (isRewrite) {
+    return NextResponse.rewrite(new URL(effectivePath, nextUrl));
   }
 
   return NextResponse.next();

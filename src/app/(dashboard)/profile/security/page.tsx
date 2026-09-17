@@ -6,7 +6,7 @@ import { ProfileClient } from "@/components/profile-client";
 
 export const revalidate = 0;
 
-export default async function ProfilePage() {
+export default async function ProfileSecurityPage() {
   const session = await auth();
   if (!session?.user?.id) {
     redirect("/login");
@@ -30,13 +30,14 @@ export default async function ProfilePage() {
     email: user.email,
     role: user.role.name,
     department: user.department?.name || "N/A",
-    mustChangePassword: user.mustChangePassword,
+    mustChangePassword: user.mustChangePassword
   };
 
   return (
     <ProfileClient 
       user={userDetails} 
-      forcePasswordChange={user.mustChangePassword}
+      initialTab="security" 
+      forcePasswordChange={user.mustChangePassword} 
     />
   );
 }

@@ -18,7 +18,11 @@ import {
   ClipboardList,
   UserCheck,
   LucideIcon,
-  X
+  X,
+  FileQuestion,
+  Scale,
+  ShieldCheck,
+  PackageCheck
 } from "lucide-react";
 
 interface SidebarProps {
@@ -52,6 +56,8 @@ export function Sidebar({ user, isMobileOpen = false, onClose }: SidebarProps) {
       case "PROPERTY_ADMINISTRATION_OFFICER":
         items = [
           { name: "Dashboard", href: "/pao/dashboard", icon: LayoutDashboard },
+          { name: "Asset Requests", href: "/pao/asset-requests", icon: PackageCheck },
+          { name: "Appeals & Escalations", href: "/pao/appeals", icon: Scale },
           { name: "Register Asset", href: "/pao/assets/new", icon: PlusCircle },
           { name: "Asset Inventory", href: "/pao/assets", icon: List },
           { name: "Assignments", href: "/pao/assignments", icon: FolderTree },
@@ -62,13 +68,18 @@ export function Sidebar({ user, isMobileOpen = false, onClose }: SidebarProps) {
       case "DEPARTMENT_HEAD":
         items = [
           { name: "Dashboard", href: "/head/dashboard", icon: LayoutDashboard },
+          { name: "Staff Directory", href: "/head/staff", icon: Users },
+          { name: "Asset Requests", href: "/head/asset-requests", icon: FileQuestion },
           { name: "Department Assets", href: "/head/assets", icon: List },
+          { name: "Staff Audit Logs", href: "/head/audit-logs", icon: ShieldCheck },
+          { name: "Appeals & Escalations", href: "/head/appeals", icon: Scale },
         ];
         break;
       case "STAFF_MEMBER":
         items = [
           { name: "Dashboard", href: "/staff/dashboard", icon: LayoutDashboard },
           { name: "My Assets", href: "/staff/assets", icon: List },
+          { name: "Asset Requests", href: "/staff/requests", icon: FileQuestion },
         ];
         break;
       case "MAINTENANCE_TECHNICIAN":

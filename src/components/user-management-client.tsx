@@ -87,7 +87,6 @@ export function UserManagementClient({ users, roles, departments }: UserManageme
           id: userId,
           name,
           email,
-          password: password || undefined,
           roleId,
           departmentId: departmentId || null,
         });
@@ -231,19 +230,28 @@ export function UserManagementClient({ users, roles, departments }: UserManageme
                 />
               </div>
 
-              <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                  Password {editMode && "(leave blank to keep unchanged)"}
-                </label>
-                <input
-                  type="password"
-                  required={!editMode}
-                  placeholder={editMode ? "••••••••" : "Minimum 6 chars"}
-                  className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
+              {!editMode ? (
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                    Initial Password *
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Minimum 6 characters"
+                    className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <p className="text-[10px] text-slate-400 mt-1">
+                    User will be required to change this password on first login.
+                  </p>
+                </div>
+              ) : (
+                <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-[11px] text-slate-500">
+                  <span className="font-bold text-slate-700">Password Security:</span> Passwords are managed directly by users in their Security Profile.
+                </div>
+              )}
 
               <div>
                 <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">System Role</label>

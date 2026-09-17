@@ -20,6 +20,8 @@ interface NotificationItem {
   id: string;
   title: string;
   message: string;
+  type?: string | null;
+  link?: string | null;
   isRead: boolean;
   createdAt: Date | string;
 }
@@ -57,13 +59,13 @@ export function Header({ user, onToggleMobileMenu }: HeaderProps) {
   };
 
   const loadNotifications = useCallback(async () => {
-    const res = await fetchNotificationsAction(user.id);
+    const res = await fetchNotificationsAction();
     if (res.success && res.list) {
       const list = res.list as NotificationItem[];
       setNotifications(list);
       setUnreadCount(list.filter((n) => !n.isRead).length);
     }
-  }, [user.id]);
+  }, []);
 
   // Fetch notifications on mount & when path changes
   useEffect(() => {
@@ -72,7 +74,7 @@ export function Header({ user, onToggleMobileMenu }: HeaderProps) {
 
   const handleMarkAllRead = () => {
     startTransition(async () => {
-      await markAllReadAction(user.id);
+      await markAllReadAction();
       await loadNotifications();
     });
   };
@@ -184,18 +186,29 @@ export function Header({ user, onToggleMobileMenu }: HeaderProps) {
                   notifications.map((notif) => (
                     <div
                       key={notif.id}
+                      onClick={() => {
+                        if (notif.link) {
+                          setShowNotifications(false);
+                          router.push(notif.link);
+                        }
+                      }}
                       className={`p-3 border-b border-slate-50 flex flex-col hover:bg-slate-50 transition-colors ${
+                        notif.link ? "cursor-pointer" : ""
+                      } ${
                         !notif.isRead ? "bg-sky-50/20" : ""
                       }`}
                     >
-                      <div className="flex justify-between items-start">
+                      <div className="flex justify-between items-start gap-2">
                         <span className={`text-[10px] font-bold ${!notif.isRead ? "text-slate-800" : "text-slate-500"}`}>
                           {notif.title}
                         </span>
                         {!notif.isRead && (
                           <button
-                            onClick={() => handleMarkOneRead(notif.id)}
-                            className="text-[9px] font-bold text-sky-600 hover:underline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleMarkOneRead(notif.id);
+                            }}
+                            className="text-[9px] font-bold text-sky-600 hover:underline shrink-0"
                           >
                             Mark read
                           </button>
@@ -209,6 +222,18 @@ export function Header({ user, onToggleMobileMenu }: HeaderProps) {
                     </div>
                   ))
                 )}
+              </div>
+
+              <div className="p-2 border-t border-slate-100 bg-slate-50/80 text-center">
+                <button
+                  onClick={() => {
+                    setShowNotifications(false);
+                    router.push("/notifications");
+                  }}
+                  className="text-[11px] font-bold text-sky-700 hover:text-sky-800 hover:underline w-full py-1 block"
+                >
+                  View All Notifications
+                </button>
               </div>
             </div>
           )}

@@ -50,6 +50,8 @@ model OrganizationalUnit {
   transfersFrom     Transfer[]           @relation("FromDepartment")
   transfersTo       Transfer[]           @relation("ToDepartment")
   users             User[]
+  assetRequests     AssetRequest[]       @relation("DepartmentAssetRequests")
+  propertyAppeals   PropertyAppeal[]     @relation("DepartmentAppeals")
 }
 
 model User {
@@ -62,6 +64,7 @@ model User {
   employeeId                 String?                 @unique
   roleId                     String                  @db.Uuid
   departmentId               String?                 @db.Uuid
+  mustChangePassword         Boolean                 @default(false)
   createdAt                  DateTime                @default(now())
   updatedAt                  DateTime                @updatedAt
   deletedAt                  DateTime?
@@ -90,6 +93,13 @@ model User {
   transfersToUser            Transfer[]              @relation("ToUser")
   department                 OrganizationalUnit?     @relation(fields: [departmentId], references: [id])
   role                       Role                    @relation(fields: [roleId], references: [id])
+  assetRequestsRequested     AssetRequest[]          @relation("StaffAssetRequests")
+  assetRequestsReviewedByHead AssetRequest[]         @relation("HeadReviewedRequests")
+  assetRequestsReviewedByPao  AssetRequest[]         @relation("PaoReviewedRequests")
+  assetRequestHistories      AssetRequestHistory[]
+  propertyAppealsFiled       PropertyAppeal[]        @relation("HeadFiledAppeals")
+  propertyAppealsResponded   PropertyAppeal[]        @relation("PaoRespondedAppeals")
+  propertyAppealHistories    PropertyAppealHistory[]
 }
 
 model AssetCategory {
@@ -106,6 +116,7 @@ model AssetCategory {
   assets              Asset[]
   assetTypes          AssetType[]
   supplierAssignments SupplierAssignment[]
+  assetRequests       AssetRequest[]
 }
 
 model AssetType {
@@ -122,6 +133,7 @@ model AssetType {
   category            AssetCategory        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   formFields          AssetTypeField[]
   supplierAssignments SupplierAssignment[]
+  assetRequests       AssetRequest[]
 }
 
 model Asset {
@@ -184,6 +196,8 @@ model Asset {
   qrCode                  QRCode?
   returns                 Return[]
   transfers               Transfer[]
+  fulfilledAssetRequests  AssetRequest[]
+  propertyAppeals         PropertyAppeal[]
 
   @@index([purchaseDate])
 }
@@ -232,6 +246,7 @@ model Assignment {
   department       OrganizationalUnit? @relation(fields: [departmentId], references: [id])
   rejectedBy       User?               @relation("RejectedBy", fields: [rejectedById], references: [id])
   returns          Return[]
+  fulfilledAssetRequests AssetRequest[]
 }
 
 model Transfer {
@@ -307,14 +322,18 @@ model Disposal {
 }
 
 model Notification {
-  id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @db.Uuid
-  title     String
-  message   String
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String   @db.Uuid
+  title      String
+  message    String
+  type       String?
+  link       String?
+  entityType String?
+  entityId   String?
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AuditLog {
@@ -606,4 +625,121 @@ enum InventorySessionStatus {
   COMPLETED
   CANCELLED
   REOPENED
+}
+
+model AssetRequest {
+  id                  String               @id @default(uuid()) @db.Uuid
+  requestNumber       String               @unique
+  userId              String               @db.Uuid
+  departmentId        String               @db.Uuid
+  categoryId          String               @db.Uuid
+  assetTypeId         String?              @db.Uuid
+  quantity            Int                  @default(1)
+  reason              String
+  priority            String               @default("MEDIUM")
+  status              AssetRequestStatus   @default(PENDING_DEPARTMENT_HEAD)
+  reviewedByHeadId    String?              @db.Uuid
+  headReviewDate      DateTime?
+  headResponseReason  String?
+  reviewedByPaoId     String?              @db.Uuid
+  paoReviewDate       DateTime?
+  paoResponseReason   String?
+  fulfilledAssetId    String?              @db.Uuid
+  assignmentId        String?              @db.Uuid
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  user                User                 @relation("StaffAssetRequests", fields: [userId], references: [id])
+  department          OrganizationalUnit   @relation("DepartmentAssetRequests", fields: [departmentId], references: [id])
+  category            AssetCategory        @relation(fields: [categoryId], references: [id])
+  assetType           AssetType?           @relation(fields: [assetTypeId], references: [id])
+  reviewedByHead      User?                @relation("HeadReviewedRequests", fields: [reviewedByHeadId], references: [id])
+  reviewedByPao       User?                @relation("PaoReviewedRequests", fields: [reviewedByPaoId], references: [id])
+  fulfilledAsset      Asset?               @relation(fields: [fulfilledAssetId], references: [id])
+  assignment          Assignment?          @relation(fields: [assignmentId], references: [id])
+  history             AssetRequestHistory[]
+  appeals             PropertyAppeal[]
+
+  @@index([userId])
+  @@index([departmentId])
+  @@index([status])
+}
+
+model AssetRequestHistory {
+  id         String              @id @default(uuid()) @db.Uuid
+  requestId  String              @db.Uuid
+  actorId    String?             @db.Uuid
+  fromStatus AssetRequestStatus?
+  toStatus   AssetRequestStatus
+  comment    String?
+  createdAt  DateTime            @default(now())
+
+  request    AssetRequest        @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  actor      User?               @relation(fields: [actorId], references: [id])
+
+  @@index([requestId])
+}
+
+model PropertyAppeal {
+  id               String               @id @default(uuid()) @db.Uuid
+  appealNumber     String               @unique
+  departmentId     String               @db.Uuid
+  departmentHeadId String               @db.Uuid
+  requestId        String?              @db.Uuid
+  assetId          String?              @db.Uuid
+  subject          String
+  reason           String
+  description      String
+  supportingInfo   String?
+  status           PropertyAppealStatus @default(PENDING_PROPERTY_MANAGEMENT)
+  responderId      String?              @db.Uuid
+  responseDate     DateTime?
+  responseComment  String?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
+  department       OrganizationalUnit   @relation("DepartmentAppeals", fields: [departmentId], references: [id])
+  departmentHead   User                 @relation("HeadFiledAppeals", fields: [departmentHeadId], references: [id])
+  request          AssetRequest?        @relation(fields: [requestId], references: [id])
+  asset            Asset?               @relation(fields: [assetId], references: [id])
+  responder        User?                @relation("PaoRespondedAppeals", fields: [responderId], references: [id])
+  history          PropertyAppealHistory[]
+
+  @@index([departmentId])
+  @@index([departmentHeadId])
+  @@index([status])
+}
+
+model PropertyAppealHistory {
+  id         String                @id @default(uuid()) @db.Uuid
+  appealId   String                @db.Uuid
+  actorId    String?               @db.Uuid
+  fromStatus PropertyAppealStatus?
+  toStatus   PropertyAppealStatus
+  comment    String?
+  createdAt  DateTime              @default(now())
+
+  appeal     PropertyAppeal        @relation(fields: [appealId], references: [id], onDelete: Cascade)
+  actor      User?                 @relation(fields: [actorId], references: [id])
+
+  @@index([appealId])
+}
+
+enum AssetRequestStatus {
+  PENDING_DEPARTMENT_HEAD
+  APPROVED_BY_DEPARTMENT_HEAD
+  REJECTED_BY_DEPARTMENT_HEAD
+  APPROVED_BY_PROPERTY_MANAGEMENT
+  REJECTED_BY_PROPERTY_MANAGEMENT
+  FULFILLED
+  CANCELLED
+}
+
+enum PropertyAppealStatus {
+  PENDING_PROPERTY_MANAGEMENT
+  UNDER_REVIEW
+  ADDITIONAL_INFORMATION_REQUIRED
+  RESOLVED
+  REJECTED
+  CLOSED
 }

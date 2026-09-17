@@ -4,6 +4,8 @@ import React, { useState, useTransition } from "react";
 import { changePasswordAction } from "@/app/actions/profile";
 import { Eye, EyeOff, Lock, User, Shield, Info, Check, X } from "lucide-react";
 
+import { useRouter } from "next/navigation";
+
 interface ProfileClientProps {
   user: {
     id: string;
@@ -11,14 +13,27 @@ interface ProfileClientProps {
     email: string;
     role: string;
     department: string;
+    mustChangePassword?: boolean;
   };
+  initialTab?: "info" | "security";
+  forcePasswordChange?: boolean;
 }
 
-export function ProfileClient({ user }: ProfileClientProps) {
-  const [activeTab, setActiveTab] = useState<"info" | "security">("info");
+export function ProfileClient({ 
+  user, 
+  initialTab = "info",
+  forcePasswordChange = false 
+}: ProfileClientProps) {
+  const router = useRouter();
+  const mustChange = forcePasswordChange || user.mustChangePassword;
+  const [activeTab, setActiveTab] = useState<"info" | "security">(mustChange ? "security" : initialTab);
   const [isPending, startTransition] = useTransition();
 
   React.useEffect(() => {
+    if (mustChange) {
+      setActiveTab("security");
+      return;
+    }
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const tab = params.get("tab");
@@ -26,7 +41,7 @@ export function ProfileClient({ user }: ProfileClientProps) {
         setActiveTab("security");
       }
     }
-  }, []);
+  }, [mustChange]);
 
   // Password fields
   const [currentPassword, setCurrentPassword] = useState("");
@@ -86,10 +101,11 @@ export function ProfileClient({ user }: ProfileClientProps) {
       if (res.error) {
         setError(res.error);
       } else {
-        setSuccess("Password changed successfully. Please log out and sign in again with your new credentials.");
+        setSuccess("Password updated successfully! Your account security setup is complete.");
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
+        router.refresh();
       }
     });
   };
@@ -106,14 +122,29 @@ export function ProfileClient({ user }: ProfileClientProps) {
         </div>
       </div>
 
+      {mustChange && !success && (
+        <div className="p-4 bg-amber-50 border border-amber-300 rounded-2xl flex items-start gap-3">
+          <Shield size={20} className="text-amber-700 shrink-0 mt-0.5" />
+          <div>
+            <h4 className="text-xs font-black text-amber-900 uppercase">First Login Security Enforcement</h4>
+            <p className="text-xs text-amber-800 mt-0.5">
+              You are currently using an initial temporary password assigned upon account creation. You must change your password now to activate your account and proceed to the system.
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col md:flex-row gap-6">
         {/* Left Side Tabs Sidebar */}
         <div className="w-full md:w-64 bg-white rounded-2xl border border-slate-100 p-4 h-fit space-y-2 shadow-sm">
           <button
             onClick={() => setActiveTab("info")}
+            disabled={mustChange && !success}
             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-xs font-bold transition-all ${
               activeTab === "info"
                 ? "bg-[#0b4a6e] text-white shadow-md shadow-sky-950/10"
+                : mustChange && !success
+                ? "text-slate-300 cursor-not-allowed"
                 : "text-slate-650 hover:bg-slate-50"
             }`}
           >
@@ -200,9 +231,23 @@ export function ProfileClient({ user }: ProfileClientProps) {
               )}
 
               {success && (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-semibold text-emerald-800 flex items-center gap-2">
-                  <Check size={14} />
-                  <span>{success}</span>
+                <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-2.5">
+                  <div className="text-xs font-bold text-emerald-800 flex items-center gap-2">
+                    <Check size={16} />
+                    <span>{success}</span>
+                  </div>
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        window.location.href = "/";
+                      }}
+                      className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
+                    >
+                      <span>Proceed to Dashboard</span>
+                      <Check size={14} />
+                    </button>
+                  </div>
                 </div>
               )}
 

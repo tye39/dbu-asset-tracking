@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { StaffDashboardClient } from "@/components/staff-dashboard-client";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { AssignmentStatus, MaintenanceStatus } from "@prisma/client";
+import { AssignmentStatus, MaintenanceStatus, AssetRequestStatus } from "@prisma/client";
 
 export const revalidate = 0;
 
@@ -15,7 +15,7 @@ export default async function StaffDashboardPage() {
 
   const userId = session.user.id;
   // 1. Fetch Stats
-  const [assignedAssets, pendingCount, openMaintenance] = await Promise.all([
+  const [assignedAssets, pendingCount, openMaintenance, pendingAssetRequests] = await Promise.all([
     prisma.assignment.count({
       where: {
         assignedToUserId: userId,
@@ -32,6 +32,12 @@ export default async function StaffDashboardPage() {
       where: {
         reportedById: userId,
         NOT: { status: MaintenanceStatus.COMPLETED },
+      },
+    }),
+    prisma.assetRequest.count({
+      where: {
+        userId,
+        status: { in: [AssetRequestStatus.PENDING_DEPARTMENT_HEAD, AssetRequestStatus.APPROVED_BY_DEPARTMENT_HEAD] },
       },
     }),
   ]);
@@ -115,6 +121,7 @@ export default async function StaffDashboardPage() {
         assignedAssets,
         pendingAssignments: pendingCount,
         openMaintenance,
+        pendingAssetRequests,
       }}
       myAssetsList={myAssetsList}
       pendingAssignments={pendingList}

@@ -14,9 +14,11 @@ export default async function AdminDashboardPage() {
   });
 
   // 1. Fetch count stats
-  const [totalUsers, totalDepartments] = await Promise.all([
+  const [totalUsers, totalDepartments, pendingRequestsCount, maintenanceCount] = await Promise.all([
     prisma.user.count({ where: { deletedAt: null } }),
     prisma.organizationalUnit.count({ where: { deletedAt: null } }),
+    prisma.assetRequest.count({ where: { status: { in: ["PENDING_DEPARTMENT_HEAD", "APPROVED_BY_DEPARTMENT_HEAD"] } } }),
+    prisma.maintenance.count({ where: { status: { in: ["PENDING", "IN_PROGRESS"] } } }),
   ]);
 
   // 2. Fetch Assets and Maintenance logs for calculations
@@ -42,6 +44,7 @@ export default async function AdminDashboardPage() {
   let totalMaintenanceCostVal = 0;
   let totalAssetInvestment = 0;
   let warrantyExpiringCount = 0;
+  let expiredAssetsCount = 0;
   let endOfLifeCount = 0;
 
   const now = new Date();
@@ -75,7 +78,11 @@ export default async function AdminDashboardPage() {
     totalAssetInvestment += invest;
 
     // Check warranty status
-    if (a.warrantyEndDate && a.warrantyEndDate > now && a.warrantyEndDate <= thirtyDaysFromNow) {
+    const isExpired = (a.warrantyEndDate && a.warrantyEndDate <= now) || (a.warrantyExpiry && a.warrantyExpiry <= now);
+    if (isExpired) {
+      expiredAssetsCount++;
+    } else if ((a.warrantyEndDate && a.warrantyEndDate > now && a.warrantyEndDate <= thirtyDaysFromNow) || 
+               (a.warrantyExpiry && a.warrantyExpiry > now && a.warrantyExpiry <= thirtyDaysFromNow)) {
       warrantyExpiringCount++;
     }
 
@@ -153,7 +160,13 @@ export default async function AdminDashboardPage() {
     totalMaintenanceCost: totalMaintenanceCostVal,
     totalAssetInvestment,
     warrantyExpiringCount,
+    expiredAssetsCount,
     endOfLifeCount,
+    totalAssetsCount: allAssets.length,
+    activeAssetsCount: allAssets.filter((a) => a.status === "ACTIVE").length,
+    assignedAssetsCount: allAssets.filter((a) => a.status === "ASSIGNED").length,
+    pendingRequestsCount,
+    maintenanceCount,
     totalUsers,
     totalDepartments
   };

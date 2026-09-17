@@ -10,7 +10,11 @@ import {
   Wrench,
   X,
   Loader2,
-  HelpCircle
+  HelpCircle,
+  Plus,
+  Send,
+  FileQuestion,
+  ArrowRight
 } from "lucide-react";
 
 interface AssetItem {
@@ -52,6 +56,7 @@ interface StaffDashboardClientProps {
     assignedAssets: number;
     pendingAssignments: number;
     openMaintenance: number;
+    pendingAssetRequests?: number;
   };
   myAssetsList: AssetItem[];
   pendingAssignments: PendingAssignmentItem[];
@@ -153,40 +158,64 @@ export function StaffDashboardClient({
       )}
 
       {/* Header section matching mockup color */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-purple-100 pb-4 bg-purple-950/5 -mx-3 -mt-3 sm:-mx-6 sm:-mt-6 p-4 sm:p-6 gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-purple-100 pb-4 bg-purple-950/5 -mx-3 -mt-3 sm:-mx-6 sm:-mt-6 p-4 sm:p-6 gap-3">
         <div>
           <h2 className="text-lg sm:text-xl font-bold text-purple-900">STAFF MEMBER PORTAL</h2>
           <p className="text-[11px] sm:text-xs text-purple-600 font-semibold mt-0.5">My Assigned Assets & Requests</p>
         </div>
+        <button
+          onClick={() => router.push("/staff/requests")}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl text-xs font-semibold hover:bg-purple-700 transition shadow-sm self-start sm:self-auto"
+        >
+          <Plus size={15} />
+          <span>Request New Asset</span>
+        </button>
       </div>
       {pendingAssignments.length === -1 && <span />}
 
       {/* Grid of stats cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Assets Assigned to Me */}
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
-          <div className="p-3 bg-purple-50 text-purple-700 rounded-lg"><Package size={20} /></div>
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-3">
+          <div className="p-2.5 bg-purple-50 text-purple-700 rounded-lg"><Package size={20} /></div>
           <div>
-            <p className="text-[10px] font-extrabold text-slate-400 uppercase">My Assigned Assets</p>
+            <p className="text-[10px] font-extrabold text-slate-400 uppercase">My Assets</p>
             <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.assignedAssets}</h3>
           </div>
         </div>
 
         {/* Pending Assignments */}
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
-          <div className="p-3 bg-amber-50 text-amber-600 rounded-lg"><AlertTriangle size={20} /></div>
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-3">
+          <div className="p-2.5 bg-amber-50 text-amber-600 rounded-lg"><AlertTriangle size={20} /></div>
           <div>
-            <p className="text-[10px] font-extrabold text-slate-400 uppercase">Pending Confirmation</p>
+            <p className="text-[10px] font-extrabold text-slate-400 uppercase">Pending Custody</p>
             <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.pendingAssignments}</h3>
           </div>
         </div>
 
         {/* Open Maintenance Requests */}
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
-          <div className="p-3 bg-orange-50 text-orange-700 rounded-lg"><Wrench size={20} /></div>
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-3">
+          <div className="p-2.5 bg-orange-50 text-orange-700 rounded-lg"><Wrench size={20} /></div>
           <div>
-            <p className="text-[10px] font-extrabold text-slate-400 uppercase">Active Repair Requests</p>
+            <p className="text-[10px] font-extrabold text-slate-400 uppercase">Active Repairs</p>
             <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.openMaintenance}</h3>
+          </div>
+        </div>
+
+        {/* Pending Asset Requests */}
+        <div
+          onClick={() => router.push("/staff/requests")}
+          className="bg-white p-4 rounded-xl shadow-sm border border-blue-200/80 hover:border-blue-400 cursor-pointer transition-all flex items-center space-x-3 group"
+        >
+          <div className="p-2.5 bg-blue-50 text-blue-600 rounded-lg group-hover:scale-105 transition-transform"><FileQuestion size={20} /></div>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <p className="text-[10px] font-extrabold text-slate-400 uppercase">Asset Requests</p>
+              {(stats.pendingAssetRequests ?? 0) > 0 && (
+                <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+              )}
+            </div>
+            <h3 className="text-lg font-bold text-blue-700 mt-0.5">{stats.pendingAssetRequests ?? 0}</h3>
           </div>
         </div>
       </div>
@@ -254,14 +283,42 @@ export function StaffDashboardClient({
         <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
           <div>
             <h4 className="text-xs font-extrabold text-slate-700 uppercase mb-4">Quick Actions</h4>
-            <div className="space-y-3">
+            <div className="space-y-2.5">
+              <button
+                onClick={() => router.push("/staff/requests")}
+                className="w-full flex items-center justify-between p-2.5 bg-blue-50/80 border border-blue-200 text-blue-900 rounded-xl text-xs font-semibold hover:bg-blue-100 transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <Send size={15} className="text-blue-700" />
+                  <span>Request New Asset</span>
+                </span>
+                <ArrowRight size={13} className="text-blue-500" />
+              </button>
+
+              <button
+                onClick={() => router.push("/staff/requests")}
+                className="w-full flex items-center justify-between p-2.5 bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold hover:bg-slate-100 transition-colors"
+              >
+                <span className="flex items-center gap-2">
+                  <FileQuestion size={15} className="text-slate-600" />
+                  <span>My Asset Requests</span>
+                </span>
+                {(stats.pendingAssetRequests ?? 0) > 0 && (
+                  <span className="text-[10px] bg-blue-600 text-white px-1.5 py-0.2 rounded-full font-bold">
+                    {stats.pendingAssetRequests}
+                  </span>
+                )}
+              </button>
+
               <button
                 onClick={() => setShowReportModal(true)}
                 disabled={myAssetsList.length === 0}
-                className="w-full flex items-center space-x-3 p-3 bg-purple-50 border border-purple-100 text-purple-800 rounded-xl text-xs font-semibold hover:bg-purple-100/80 transition-colors disabled:opacity-40"
+                className="w-full flex items-center justify-between p-2.5 bg-purple-50/80 border border-purple-200 text-purple-900 rounded-xl text-xs font-semibold hover:bg-purple-100 transition-colors disabled:opacity-40"
               >
-                <AlertTriangle size={16} className="text-purple-700" />
-                <span>Report Damaged Asset</span>
+                <span className="flex items-center gap-2">
+                  <AlertTriangle size={15} className="text-purple-700" />
+                  <span>Report Damaged Asset</span>
+                </span>
               </button>
             </div>
           </div>

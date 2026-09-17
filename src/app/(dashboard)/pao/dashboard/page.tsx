@@ -1,7 +1,13 @@
 import React from "react";
 import { prisma } from "@/lib/db";
 import { PaoDashboardClient } from "@/components/pao-dashboard-client";
-import { AssetStatus, TransferStatus, MaintenanceStatus } from "@prisma/client";
+import {
+  AssetStatus,
+  TransferStatus,
+  MaintenanceStatus,
+  AssetRequestStatus,
+  PropertyAppealStatus,
+} from "@prisma/client";
 
 export const revalidate = 0; // Disable caching to ensure real-time dashboard data
 
@@ -16,6 +22,8 @@ export default async function PaoDashboardPage() {
     disposedAssets,
     pendingMaintenances,
     totalCategories,
+    pendingAssetRequests,
+    pendingAppeals,
   ] = await Promise.all([
     prisma.asset.count({ where: { deletedAt: null } }),
     prisma.asset.count({ where: { status: AssetStatus.ACTIVE, deletedAt: null } }),
@@ -25,6 +33,20 @@ export default async function PaoDashboardPage() {
     prisma.asset.count({ where: { status: AssetStatus.DISPOSED, deletedAt: null } }),
     prisma.maintenance.count({ where: { status: MaintenanceStatus.PENDING } }),
     prisma.assetCategory.count({ where: { deletedAt: null } }),
+    prisma.assetRequest.count({
+      where: { status: AssetRequestStatus.APPROVED_BY_DEPARTMENT_HEAD },
+    }),
+    prisma.propertyAppeal.count({
+      where: {
+        status: {
+          in: [
+            PropertyAppealStatus.PENDING_PROPERTY_MANAGEMENT,
+            PropertyAppealStatus.UNDER_REVIEW,
+            PropertyAppealStatus.ADDITIONAL_INFORMATION_REQUIRED,
+          ],
+        },
+      },
+    }),
   ]);
 
   // 2. Fetch Chart Data (Assets by Category)
@@ -99,6 +121,8 @@ export default async function PaoDashboardPage() {
         disposedAssets,
         pendingMaintenances,
         totalCategories,
+        pendingAssetRequests,
+        pendingAppeals,
       }}
       chartData={chartData}
       recentActivities={recentActivities}
