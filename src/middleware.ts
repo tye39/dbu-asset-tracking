@@ -11,14 +11,29 @@ export default auth((req) => {
   const userRole = req.auth?.user?.role;
 
   const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth");
+  const isPublicVerificationRoute = nextUrl.pathname.startsWith("/asset/verify");
   const isPublicRoute =
     nextUrl.pathname === "/login" ||
     nextUrl.pathname === "/forgot-password" ||
     nextUrl.pathname === "/reset-password" ||
+    isPublicVerificationRoute ||
     nextUrl.pathname.startsWith("/assets/");
 
   if (isApiAuthRoute) {
     return NextResponse.next();
+  }
+
+  // Handle public verification route (accessible without login)
+  if (isPublicVerificationRoute) {
+    return NextResponse.next();
+  }
+
+  // Legacy QR code redirect: If an unauthenticated user visits /assets/[id], redirect to /asset/verify/[id]
+  if (!isLoggedIn && nextUrl.pathname.startsWith("/assets/")) {
+    const legacyId = nextUrl.pathname.replace(/^\/assets\/?/, "");
+    if (legacyId) {
+      return NextResponse.redirect(new URL(`/asset/verify/${legacyId}`, nextUrl));
+    }
   }
 
   // Handle public routes (login, forgot password, reset password)

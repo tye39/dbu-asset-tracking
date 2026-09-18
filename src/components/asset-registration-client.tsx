@@ -567,8 +567,12 @@ export function AssetRegistrationClient({
         setError(res.error);
         setStep(2);
       } else {
-        // Generate QR code for review label
-        const codeString = res.asset?.assetCode || assetCode;
+        // Generate QR code for review label pointing to public verification page
+        const codeString =
+          res.asset?.qrCode?.qrCodeString ||
+          (res.asset?.publicId
+            ? `${window.location.origin}/asset/verify/${res.asset.publicId}`
+            : res.asset?.assetCode || assetCode);
         try {
           const qr = await QRCode.toDataURL(codeString, { width: 200, margin: 1 });
           setQrCodeUrl(qr);

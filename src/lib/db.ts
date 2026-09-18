@@ -12,7 +12,18 @@ if (!connectionString) {
   throw new Error("DATABASE_URL is not set in environment variables");
 }
 
-const pool = globalForPrisma.pool ?? new Pool({ connectionString });
+const pool = globalForPrisma.pool ?? new Pool({
+  connectionString,
+  connectionTimeoutMillis: 60000,
+  idleTimeoutMillis: 60000,
+  max: 10,
+});
+
+// Prevent unhandled error crashes on idle connection resets from Neon serverless pooler
+pool.on("error", (err) => {
+  console.warn("PG pool idle connection notice:", err.message);
+});
+
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.pool = pool;
 }

@@ -119,9 +119,26 @@ export async function scanAssetInSession(inventorySessionId: string, assetCodeOr
     throw new Error("A completed or cancelled inventory cannot receive new scans.");
   }
 
-  // Find asset (searching by code or tag)
-  const asset = await prisma.asset.findUnique({
-    where: { assetCode: assetCodeOrTag.trim() },
+  // Extract identifier if a full QR verification URL was scanned
+  let cleanTag = assetCodeOrTag.trim();
+  if (cleanTag.includes("/asset/verify/")) {
+    cleanTag = cleanTag.substring(cleanTag.lastIndexOf("/asset/verify/") + "/asset/verify/".length).split(/[?#]/)[0];
+  } else if (cleanTag.includes("/assets/")) {
+    cleanTag = cleanTag.substring(cleanTag.lastIndexOf("/assets/") + "/assets/".length).split(/[?#]/)[0];
+  }
+
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(cleanTag);
+
+  // Find asset (searching by code, publicId, or id)
+  const asset = await prisma.asset.findFirst({
+    where: {
+      OR: [
+        { assetCode: cleanTag },
+        { publicId: cleanTag },
+        ...(isUuid ? [{ id: cleanTag }] : []),
+      ],
+      deletedAt: null,
+    },
     include: {
       department: true,
       category: true,

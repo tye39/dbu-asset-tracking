@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { createAuditLog } from "./audit";
 import { Prisma, AssetStatus, FundingSource, AssignmentStatus } from "@prisma/client";
 import { calculateAssetFinancials } from "./financials";
+import { getAppBaseUrl } from "@/lib/privacy";
 
 export async function registerAsset(data: {
   name: string;
@@ -331,11 +332,11 @@ export async function registerAsset(data: {
       });
     }
 
-    const host = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const host = getAppBaseUrl();
     await tx.qRCode.create({
       data: {
         assetId: newAsset.id,
-        qrCodeString: `${host}/assets/${newAsset.id}`,
+        qrCodeString: `${host}/asset/verify/${newAsset.publicId}`,
         barcodeString: newAsset.assetCode,
       },
     });

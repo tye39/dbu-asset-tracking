@@ -138,6 +138,7 @@ model AssetType {
 
 model Asset {
   id                      String                  @id @default(uuid()) @db.Uuid
+  publicId                String                  @unique @default(uuid())
   name                    String
   assetCode               String                  @unique
   serialNumber            String                  @unique

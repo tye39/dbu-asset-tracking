@@ -12,7 +12,11 @@ import {
   Download,
   Printer,
   ChevronLeft,
-  DollarSign
+  DollarSign,
+  Copy,
+  Check,
+  ExternalLink,
+  ShieldCheck
 } from "lucide-react";
 
 interface AssignmentRecord {
@@ -45,6 +49,7 @@ interface TransferRecord {
 
 interface AssetDetails {
   id: string;
+  publicId?: string | null;
   name: string;
   assetCode: string;
   serialNumber: string;
@@ -443,16 +448,44 @@ export function AssetDetailsClient({ asset, session, departments, staffUsers, en
     return { score: totalScore, recommendation };
   })();
 
-  // QR Code Image Download
+  // Public QR Verification URL
+  const [copiedUrl, setCopiedUrl] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
 
+  const verificationUrl = React.useMemo(() => {
+    if (typeof window !== "undefined") {
+      const origin = window.location.origin;
+      if (asset?.publicId) {
+        return `${origin}/asset/verify/${asset.publicId}`;
+      }
+      if (asset?.qrCode?.qrCodeString?.includes("/asset/verify/")) {
+        return asset.qrCode.qrCodeString;
+      }
+      return `${origin}/asset/verify/${asset?.assetCode || asset?.id}`;
+    }
+    return asset?.qrCode?.qrCodeString || "";
+  }, [asset]);
+
   React.useEffect(() => {
-    if (asset?.qrCode?.qrCodeString) {
-      QRCode.toDataURL(asset.qrCode.qrCodeString, { width: 200, margin: 1 })
+    const stringToEncode = verificationUrl || asset?.qrCode?.qrCodeString || asset?.assetCode;
+    if (stringToEncode) {
+      QRCode.toDataURL(stringToEncode, { width: 250, margin: 1 })
         .then(setQrCodeUrl)
         .catch(() => setQrCodeUrl(null));
     }
-  }, [asset]);
+  }, [verificationUrl, asset]);
+
+  const handleCopyUrl = async () => {
+    if (!verificationUrl) return;
+    try {
+      await navigator.clipboard.writeText(verificationUrl);
+      setCopiedUrl(true);
+      setTimeout(() => setCopiedUrl(false), 2000);
+    } catch {
+      // Fallback
+      setCopiedUrl(false);
+    }
+  };
 
   // Form errors / states
   const [error, setError] = useState<string | null>(null);
@@ -896,6 +929,84 @@ export function AssetDetailsClient({ asset, session, departments, staffUsers, en
                 >
                   <Download size={12} />
                   <span>Download</span>
+                </a>
+              )}
+            </div>
+          </div>
+
+          {/* Public QR Verification Card */}
+          <div className="bg-white p-5 rounded-2xl border border-slate-150 shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center space-x-2">
+                <ShieldCheck size={18} className="text-emerald-600" />
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 m-0">
+                  Public QR Verification
+                </h4>
+              </div>
+              <span className="text-[10px] bg-emerald-50 text-emerald-700 font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">
+                Privacy Safe
+              </span>
+            </div>
+
+            <div className="flex items-center space-x-3.5">
+              <div className="w-20 h-20 bg-white border border-slate-200 rounded-xl p-1 flex items-center justify-center shrink-0 shadow-2xs">
+                {qrCodeUrl ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={qrCodeUrl} alt="Public Verification QR Code" className="w-full h-full object-contain" />
+                ) : (
+                  <QrCode size={32} className="text-slate-300" />
+                )}
+              </div>
+              <div className="flex-1 min-w-0 space-y-1">
+                <p className="text-[11px] font-bold text-slate-700 m-0">Public Verification URL</p>
+                <p className="text-[10px] font-mono text-slate-600 truncate bg-slate-50 p-1.5 rounded-md border border-slate-150 select-all m-0">
+                  {verificationUrl || "Generating..."}
+                </p>
+                <p className="text-[9px] text-slate-400 leading-tight m-0">
+                  Allows anyone to scan and verify asset registration without logging in.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                type="button"
+                onClick={handleCopyUrl}
+                className="flex items-center justify-center space-x-1.5 py-2 px-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 transition-colors"
+              >
+                {copiedUrl ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
+                <span>{copiedUrl ? "Copied!" : "Copy URL"}</span>
+              </button>
+
+              {qrCodeUrl && (
+                <a
+                  href={qrCodeUrl}
+                  download={`qr-verify-${asset.assetCode}.png`}
+                  className="flex items-center justify-center space-x-1.5 py-2 px-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 transition-colors text-center"
+                >
+                  <Download size={13} />
+                  <span>Download QR</span>
+                </a>
+              )}
+
+              <button
+                type="button"
+                onClick={handlePrintLabel}
+                className="flex items-center justify-center space-x-1.5 py-2 px-2.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 transition-colors"
+              >
+                <Printer size={13} />
+                <span>Print Label</span>
+              </button>
+
+              {verificationUrl && (
+                <a
+                  href={verificationUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center space-x-1.5 py-2 px-2.5 bg-sky-50 hover:bg-sky-100 text-sky-850 border border-sky-200 rounded-xl text-xs font-bold transition-colors text-center"
+                >
+                  <ExternalLink size={13} />
+                  <span>Preview Page</span>
                 </a>
               )}
             </div>
