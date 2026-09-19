@@ -41,8 +41,10 @@ interface DashboardFinancialClientProps {
     totalAssetValue: number;
     currentBookValue: number;
     totalDepreciation: number;
+    totalSalvageValue?: number;
     totalMaintenanceCost: number;
     totalAssetInvestment: number;
+    financiallyValuedCount?: number;
     warrantyExpiringCount: number;
     expiredAssetsCount: number;
     endOfLifeCount: number;
@@ -305,7 +307,8 @@ export function DashboardFinancialClient({
       </div>
 
       {/* Financial Valuation Summary Section */}
-      <div className="space-y-3 pt-2">
+      {/* Financial Valuation Summary Section */}
+      <div className="space-y-4 pt-2">
         <h3 className="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
           <DollarSign size={14} className="text-emerald-700" />
           University Capital Valuation & Financial Summary
@@ -315,36 +318,111 @@ export function DashboardFinancialClient({
           {/* Total Asset Value */}
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1.5">
             <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Total Value</span>
-            <h3 className="text-base font-black text-slate-800">{stats.totalAssetValue.toLocaleString()} ETB</h3>
-            <p className="text-[9px] text-slate-400 font-medium">Acquisition cost of all items</p>
+            <h3 className="text-base font-black text-slate-800">
+              {stats.totalAssetValue !== undefined && !isNaN(stats.totalAssetValue) ? `${stats.totalAssetValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB` : "—"}
+            </h3>
+            <p className="text-[9px] text-slate-400 font-medium">Acquisition cost of active inventory</p>
           </div>
 
           {/* Current Book Value */}
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1.5">
             <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Book Value</span>
-            <h3 className="text-base font-black text-emerald-700">{stats.currentBookValue.toLocaleString()} ETB</h3>
+            <h3 className="text-base font-black text-emerald-700">
+              {stats.currentBookValue !== undefined && !isNaN(stats.currentBookValue) ? `${stats.currentBookValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB` : "—"}
+            </h3>
             <p className="text-[9px] text-slate-400 font-medium">After straight-line depreciation</p>
           </div>
 
           {/* Total Depreciation */}
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1.5">
             <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Depreciation</span>
-            <h3 className="text-base font-black text-indigo-700">{stats.totalDepreciation.toLocaleString()} ETB</h3>
-            <p className="text-[9px] text-slate-400 font-medium">Cumulative book depreciation</p>
+            <h3 className="text-base font-black text-indigo-700">
+              {stats.totalDepreciation !== undefined && !isNaN(stats.totalDepreciation) ? `${stats.totalDepreciation.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB` : "—"}
+            </h3>
+            <p className="text-[9px] text-slate-400 font-medium">Cumulative recognized depreciation</p>
           </div>
 
           {/* Total Maintenance Cost */}
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1.5">
             <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Repairs Cost</span>
-            <h3 className="text-base font-black text-amber-700">{stats.totalMaintenanceCost.toLocaleString()} ETB</h3>
+            <h3 className="text-base font-black text-amber-700">
+              {stats.totalMaintenanceCost !== undefined && !isNaN(stats.totalMaintenanceCost) ? `${stats.totalMaintenanceCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB` : "—"}
+            </h3>
             <p className="text-[9px] text-slate-400 font-medium">Sum of all completed repairs</p>
           </div>
 
           {/* Total Asset Investment */}
           <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-1.5">
             <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Total Invested</span>
-            <h3 className="text-base font-black text-violet-700">{stats.totalAssetInvestment.toLocaleString()} ETB</h3>
+            <h3 className="text-base font-black text-violet-700">
+              {stats.totalAssetInvestment !== undefined && !isNaN(stats.totalAssetInvestment) ? `${stats.totalAssetInvestment.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB` : "—"}
+            </h3>
             <p className="text-[9px] text-slate-400 font-medium">Acquisition + Repairs combined</p>
+          </div>
+        </div>
+
+        {/* Executive Capital Valuation Ledger Breakdown Table (Requirement 20) */}
+        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+          <div className="px-5 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+            <span className="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+              <FileText size={13} className="text-sky-700" /> Executive Capital Valuation Ledger Breakdown
+            </span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Debre Berhan University Fixed Assets</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs text-left">
+              <thead className="bg-slate-50/75 text-slate-500 font-bold border-b border-slate-200 uppercase text-[10px] tracking-wider">
+                <tr>
+                  <th className="py-2.5 px-5">Financial Valuation Metric</th>
+                  <th className="py-2.5 px-5">Accounting Meaning</th>
+                  <th className="py-2.5 px-5 text-right">Portfolio Amount</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-medium">
+                <tr>
+                  <td className="py-2.5 px-5 font-bold text-slate-800">Total Acquisition Cost</td>
+                  <td className="py-2.5 px-5 text-slate-500">Historical purchase & procurement cost of active assets</td>
+                  <td className="py-2.5 px-5 text-right font-black text-slate-900">
+                    {stats.totalAssetValue !== undefined && !isNaN(stats.totalAssetValue) ? `${stats.totalAssetValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB` : "—"}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2.5 px-5 font-bold text-indigo-700">Total Accumulated Depreciation</td>
+                  <td className="py-2.5 px-5 text-slate-500">Cumulative straight-line depreciation recognized to date</td>
+                  <td className="py-2.5 px-5 text-right font-black text-indigo-700">
+                    {stats.totalDepreciation !== undefined && !isNaN(stats.totalDepreciation) ? `${stats.totalDepreciation.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB` : "—"}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2.5 px-5 font-bold text-emerald-700">Current University Book Value</td>
+                  <td className="py-2.5 px-5 text-slate-500">Net carrying value on university balance sheet</td>
+                  <td className="py-2.5 px-5 text-right font-black text-emerald-700">
+                    {stats.currentBookValue !== undefined && !isNaN(stats.currentBookValue) ? `${stats.currentBookValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB` : "—"}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2.5 px-5 font-bold text-slate-700">Total Salvage Value</td>
+                  <td className="py-2.5 px-5 text-slate-500">Estimated residual value floor at end of lifecycle</td>
+                  <td className="py-2.5 px-5 text-right font-black text-slate-700">
+                    {stats.totalSalvageValue !== undefined && !isNaN(stats.totalSalvageValue) ? `${stats.totalSalvageValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB` : "—"}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-2.5 px-5 font-bold text-amber-700">Total Maintenance Expenditure</td>
+                  <td className="py-2.5 px-5 text-slate-500">Sum of all completed repair and servicing expenditures</td>
+                  <td className="py-2.5 px-5 text-right font-black text-amber-700">
+                    {stats.totalMaintenanceCost !== undefined && !isNaN(stats.totalMaintenanceCost) ? `${stats.totalMaintenanceCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB` : "—"}
+                  </td>
+                </tr>
+                <tr className="bg-slate-50/50">
+                  <td className="py-2.5 px-5 font-bold text-sky-850">Financially Valued Assets</td>
+                  <td className="py-2.5 px-5 text-slate-500">Total active university assets with recorded acquisition costs</td>
+                  <td className="py-2.5 px-5 text-right font-black text-sky-850">
+                    {stats.financiallyValuedCount !== undefined ? `${stats.financiallyValuedCount} Assets` : `${stats.activeAssetsCount} Assets`}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

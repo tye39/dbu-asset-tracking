@@ -10,7 +10,7 @@ import {
   getMaintenanceCostAudit,
   getFinancialAuditHistory
 } from "@/app/actions/financial-audit";
-import { calculateDepreciation } from "@/services/valuation";
+import { calculateSingleAssetFinancials } from "@/services/financials";
 import Link from "next/link";
 
 export const revalidate = 0;
@@ -22,16 +22,6 @@ function toSafeISOString(date: Date | string | null | undefined): string {
     return isNaN(d.getTime()) ? "" : d.toISOString();
   } catch {
     return "";
-  }
-}
-
-function toSafeDate(date: Date | string | null | undefined): Date | null {
-  if (!date) return null;
-  try {
-    const d = date instanceof Date ? date : new Date(date);
-    return isNaN(d.getTime()) ? null : d;
-  } catch {
-    return null;
   }
 }
 
@@ -193,22 +183,19 @@ export default async function AuditorDashboardPage({ searchParams }: AuditorDash
     approved: a.purchaseApproved
   }));
 
-  // Map Depreciations
+  // Map Depreciations using central single source of truth
+  const now = new Date();
   const depreciations = rawAssets.map((a) => {
-    const cost = a.procurementCost ? Number(a.procurementCost) : 0;
-    const salvage = a.salvageValue ? Number(a.salvageValue) : 0;
-    const lifecycle = (a.expectedLifecycleYears && a.expectedLifecycleYears > 0) ? a.expectedLifecycleYears : 5;
-    const deprVal = calculateDepreciation(cost, toSafeDate(a.purchaseDate), lifecycle, salvage);
-    const annual = (cost - salvage) / lifecycle;
+    const fin = calculateSingleAssetFinancials(a, now);
     return {
       assetCode: a.assetCode,
       name: a.name,
-      cost,
-      salvage,
-      lifecycle,
-      annualDepr: Number(annual.toFixed(2)),
-      accumDepr: deprVal.totalDepreciation,
-      bookValue: deprVal.currentValue
+      cost: fin.cost,
+      salvage: fin.salvageValue,
+      lifecycle: fin.usefulLifeYears,
+      annualDepr: fin.annualDepreciation,
+      accumDepr: fin.accumulatedDepreciation,
+      bookValue: fin.currentBookValue
     };
   });
 

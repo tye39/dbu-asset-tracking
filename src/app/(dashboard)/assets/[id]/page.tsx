@@ -2,6 +2,7 @@ import React from "react";
 import { prisma } from "@/lib/db";
 import { AssetDetailsClient } from "@/components/asset-details-client";
 import { auth } from "@/auth";
+import { calculateSingleAssetFinancials } from "@/services/financials";
 
 
 export const revalidate = 0;
@@ -77,6 +78,9 @@ export default async function AssetDetailPage({ params }: AssetDetailPageProps) 
     orderBy: { name: "asc" }
   });
 
+  // Calculate live financial metrics as of current date (single source of truth)
+  const liveFinancials = calculateSingleAssetFinancials(asset, new Date());
+
   return (
     <AssetDetailsClient
       asset={asset}
@@ -84,6 +88,7 @@ export default async function AssetDetailPage({ params }: AssetDetailPageProps) 
       departments={departments}
       staffUsers={staffUsers}
       enabledFields={enabledFields}
+      liveFinancials={liveFinancials}
     />
   );
 }

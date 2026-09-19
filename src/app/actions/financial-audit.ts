@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
-import { calculateDepreciation } from "@/services/valuation";
+import { calculateSingleAssetFinancials } from "@/services/financials";
 
 export interface FinancialStats {
   totalAssetCost: number;
@@ -25,7 +25,20 @@ export async function getFinancialAuditDashboard(): Promise<FinancialStats> {
   const [assets, maintenances, disposals] = await Promise.all([
     prisma.asset.findMany({ where: { deletedAt: null } }),
     prisma.maintenance.findMany({ where: { status: "COMPLETED" }, select: { cost: true, maintenanceCost: true } }),
-    prisma.disposal.findMany({ select: { asset: { select: { procurementCost: true, purchaseDate: true, expectedLifecycleYears: true, salvageValue: true } } } }),
+    prisma.disposal.findMany({
+      select: {
+        asset: {
+          select: {
+            purchaseCost: true,
+            procurementCost: true,
+            purchaseDate: true,
+            usefulLife: true,
+            expectedLifecycleYears: true,
+            salvageValue: true
+          }
+        }
+      }
+    }),
   ]);
 
   let totalAssetCost = 0;
@@ -33,20 +46,15 @@ export async function getFinancialAuditDashboard(): Promise<FinancialStats> {
   let currentBookValue = 0;
   let totalProcurementCost = 0;
 
-  assets.forEach((a) => {
-    const cost = a.procurementCost ? Number(a.procurementCost) : 0;
-    totalAssetCost += cost;
-    if (a.status !== "DISPOSED") {
-      totalProcurementCost += cost;
-    }
+  const now = new Date();
 
-    const isValidDate = a.purchaseDate instanceof Date && !isNaN(a.purchaseDate.getTime());
-    if (cost > 0 && a.purchaseDate && isValidDate) {
-      const depr = calculateDepreciation(cost, a.purchaseDate, a.expectedLifecycleYears || 5, a.salvageValue ? Number(a.salvageValue) : 0);
-      totalDepreciation += depr.totalDepreciation;
-      currentBookValue += depr.currentValue;
-    } else {
-      currentBookValue += cost;
+  assets.forEach((a) => {
+    const fin = calculateSingleAssetFinancials(a, now);
+    totalAssetCost += fin.cost;
+    if (a.status !== "DISPOSED") {
+      totalProcurementCost += fin.cost;
+      totalDepreciation += fin.accumulatedDepreciation;
+      currentBookValue += fin.currentBookValue;
     }
   });
 
@@ -58,13 +66,9 @@ export async function getFinancialAuditDashboard(): Promise<FinancialStats> {
   // Disposal value
   let totalDisposalValue = 0;
   disposals.forEach((d) => {
-    const cost = d.asset?.procurementCost ? Number(d.asset.procurementCost) : 0;
-    const salvage = d.asset?.salvageValue ? Number(d.asset.salvageValue) : 0;
-    const purchaseDate = d.asset?.purchaseDate;
-    const isValidDate = purchaseDate instanceof Date && !isNaN(purchaseDate.getTime());
-    if (cost > 0 && purchaseDate && isValidDate) {
-      const depr = calculateDepreciation(cost, purchaseDate, d.asset.expectedLifecycleYears || 5, salvage);
-      totalDisposalValue += depr.currentValue; // Book value at write-off
+    if (d.asset) {
+      const fin = calculateSingleAssetFinancials(d.asset, now);
+      totalDisposalValue += fin.currentBookValue; // Book value at write-off
     }
   });
 

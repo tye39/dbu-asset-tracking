@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { NextRequest } from "next/server";
 import { auth } from "@/auth";
 import { Prisma, FundingSource, AssetStatus } from "@prisma/client";
+import { calculateSingleAssetFinancials } from "@/services/financials";
 
 // Helper to escape CSV fields
 function escapeCSV(val: unknown): string {
@@ -249,27 +250,24 @@ export async function GET(req: NextRequest) {
       case "fin_asset": {
         const assets = await prisma.asset.findMany({
           where: assetWhere,
-          include: { category: true, department: true }
+          include: { category: true, department: true, maintenances: true }
         });
+        const now = new Date();
         const headers = ["Asset Code", "Name", "Category", "Department", "Funding Source", "Purchase Cost (ETB)", "Current Book Value (ETB)", "Accumulated Depreciation (ETB)", "Total Maintenance Cost (ETB)", "Total Asset Investment (ETB)"];
         const rows = assets.map((a) => {
-          const cost = a.purchaseCost ? Number(a.purchaseCost) : 0;
-          const book = a.currentBookValue ? Number(a.currentBookValue) : cost;
-          const depr = a.accumulatedDepreciation ? Number(a.accumulatedDepreciation) : 0;
-          const maint = a.totalMaintenanceCost ? Number(a.totalMaintenanceCost) : 0;
-          const invest = a.totalAssetInvestment ? Number(a.totalAssetInvestment) : (cost + maint);
+          const fin = calculateSingleAssetFinancials(a, now);
 
           return [
             a.assetCode,
             a.name,
-            a.category.name,
-            a.department.name,
+            a.category?.name || "Uncategorized",
+            a.department?.name || "Unassigned",
             a.fundingSource || "UNSPECIFIED",
-            cost.toString(),
-            book.toString(),
-            depr.toString(),
-            maint.toString(),
-            invest.toString()
+            fin.cost.toFixed(2),
+            fin.currentBookValue.toFixed(2),
+            fin.accumulatedDepreciation.toFixed(2),
+            fin.totalMaintenanceCost.toFixed(2),
+            fin.totalAssetInvestment.toFixed(2)
           ];
         });
         csvContent = [headers, ...rows].map((r) => r.map(escapeCSV).join(",")).join("\n");
@@ -281,28 +279,24 @@ export async function GET(req: NextRequest) {
           where: assetWhere,
           include: { category: true }
         });
-        const headers = ["Asset Code", "Name", "Category", "Purchase Date", "Cost (ETB)", "Salvage Value (ETB)", "Useful Life (Yrs)", "Annual Depreciation (ETB)", "Monthly Depreciation (ETB)", "Accumulated Depreciation (ETB)", "Current Book Value (ETB)"];
+        const now = new Date();
+        const headers = ["Asset Code", "Name", "Category", "Purchase Date", "Cost (ETB)", "Salvage Value (ETB)", "Useful Life (Yrs)", "Annual Depreciation (ETB)", "Monthly Depreciation (ETB)", "Accumulated Depreciation (ETB)", "Current Book Value (ETB)", "Depreciation Status"];
         const rows = assets.map((a) => {
-          const cost = a.purchaseCost ? Number(a.purchaseCost) : 0;
-          const salvage = a.salvageValue ? Number(a.salvageValue) : 0;
-          const life = a.usefulLife || 5;
-          const annual = a.annualDepreciation ? Number(a.annualDepreciation) : 0;
-          const monthly = a.monthlyDepreciation ? Number(a.monthlyDepreciation) : 0;
-          const accum = a.accumulatedDepreciation ? Number(a.accumulatedDepreciation) : 0;
-          const book = a.currentBookValue ? Number(a.currentBookValue) : cost;
+          const fin = calculateSingleAssetFinancials(a, now);
 
           return [
             a.assetCode,
             a.name,
-            a.category.name,
-            a.purchaseDate ? a.purchaseDate.toLocaleDateString() : "-",
-            cost.toString(),
-            salvage.toString(),
-            life.toString(),
-            annual.toString(),
-            monthly.toString(),
-            accum.toString(),
-            book.toString()
+            a.category?.name || "Uncategorized",
+            a.purchaseDate ? new Date(a.purchaseDate).toLocaleDateString() : "-",
+            fin.cost.toFixed(2),
+            fin.salvageValue.toFixed(2),
+            fin.usefulLifeYears.toString(),
+            fin.annualDepreciation.toFixed(2),
+            fin.monthlyDepreciation.toFixed(2),
+            fin.accumulatedDepreciation.toFixed(2),
+            fin.currentBookValue.toFixed(2),
+            fin.statusLabel
           ];
         });
         csvContent = [headers, ...rows].map((r) => r.map(escapeCSV).join(",")).join("\n");
@@ -312,21 +306,21 @@ export async function GET(req: NextRequest) {
       case "fin_maint": {
         const assets = await prisma.asset.findMany({
           where: assetWhere,
-          include: { department: true }
+          include: { department: true, maintenances: true }
         });
+        const now = new Date();
         const headers = ["Asset Code", "Name", "Department", "Purchase Price (ETB)", "Total Maintenance Cost (ETB)", "Repair Ratio Pct", "Replacement Recommendation"];
         const rows = assets.map((a) => {
-          const cost = a.purchaseCost ? Number(a.purchaseCost) : 0;
-          const maint = a.totalMaintenanceCost ? Number(a.totalMaintenanceCost) : 0;
-          const ratio = cost > 0 ? (maint / cost) * 100 : 0;
+          const fin = calculateSingleAssetFinancials(a, now);
+          const ratio = fin.cost > 0 ? (fin.totalMaintenanceCost / fin.cost) * 100 : 0;
           const recommendation = ratio > 50 ? "REPLACE" : "KEEP";
 
           return [
             a.assetCode,
             a.name,
-            a.department.name,
-            cost.toString(),
-            maint.toString(),
+            a.department?.name || "Unassigned",
+            fin.cost.toFixed(2),
+            fin.totalMaintenanceCost.toFixed(2),
             `${Math.round(ratio)}%`,
             recommendation
           ];
@@ -338,24 +332,22 @@ export async function GET(req: NextRequest) {
       case "fin_funding": {
         const assets = await prisma.asset.findMany({
           where: assetWhere,
-          include: { category: true }
+          include: { category: true, maintenances: true }
         });
+        const now = new Date();
         const headers = ["Asset Code", "Name", "Category", "Funding Source", "Purchase Cost (ETB)", "Current Book Value (ETB)", "Total Maintenance (ETB)", "Total Investment (ETB)"];
         const rows = assets.map((a) => {
-          const cost = a.purchaseCost ? Number(a.purchaseCost) : 0;
-          const book = a.currentBookValue ? Number(a.currentBookValue) : cost;
-          const maint = a.totalMaintenanceCost ? Number(a.totalMaintenanceCost) : 0;
-          const invest = cost + maint;
+          const fin = calculateSingleAssetFinancials(a, now);
 
           return [
             a.assetCode,
             a.name,
-            a.category.name,
+            a.category?.name || "Uncategorized",
             a.fundingSource || "UNSPECIFIED",
-            cost.toString(),
-            book.toString(),
-            maint.toString(),
-            invest.toString()
+            fin.cost.toFixed(2),
+            fin.currentBookValue.toFixed(2),
+            fin.totalMaintenanceCost.toFixed(2),
+            fin.totalAssetInvestment.toFixed(2)
           ];
         });
         csvContent = [headers, ...rows].map((r) => r.map(escapeCSV).join(",")).join("\n");

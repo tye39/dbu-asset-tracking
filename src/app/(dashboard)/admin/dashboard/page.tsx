@@ -1,7 +1,7 @@
 import React from "react";
 import { prisma } from "@/lib/db";
 import { DashboardFinancialClient } from "@/components/dashboard-financial-client";
-import { scanAndGenerateFinancialAlerts } from "@/services/financials";
+import { scanAndGenerateFinancialAlerts, calculateSingleAssetFinancials } from "@/services/financials";
 
 export const revalidate = 0;
 
@@ -41,8 +41,10 @@ export default async function AdminDashboardPage() {
   let totalAssetValue = 0;
   let currentBookValue = 0;
   let totalDepreciation = 0;
+  let totalSalvageValue = 0;
   let totalMaintenanceCostVal = 0;
   let totalAssetInvestment = 0;
+  let financiallyValuedCount = 0;
   let warrantyExpiringCount = 0;
   let expiredAssetsCount = 0;
   let endOfLifeCount = 0;
@@ -59,23 +61,57 @@ export default async function AdminDashboardPage() {
   const deprTrendMap: Record<string, { bookValue: number; accumDep: number; count: number }> = {};
 
   allAssets.forEach((a) => {
-    const cost = a.purchaseCost ? Number(a.purchaseCost) : (a.procurementCost ? Number(a.procurementCost) : 0);
-    totalAssetValue += cost;
+    // Single source of truth calculation for live as-of-date valuation
+    const fin = calculateSingleAssetFinancials(a, now);
 
-    const book = a.currentBookValue ? Number(a.currentBookValue) : cost;
-    currentBookValue += book;
+    // Maintenance costs are tracked across all completed records
+    totalMaintenanceCostVal += fin.totalMaintenanceCost;
 
-    const dep = a.accumulatedDepreciation ? Number(a.accumulatedDepreciation) : 0;
-    totalDepreciation += dep;
+    // Disposed assets are derecognized from the active capital balance sheet
+    const isDisposed = a.status === "DISPOSED";
 
-    const maint = a.maintenances.reduce((sum, m) => {
-      const c = m.maintenanceCost ? Number(m.maintenanceCost) : (m.cost ? Number(m.cost) : 0);
-      return sum + c;
-    }, 0);
-    totalMaintenanceCostVal += maint;
+    if (!isDisposed) {
+      totalAssetValue += fin.cost;
+      currentBookValue += fin.currentBookValue;
+      totalDepreciation += fin.accumulatedDepreciation;
+      totalSalvageValue += fin.salvageValue;
+      if (fin.isFinanciallyValued) {
+        financiallyValuedCount++;
+      }
 
-    const invest = cost + maint;
-    totalAssetInvestment += invest;
+      // Grouping by department
+      const deptName = a.department?.name || "Unknown";
+      deptValueMap[deptName] = (deptValueMap[deptName] || 0) + fin.cost;
+
+      // Grouping by category
+      const catName = a.category?.name || "Unknown";
+      catValueMap[catName] = (catValueMap[catName] || 0) + fin.cost;
+
+      // Grouping by funding source
+      if (a.fundingSource) {
+        const sourceStr = String(a.fundingSource).replace(/_/g, " ");
+        fundingSourceMap[sourceStr] = (fundingSourceMap[sourceStr] || 0) + fin.cost;
+      } else {
+        fundingSourceMap["UNSPECIFIED"] = (fundingSourceMap["UNSPECIFIED"] || 0) + fin.cost;
+      }
+
+      // Grouping annual purchases by purchaseDate year
+      if (a.purchaseDate) {
+        const pDate = a.purchaseDate instanceof Date ? a.purchaseDate : new Date(a.purchaseDate);
+        if (!isNaN(pDate.getTime())) {
+          const pYear = pDate.getFullYear().toString();
+          annualPurchaseMap[pYear] = (annualPurchaseMap[pYear] || 0) + fin.cost;
+
+          // Depreciation trend over purchase years
+          if (!deprTrendMap[pYear]) {
+            deprTrendMap[pYear] = { bookValue: 0, accumDep: 0, count: 0 };
+          }
+          deprTrendMap[pYear].bookValue += fin.currentBookValue;
+          deprTrendMap[pYear].accumDep += fin.accumulatedDepreciation;
+          deprTrendMap[pYear].count += 1;
+        }
+      }
+    }
 
     // Check warranty status
     const isExpired = (a.warrantyEndDate && a.warrantyEndDate <= now) || (a.warrantyExpiry && a.warrantyExpiry <= now);
@@ -86,44 +122,9 @@ export default async function AdminDashboardPage() {
       warrantyExpiringCount++;
     }
 
-    // Check useful life limit
-    if (a.purchaseDate && cost > 0) {
-      const useful = a.usefulLife || a.expectedLifecycleYears || 5;
-      const elapsedYears = now.getFullYear() - a.purchaseDate.getFullYear();
-      const elapsedMonths = (now.getMonth() - a.purchaseDate.getMonth()) + (elapsedYears * 12);
-      if (elapsedMonths >= (useful * 12)) {
-        endOfLifeCount++;
-      }
-    }
-
-    // Grouping by department
-    const deptName = a.department.name || "Unknown";
-    deptValueMap[deptName] = (deptValueMap[deptName] || 0) + cost;
-
-    // Grouping by category
-    const catName = a.category.name || "Unknown";
-    catValueMap[catName] = (catValueMap[catName] || 0) + cost;
-
-    // Grouping by funding source
-    if (a.fundingSource) {
-      const sourceStr = String(a.fundingSource).replace(/_/g, " ");
-      fundingSourceMap[sourceStr] = (fundingSourceMap[sourceStr] || 0) + cost;
-    } else {
-      fundingSourceMap["UNSPECIFIED"] = (fundingSourceMap["UNSPECIFIED"] || 0) + cost;
-    }
-
-    // Grouping annual purchases by purchaseDate year
-    if (a.purchaseDate) {
-      const pYear = a.purchaseDate.getFullYear().toString();
-      annualPurchaseMap[pYear] = (annualPurchaseMap[pYear] || 0) + cost;
-
-      // Depreciation trend over purchase years
-      if (!deprTrendMap[pYear]) {
-        deprTrendMap[pYear] = { bookValue: 0, accumDep: 0, count: 0 };
-      }
-      deprTrendMap[pYear].bookValue += book;
-      deprTrendMap[pYear].accumDep += dep;
-      deprTrendMap[pYear].count += 1;
+    // Check useful life limit (end of useful life reached)
+    if (fin.isFullyDepreciated && fin.cost > 0 && !isDisposed) {
+      endOfLifeCount++;
     }
 
     // Grouping annual maintenance cost by maintenance date/createdAt year
@@ -135,21 +136,29 @@ export default async function AdminDashboardPage() {
     });
   });
 
+  // Total Capital Investment = Acquisition Cost of Active Inventory + Maintenance
+  totalAssetInvestment = Math.round((totalAssetValue + totalMaintenanceCostVal) * 100) / 100;
+  totalAssetValue = Math.round(totalAssetValue * 100) / 100;
+  currentBookValue = Math.round(currentBookValue * 100) / 100;
+  totalDepreciation = Math.round(totalDepreciation * 100) / 100;
+  totalSalvageValue = Math.round(totalSalvageValue * 100) / 100;
+  totalMaintenanceCostVal = Math.round(totalMaintenanceCostVal * 100) / 100;
+
   // Format charts datasets
-  const deptChartData = Object.entries(deptValueMap).map(([name, value]) => ({ name, value }));
-  const catChartData = Object.entries(catValueMap).map(([name, value]) => ({ name, value }));
-  const fundingChartData = Object.entries(fundingSourceMap).map(([name, value]) => ({ name, value }));
+  const deptChartData = Object.entries(deptValueMap).map(([name, value]) => ({ name, value: Math.round(value * 100) / 100 }));
+  const catChartData = Object.entries(catValueMap).map(([name, value]) => ({ name, value: Math.round(value * 100) / 100 }));
+  const fundingChartData = Object.entries(fundingSourceMap).map(([name, value]) => ({ name, value: Math.round(value * 100) / 100 }));
   const purchaseChartData = Object.entries(annualPurchaseMap)
-    .map(([year, value]) => ({ name: year, value }))
+    .map(([year, value]) => ({ name: year, value: Math.round(value * 100) / 100 }))
     .sort((a, b) => a.name.localeCompare(b.name));
   const maintChartData = Object.entries(annualMaintMap)
-    .map(([year, value]) => ({ name: year, value }))
+    .map(([year, value]) => ({ name: year, value: Math.round(value * 100) / 100 }))
     .sort((a, b) => a.name.localeCompare(b.name));
   const depreciationTrendData = Object.entries(deprTrendMap)
     .map(([year, data]) => ({
       name: year,
-      bookValue: data.bookValue,
-      accumulatedDepreciation: data.accumDep
+      bookValue: Math.round(data.bookValue * 100) / 100,
+      accumulatedDepreciation: Math.round(data.accumDep * 100) / 100
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
 
@@ -157,8 +166,10 @@ export default async function AdminDashboardPage() {
     totalAssetValue,
     currentBookValue,
     totalDepreciation,
+    totalSalvageValue,
     totalMaintenanceCost: totalMaintenanceCostVal,
     totalAssetInvestment,
+    financiallyValuedCount,
     warrantyExpiringCount,
     expiredAssetsCount,
     endOfLifeCount,

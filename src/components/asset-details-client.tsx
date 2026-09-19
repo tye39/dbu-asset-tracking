@@ -207,15 +207,37 @@ export function generateBarcodeSvg(value: string) {
   return `<svg width="100%" height="45" viewBox="0 0 ${currentX} ${height}" preserveAspectRatio="none">${rects.join("")}</svg>`;
 }
 
+export interface AssetLiveFinancials {
+  cost: number;
+  salvageValue: number;
+  depreciableBase: number;
+  usefulLifeYears: number;
+  usefulLifeMonths: number;
+  annualDepreciation: number;
+  monthlyDepreciation: number;
+  elapsedMonths: number;
+  clampedMonths: number;
+  accumulatedDepreciation: number;
+  currentBookValue: number;
+  depreciationProgressPercent: number;
+  depreciationStatus: string;
+  statusLabel: string;
+  totalMaintenanceCost: number;
+  totalAssetInvestment: number;
+  isFullyDepreciated: boolean;
+  isFinanciallyValued: boolean;
+}
+
 interface AssetDetailsClientProps {
   asset: AssetDetails;
   session: { user?: { role?: string; id?: string } } | null;
   departments: DepartmentOption[];
   staffUsers: StaffUserOption[];
   enabledFields?: string[];
+  liveFinancials?: AssetLiveFinancials;
 }
 
-export function AssetDetailsClient({ asset, session, departments, staffUsers, enabledFields }: AssetDetailsClientProps) {
+export function AssetDetailsClient({ asset, session, departments, staffUsers, enabledFields, liveFinancials }: AssetDetailsClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [activeTab, setActiveTab] = useState<"overview" | "assignments" | "maintenance" | "transfers">("overview");
@@ -382,54 +404,67 @@ export function AssetDetailsClient({ asset, session, departments, staffUsers, en
 
   const parsedDesc = parseDescription();
 
-  // Client-side Straight-line Depreciation calculator
-  const depr = (() => {
-    const cost = asset.procurementCost ? Number(asset.procurementCost) : 0;
-    const salvage = asset.salvageValue ? Number(asset.salvageValue) : 0;
-    const lifecycle = asset.expectedLifecycleYears || 5;
-    const purchaseDate = asset.purchaseDate ? new Date(asset.purchaseDate) : null;
-
-    if (cost === 0 || !purchaseDate) {
-      return { currentValue: cost, totalDepreciation: 0, progressPercent: 0 };
-    }
-
-    const now = new Date();
-    const monthsDiff = (now.getFullYear() - purchaseDate.getFullYear()) * 12 + (now.getMonth() - purchaseDate.getMonth());
-    const yearsAge = Math.max(0, monthsDiff / 12);
-    const annualDepreciation = Math.max(0, (cost - salvage) / lifecycle);
-    const totalDepr = Math.min(cost - salvage, annualDepreciation * yearsAge);
-    const currentVal = Math.max(salvage, cost - totalDepr);
-    const progressPercent = Math.min(100, Math.round((yearsAge / lifecycle) * 100));
-
+  // Live single-source-of-truth financials resolution
+  const fin: AssetLiveFinancials = liveFinancials || (() => {
+    const rawCost = asset.purchaseCost !== undefined && asset.purchaseCost !== null ? Number(asset.purchaseCost) : Number(asset.procurementCost || 0);
+    const cost = isNaN(rawCost) ? 0 : Math.max(0, rawCost);
+    const rawSalvage = Number(asset.salvageValue || 0);
+    const salvageValue = Math.min(cost, isNaN(rawSalvage) ? 0 : Math.max(0, rawSalvage));
+    const depreciableBase = Math.max(0, cost - salvageValue);
+    const usefulLifeYears = Number(asset.usefulLife || asset.expectedLifecycleYears || 5);
+    const usefulLifeMonths = Math.max(1, Math.round(usefulLifeYears * 12));
+    const rawBook = asset.currentBookValue !== null && asset.currentBookValue !== undefined && !isNaN(Number(asset.currentBookValue))
+      ? Number(asset.currentBookValue)
+      : cost;
+    const currentBookValue = Math.max(salvageValue, Math.min(cost, rawBook));
+    const rawAccum = asset.accumulatedDepreciation !== null && asset.accumulatedDepreciation !== undefined && !isNaN(Number(asset.accumulatedDepreciation))
+      ? Number(asset.accumulatedDepreciation)
+      : Math.max(0, cost - currentBookValue);
+    const accumulatedDepreciation = Math.min(depreciableBase, Math.max(0, rawAccum));
+    const totalMaint = asset.maintenances ? asset.maintenances.reduce((acc, curr) => acc + (curr.cost ? Number(curr.cost) : 0), 0) : 0;
     return {
-      currentValue: Number(currentVal.toFixed(2)),
-      totalDepreciation: Number(totalDepr.toFixed(2)),
-      progressPercent
+      cost,
+      salvageValue,
+      depreciableBase,
+      usefulLifeYears,
+      usefulLifeMonths,
+      annualDepreciation: Number(asset.annualDepreciation || 0),
+      monthlyDepreciation: Number(asset.monthlyDepreciation || 0),
+      elapsedMonths: 0,
+      clampedMonths: 0,
+      accumulatedDepreciation,
+      currentBookValue,
+      depreciationProgressPercent: 0,
+      depreciationStatus: "DEPRECIATING",
+      statusLabel: "Depreciating",
+      totalMaintenanceCost: totalMaint,
+      totalAssetInvestment: cost + totalMaint,
+      isFullyDepreciated: false,
+      isFinanciallyValued: cost > 0,
     };
   })();
-
-  // Client-side replacement score logic
+  // Replacement score logic using verified metrics
   const replacementScore = (() => {
-    const cost = asset.procurementCost ? Number(asset.procurementCost) : 0;
+    const cost = fin.cost;
     const purchaseDate = asset.purchaseDate ? new Date(asset.purchaseDate) : null;
-    const lifecycle = asset.expectedLifecycleYears || 5;
+    const lifecycle = fin.usefulLifeYears;
 
     let ageScore = 0;
     let deprScore = 0;
     let repairScore = 0;
     let conditionScore = 0;
 
-    if (purchaseDate) {
+    if (purchaseDate && !isNaN(purchaseDate.getTime())) {
       const yearsAge = (new Date().getTime() - purchaseDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
-      const ageRatio = Math.min(1.5, yearsAge / lifecycle);
+      const ageRatio = lifecycle > 0 ? Math.min(1.5, Math.max(0, yearsAge) / lifecycle) : 0;
       ageScore = ageRatio * 30;
     }
 
-    if (cost > 0 && purchaseDate) {
-      deprScore = (depr.totalDepreciation / cost) * 20;
+    if (cost > 0) {
+      deprScore = (fin.accumulatedDepreciation / cost) * 20;
     }
 
-    const totalRepairCost = asset.maintenances ? asset.maintenances.reduce((acc, curr) => acc + (curr.cost ? Number(curr.cost) : 0), 0) : 0;
+    const totalRepairCost = fin.totalMaintenanceCost;
     if (cost > 0 && totalRepairCost > 0) {
       repairScore = Math.min(1.0, totalRepairCost / cost) * 25;
     }
@@ -1081,39 +1116,49 @@ export function AssetDetailsClient({ asset, session, departments, staffUsers, en
                   )}
 
                   {/* Financial & Depreciation Panel */}
-                  {session?.user?.role !== "STAFF_MEMBER" && (!!asset.purchaseCost || !!asset.procurementCost) && (
+                  {session?.user?.role !== "STAFF_MEMBER" && fin.isFinanciallyValued && (
                     <div className="p-5 bg-slate-50 rounded-2xl border border-slate-150 space-y-4">
-                      <h5 className="text-[10px] font-black text-sky-850 uppercase tracking-widest border-b border-slate-200 pb-1.5 flex items-center">
-                        <DollarSign size={12} className="mr-1 text-sky-700" /> Asset Financial Ledger Summary
-                      </h5>
+                      <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                        <h5 className="text-[10px] font-black text-sky-850 uppercase tracking-widest flex items-center">
+                          <DollarSign size={12} className="mr-1 text-sky-700" /> Asset Financial Ledger Summary
+                        </h5>
+                        <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-wider ${
+                          fin.isFullyDepreciated ? "bg-indigo-50 text-indigo-700 border border-indigo-200" :
+                          fin.depreciationStatus === "FUTURE_PURCHASE" ? "bg-amber-50 text-amber-700 border border-amber-200" :
+                          fin.depreciationStatus === "NO_PURCHASE_DATE" ? "bg-slate-100 text-slate-600 border border-slate-200" :
+                          "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                        }`}>
+                          {fin.statusLabel}
+                        </span>
+                      </div>
                       <div className="grid grid-cols-2 gap-x-6 gap-y-3.5 text-xs">
                         <div>
                           <span className="text-slate-400 block font-semibold mb-0.5">Purchase Cost</span>
-                          <span className="text-slate-800 font-extrabold">{Number(asset.purchaseCost || asset.procurementCost || 0).toLocaleString()} {asset.currency || "ETB"}</span>
+                          <span className="text-slate-800 font-extrabold">{fin.cost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB</span>
                         </div>
                         <div>
                           <span className="text-slate-400 block font-semibold mb-0.5">Current Book Value</span>
-                          <span className="text-emerald-700 font-black">{Number(asset.currentBookValue || 0).toLocaleString()} {asset.currency || "ETB"}</span>
+                          <span className="text-emerald-700 font-black">{fin.currentBookValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB</span>
                         </div>
                         <div>
                           <span className="text-slate-400 block font-semibold mb-0.5 font-bold">Annual Depreciation</span>
-                          <span className="text-slate-700 font-bold">{Number(asset.annualDepreciation || 0).toLocaleString()} {asset.currency || "ETB"}</span>
+                          <span className="text-slate-700 font-bold">{fin.annualDepreciation.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB</span>
                         </div>
                         <div>
                           <span className="text-slate-400 block font-semibold mb-0.5 font-bold">Monthly Depreciation</span>
-                          <span className="text-slate-700 font-bold">{Number(asset.monthlyDepreciation || 0).toLocaleString()} {asset.currency || "ETB"}</span>
+                          <span className="text-slate-700 font-bold">{fin.monthlyDepreciation.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB</span>
                         </div>
                         <div>
                           <span className="text-slate-400 block font-semibold mb-0.5 font-bold">Accumulated Depreciation</span>
-                          <span className="text-violet-700 font-bold">{Number(asset.accumulatedDepreciation || 0).toLocaleString()} {asset.currency || "ETB"}</span>
+                          <span className="text-violet-700 font-bold">{fin.accumulatedDepreciation.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB</span>
                         </div>
                         <div>
-                          <span className="text-slate-400 block font-semibold mb-0.5 font-bold">Useful Life (Years)</span>
-                          <span className="text-slate-700 font-bold">{asset.usefulLife || asset.expectedLifecycleYears || 5} Years</span>
+                          <span className="text-slate-400 block font-semibold mb-0.5 font-bold">Useful Life</span>
+                          <span className="text-slate-700 font-bold">{fin.usefulLifeYears} Years ({fin.usefulLifeMonths} Months)</span>
                         </div>
                         <div>
-                          <span className="text-slate-400 block font-semibold mb-0.5 font-bold">Salvage Value</span>
-                          <span className="text-slate-700 font-bold">{Number(asset.salvageValue || 0).toLocaleString()} {asset.currency || "ETB"}</span>
+                          <span className="text-slate-400 block font-semibold mb-0.5 font-bold">Salvage Value (Floor)</span>
+                          <span className="text-slate-700 font-bold">{fin.salvageValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB</span>
                         </div>
                         <div>
                           <span className="text-slate-400 block font-semibold mb-0.5 font-bold">Funding Source</span>
@@ -1123,11 +1168,11 @@ export function AssetDetailsClient({ asset, session, departments, staffUsers, en
                         </div>
                         <div>
                           <span className="text-slate-400 block font-semibold mb-0.5 font-bold">Total Maintenance Cost</span>
-                          <span className="text-amber-700 font-bold">{Number(asset.totalMaintenanceCost || 0).toLocaleString()} {asset.currency || "ETB"}</span>
+                          <span className="text-amber-700 font-bold">{fin.totalMaintenanceCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB</span>
                         </div>
                         <div>
                           <span className="text-slate-400 block font-semibold mb-0.5 font-bold">Total Asset Investment</span>
-                          <span className="text-slate-800 font-extrabold">{Number(asset.totalAssetInvestment || 0).toLocaleString()} {asset.currency || "ETB"}</span>
+                          <span className="text-slate-800 font-extrabold">{fin.totalAssetInvestment.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB</span>
                         </div>
                         <div className="col-span-2 pt-2 border-t border-slate-200/50">
                           <span className="text-slate-400 block font-semibold mb-0.5 font-bold">Warranty Status</span>
@@ -1148,7 +1193,7 @@ export function AssetDetailsClient({ asset, session, departments, staffUsers, en
                   )}
 
                   {/* Replacement score Planning Panel */}
-                  {!!asset.procurementCost && (
+                  {fin.isFinanciallyValued && (
                     <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-2">
                       <h5 className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Lifecycle Replacement Planning</h5>
                       <div className="flex items-center justify-between text-xs pt-1">

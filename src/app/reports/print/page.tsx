@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { Printer, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Prisma, FundingSource, AssetStatus } from "@prisma/client";
+import { calculateSingleAssetFinancials } from "@/services/financials";
 
 interface PrintReportPageProps {
   searchParams: {
@@ -226,26 +227,23 @@ export default async function PrintReportPage({ searchParams }: PrintReportPageP
         headers = ["Asset Code", "Name", "Category", "Department", "Funding Source", "Purchase Cost", "Book Value", "Accum Depr", "Maint Cost", "Total Investment"];
         const assetsList = await prisma.asset.findMany({
           where: assetWhere,
-          include: { category: true, department: true }
+          include: { category: true, department: true, maintenances: true }
         });
+        const now = new Date();
         rows = assetsList.map((a) => {
-          const cost = a.purchaseCost ? Number(a.purchaseCost) : 0;
-          const book = a.currentBookValue ? Number(a.currentBookValue) : cost;
-          const depr = a.accumulatedDepreciation ? Number(a.accumulatedDepreciation) : 0;
-          const maint = a.totalMaintenanceCost ? Number(a.totalMaintenanceCost) : 0;
-          const invest = a.totalAssetInvestment ? Number(a.totalAssetInvestment) : (cost + maint);
+          const fin = calculateSingleAssetFinancials(a, now);
 
           return [
             a.assetCode,
             a.name,
-            a.category.name,
-            a.department.name,
+            a.category?.name || "Uncategorized",
+            a.department?.name || "Unassigned",
             a.fundingSource || "UNSPECIFIED",
-            `${cost.toLocaleString()} ETB`,
-            `${book.toLocaleString()} ETB`,
-            `${depr.toLocaleString()} ETB`,
-            `${maint.toLocaleString()} ETB`,
-            `${invest.toLocaleString()} ETB`
+            `${fin.cost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB`,
+            `${fin.currentBookValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB`,
+            `${fin.accumulatedDepreciation.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB`,
+            `${fin.totalMaintenanceCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB`,
+            `${fin.totalAssetInvestment.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB`
           ];
         });
         break;
@@ -253,28 +251,25 @@ export default async function PrintReportPage({ searchParams }: PrintReportPageP
 
       case "fin_depr": {
         reportTitle = "DBU Asset Depreciation Schedule (Straight-Line)";
-        headers = ["Asset Code", "Name", "Purchase Date", "Cost", "Salvage Value", "Useful Life", "Annual Depr", "Accum Depr", "Book Value"];
+        headers = ["Asset Code", "Name", "Purchase Date", "Cost", "Salvage Value", "Useful Life", "Annual Depr", "Accum Depr", "Book Value", "Status"];
         const assetsList = await prisma.asset.findMany({
           where: assetWhere
         });
+        const now = new Date();
         rows = assetsList.map((a) => {
-          const cost = a.purchaseCost ? Number(a.purchaseCost) : 0;
-          const salvage = a.salvageValue ? Number(a.salvageValue) : 0;
-          const life = a.usefulLife || 5;
-          const annual = a.annualDepreciation ? Number(a.annualDepreciation) : 0;
-          const accum = a.accumulatedDepreciation ? Number(a.accumulatedDepreciation) : 0;
-          const book = a.currentBookValue ? Number(a.currentBookValue) : cost;
+          const fin = calculateSingleAssetFinancials(a, now);
 
           return [
             a.assetCode,
             a.name,
             a.purchaseDate ? new Date(a.purchaseDate).toLocaleDateString() : "-",
-            `${cost.toLocaleString()} ETB`,
-            `${salvage.toLocaleString()} ETB`,
-            `${life} Years`,
-            `${annual.toLocaleString()} ETB`,
-            `${accum.toLocaleString()} ETB`,
-            `${book.toLocaleString()} ETB`
+            `${fin.cost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB`,
+            `${fin.salvageValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB`,
+            `${fin.usefulLifeYears} Years`,
+            `${fin.annualDepreciation.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB`,
+            `${fin.accumulatedDepreciation.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB`,
+            `${fin.currentBookValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB`,
+            fin.statusLabel
           ];
         });
         break;
@@ -285,20 +280,20 @@ export default async function PrintReportPage({ searchParams }: PrintReportPageP
         headers = ["Asset Code", "Name", "Department", "Purchase Cost", "Maintenance Cost", "Repair Ratio Pct", "Recommendation"];
         const assetsList = await prisma.asset.findMany({
           where: assetWhere,
-          include: { department: true }
+          include: { department: true, maintenances: true }
         });
+        const now = new Date();
         rows = assetsList.map((a) => {
-          const cost = a.purchaseCost ? Number(a.purchaseCost) : 0;
-          const maint = a.totalMaintenanceCost ? Number(a.totalMaintenanceCost) : 0;
-          const ratio = cost > 0 ? (maint / cost) * 100 : 0;
+          const fin = calculateSingleAssetFinancials(a, now);
+          const ratio = fin.cost > 0 ? (fin.totalMaintenanceCost / fin.cost) * 100 : 0;
           const recommendation = ratio > 50 ? "REPLACE" : "KEEP";
 
           return [
             a.assetCode,
             a.name,
-            a.department.name,
-            `${cost.toLocaleString()} ETB`,
-            `${maint.toLocaleString()} ETB`,
+            a.department?.name || "Unassigned",
+            `${fin.cost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB`,
+            `${fin.totalMaintenanceCost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB`,
             `${Math.round(ratio)}%`,
             recommendation
           ];
@@ -310,20 +305,20 @@ export default async function PrintReportPage({ searchParams }: PrintReportPageP
         reportTitle = "DBU Capital Funding Source Summary";
         headers = ["Asset Code", "Name", "Funding Source", "Purchase Cost", "Book Value", "Total Investment"];
         const assetsList = await prisma.asset.findMany({
-          where: assetWhere
+          where: assetWhere,
+          include: { maintenances: true }
         });
+        const now = new Date();
         rows = assetsList.map((a) => {
-          const cost = a.purchaseCost ? Number(a.purchaseCost) : 0;
-          const book = a.currentBookValue ? Number(a.currentBookValue) : cost;
-          const invest = a.totalAssetInvestment ? Number(a.totalAssetInvestment) : cost;
+          const fin = calculateSingleAssetFinancials(a, now);
 
           return [
             a.assetCode,
             a.name,
             a.fundingSource || "UNSPECIFIED",
-            `${cost.toLocaleString()} ETB`,
-            `${book.toLocaleString()} ETB`,
-            `${invest.toLocaleString()} ETB`
+            `${fin.cost.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB`,
+            `${fin.currentBookValue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB`,
+            `${fin.totalAssetInvestment.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ETB`
           ];
         });
         break;

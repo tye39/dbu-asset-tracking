@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
+import { calculateSingleAssetFinancials } from "@/services/financials";
 
-interface ValuationResult {
+export interface ValuationResult {
   originalCost: number;
   currentValue: number;
   totalDepreciation: number;
@@ -10,6 +11,7 @@ interface ValuationResult {
 
 /**
  * Calculates Straight-Line depreciation metrics for a given asset.
+ * Delegates directly to calculateSingleAssetFinancials as the single source of truth.
  */
 export function calculateDepreciation(
   procurementCost: number | null,
@@ -17,42 +19,24 @@ export function calculateDepreciation(
   expectedLifecycleYears: number | null,
   salvageValueInput: number | null
 ): ValuationResult {
-  const cost = procurementCost || 0;
-  const salvage = salvageValueInput || 0;
-  const lifecycleYears = (expectedLifecycleYears && expectedLifecycleYears > 0) ? expectedLifecycleYears : 5;
-
-  const isValidDate = purchaseDate instanceof Date && !isNaN(purchaseDate.getTime());
-
-  if (cost === 0 || !purchaseDate || !isValidDate) {
-    return {
-      originalCost: cost,
-      currentValue: cost,
-      totalDepreciation: 0,
-      salvageValue: salvage,
-      lifecycleProgressPercent: 0,
-    };
-  }
-
-  const now = new Date();
-  const monthsDiff = (now.getFullYear() - purchaseDate.getFullYear()) * 12 + (now.getMonth() - purchaseDate.getMonth());
-  const yearsAge = Math.max(0, monthsDiff / 12);
-
-  const annualDepreciation = Math.max(0, (cost - salvage) / lifecycleYears);
-  const totalDepr = Math.min(cost - salvage, annualDepreciation * yearsAge);
-  const currentVal = Math.max(salvage, cost - totalDepr);
-
-  const progressPercent = Math.min(100, Math.round((yearsAge / lifecycleYears) * 100));
+  const result = calculateSingleAssetFinancials({
+    purchaseCost: procurementCost,
+    procurementCost,
+    salvageValue: salvageValueInput,
+    expectedLifecycleYears,
+    purchaseDate,
+  });
 
   return {
-    originalCost: cost,
-    currentValue: Number(currentVal.toFixed(2)),
-    totalDepreciation: Number(totalDepr.toFixed(2)),
-    salvageValue: salvage,
-    lifecycleProgressPercent: progressPercent,
+    originalCost: result.cost,
+    currentValue: result.currentBookValue,
+    totalDepreciation: result.accumulatedDepreciation,
+    salvageValue: result.salvageValue,
+    lifecycleProgressPercent: result.depreciationProgressPercent,
   };
 }
 
-interface ReplacementScoreResult {
+export interface ReplacementScoreResult {
   score: number; // 0 to 100
   reason: string;
   recommendation: "KEEP" | "MONITOR" | "REPLACE";
@@ -67,7 +51,7 @@ export async function calculateReplacementScore(assetId: string): Promise<Replac
     include: {
       maintenances: {
         where: { status: "COMPLETED" },
-        select: { cost: true },
+        select: { cost: true, maintenanceCost: true },
       },
     },
   });
@@ -76,9 +60,9 @@ export async function calculateReplacementScore(assetId: string): Promise<Replac
     return { score: 0, reason: "Asset not found.", recommendation: "KEEP" };
   }
 
-  const cost = asset.procurementCost ? Number(asset.procurementCost) : 0;
+  const cost = asset.purchaseCost ? Number(asset.purchaseCost) : (asset.procurementCost ? Number(asset.procurementCost) : 0);
   const purchaseDate = asset.purchaseDate;
-  const lifecycleYears = asset.expectedLifecycleYears || 5;
+  const lifecycleYears = asset.usefulLife || asset.expectedLifecycleYears || 5;
 
   let ageScore = 0;
   let deprScore = 0;
@@ -89,18 +73,21 @@ export async function calculateReplacementScore(assetId: string): Promise<Replac
   const isValidPurchaseDate = purchaseDate instanceof Date && !isNaN(purchaseDate.getTime());
   if (isValidPurchaseDate) {
     const yearsAge = (new Date().getTime() - purchaseDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
-    const ageRatio = lifecycleYears > 0 ? Math.min(1.5, yearsAge / lifecycleYears) : 0;
-    ageScore = ageRatio * 30; // Max 45, capped later at total
+    const ageRatio = lifecycleYears > 0 ? Math.min(1.5, Math.max(0, yearsAge) / lifecycleYears) : 0;
+    ageScore = ageRatio * 30;
   }
 
   // 2. Depreciation / Value Factor (Max 20 points)
   if (cost > 0 && isValidPurchaseDate) {
-    const metrics = calculateDepreciation(cost, purchaseDate, lifecycleYears, asset.salvageValue ? Number(asset.salvageValue) : 0);
-    deprScore = (metrics.totalDepreciation / cost) * 20;
+    const metrics = calculateSingleAssetFinancials(asset);
+    deprScore = cost > 0 ? (metrics.accumulatedDepreciation / cost) * 20 : 0;
   }
 
   // 3. Repair Costs Factor (Max 25 points)
-  const totalRepairCost = asset.maintenances.reduce((acc, curr) => acc + (curr.cost ? Number(curr.cost) : 0), 0);
+  const totalRepairCost = asset.maintenances.reduce((acc, curr) => {
+    const c = curr.maintenanceCost ? Number(curr.maintenanceCost) : (curr.cost ? Number(curr.cost) : 0);
+    return acc + c;
+  }, 0);
   if (cost > 0 && totalRepairCost > 0) {
     const repairRatio = totalRepairCost / cost;
     repairScore = Math.min(1.0, repairRatio) * 25;
