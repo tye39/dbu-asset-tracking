@@ -11,7 +11,10 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
+    "@types/jsbarcode": "^3.11.4",
+    "@zxing/library": "^0.23.0",
     "bcryptjs": "^3.0.3",
+    "jsbarcode": "^3.12.3",
     "jsqr": "^1.4.0",
     "lucide-react": "^1.25.0",
     "next": "14.2.23",
@@ -36,6 +39,7 @@
     "eslint-config-next": "14.2.23",
     "postcss": "^8",
     "prisma": "^7.9.1",
+    "puppeteer-core": "^25.11.0",
     "tailwindcss": "^3.4.1",
     "tsx": "^4.23.1",
     "typescript": "^5"

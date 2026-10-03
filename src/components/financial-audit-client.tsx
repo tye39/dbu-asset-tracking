@@ -133,6 +133,7 @@ interface FinancialAuditClientProps {
   depreciations: DepreciationItem[];
   history: AuditHistoryItem[];
   departments: { id: string; name: string }[];
+  initialSubtab?: string;
 }
 
 const COLORS = ["#0284c7", "#0ea5e9", "#38bdf8", "#7dd3fc", "#bae6fd"];
@@ -145,12 +146,18 @@ export function FinancialAuditClient({
   procurements,
   depreciations,
   history,
-  departments
+  departments,
+  initialSubtab
 }: FinancialAuditClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const [activeTab, setActiveTab] = useState<"dashboard" | "budget" | "procure" | "maint" | "depr" | "discrepancies" | "history">("dashboard");
+  const validTabs = ["dashboard", "budget", "procure", "maint", "depr", "discrepancies", "history"] as const;
+  const initialActive = initialSubtab && (validTabs as readonly string[]).includes(initialSubtab)
+    ? (initialSubtab as typeof validTabs[number])
+    : "dashboard";
+
+  const [activeTab, setActiveTab] = useState<"dashboard" | "budget" | "procure" | "maint" | "depr" | "discrepancies" | "history">(initialActive);
 
   // Form states for persistent audit log
   const [fiscalYear, setFiscalYear] = useState("2026");

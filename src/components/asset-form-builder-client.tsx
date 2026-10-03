@@ -14,7 +14,8 @@ import {
   deleteFieldAction,
   createSupplierAction,
   updateSupplierAction,
-  saveSupplierAssignmentsAction
+  saveSupplierAssignmentsAction,
+  toggleAssetTypeImageAction
 } from "@/app/actions/form-builder";
 import {
   ArrowUp,
@@ -25,7 +26,8 @@ import {
   Search,
   Settings2,
   XCircle,
-  Sliders
+  Sliders,
+  Upload
 } from "lucide-react";
 
 interface CategoryItem {
@@ -45,6 +47,7 @@ interface AssetTypeItem {
   icon?: string | null;
   isActive: boolean;
   displayOrder: number;
+  includeAssetImage?: boolean;
   createdAt?: Date | string;
   formFields?: { id: string; isEnabled: boolean }[];
   supplierAssignments?: { id: string; isActive: boolean }[];
@@ -136,8 +139,29 @@ export function AssetFormBuilderClient({
   // Panel tabs: form-builder, categories, asset-types, suppliers
   const [activePanel, setActivePanel] = useState<"form-builder" | "categories" | "asset-types" | "suppliers">("form-builder");
 
+  // Local state for asset types to reflect toggle immediately
+  const [typesList, setTypesList] = useState<AssetTypeItem[]>(assetTypes);
+
+  useEffect(() => {
+    setTypesList(assetTypes);
+  }, [assetTypes]);
+
   // Redesigned Selector: Select Asset Type (Asset Type is chosen first)
   const [selectedTypeId, setSelectedTypeId] = useState<string>("");
+
+  const handleToggleIncludeAssetImage = (newVal: boolean) => {
+    if (!selectedTypeId) return;
+    setTypesList((prev) =>
+      prev.map((t) => (t.id === selectedTypeId ? { ...t, includeAssetImage: newVal } : t))
+    );
+    startTransition(async () => {
+      const res = await toggleAssetTypeImageAction(selectedTypeId, newVal);
+      if (res?.error) {
+        alert(res.error);
+      }
+      router.refresh();
+    });
+  };
 
   // Field configurations list states
   const [localConfigs, setLocalConfigs] = useState<TypeFieldConfig[]>([]);
@@ -541,7 +565,7 @@ export function AssetFormBuilderClient({
 
   // Preview elements calculations
   const activeFields = localConfigs.filter((f) => f.isEnabled);
-  const selectedType = assetTypes.find((t) => t.id === selectedTypeId);
+  const selectedType = typesList.find((t) => t.id === selectedTypeId);
   const activeSuppliers = initialSupplierAssignments
     .filter(
       (sa) =>
@@ -552,7 +576,7 @@ export function AssetFormBuilderClient({
     .map((sa) => sa.supplier);
 
   // Sorting Asset Types lists for details management tab
-  const detailedFilteredTypes = assetTypes
+  const detailedFilteredTypes = typesList
     .filter((t) => t.name.toLowerCase().includes(typeSearch.toLowerCase()))
     .sort((a, b) => a.name.localeCompare(b.name));
 
@@ -634,7 +658,7 @@ export function AssetFormBuilderClient({
               <option value="">-- Choose Asset Type to configure --</option>
               {categories.map((cat) => (
                 <optgroup key={cat.id} label={cat.name}>
-                  {assetTypes
+                  {typesList
                     .filter((t) => t.categoryId === cat.id && t.isActive)
                     .map((t) => (
                       <option key={t.id} value={t.id}>
@@ -657,6 +681,53 @@ export function AssetFormBuilderClient({
             </div>
           ) : (
             <div className="space-y-6">
+
+              {/* Include Asset Image Setting Switch (PART 4) */}
+              <div className="bg-white p-5 rounded-2xl border border-slate-200 max-w-2xl shadow-sm flex items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2.5">
+                    <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                      Include Asset Image
+                    </h3>
+                    <span
+                      className={`text-[10px] font-black px-2 py-0.5 rounded-full border transition-colors ${
+                        (selectedType?.includeAssetImage ?? true)
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : "bg-slate-100 text-slate-500 border-slate-200"
+                      }`}
+                    >
+                      {(selectedType?.includeAssetImage ?? true) ? "ON" : "OFF"}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Allow users to upload an image of the asset.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <span className={`text-xs font-black tracking-wider ${
+                    (selectedType?.includeAssetImage ?? true) ? "text-[#0b4a6e]" : "text-slate-400"
+                  }`}>
+                    {(selectedType?.includeAssetImage ?? true) ? "[ ON ]" : "[ OFF ]"}
+                  </span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={selectedType?.includeAssetImage ?? true}
+                    onClick={() => handleToggleIncludeAssetImage(!(selectedType?.includeAssetImage ?? true))}
+                    disabled={isPending}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#0b4a6e] focus:ring-offset-2 disabled:opacity-50 ${
+                      (selectedType?.includeAssetImage ?? true) ? "bg-[#0b4a6e]" : "bg-slate-300"
+                    }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                        (selectedType?.includeAssetImage ?? true) ? "translate-x-5" : "translate-x-0"
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
               
               {/* Field Groups: Standard and Custom */}
               <div className="grid grid-cols-1 gap-6">
@@ -1958,6 +2029,20 @@ export function AssetFormBuilderClient({
                       </div>
                     );
                   })}
+
+                  {/* Asset Image Preview (Conditional based on includeAssetImage) */}
+                  {(selectedType.includeAssetImage ?? true) && (
+                    <div className="col-span-1 md:col-span-2 pt-3 border-t border-slate-100 space-y-1.5">
+                      <label className="block text-[10px] font-bold text-slate-600 uppercase">
+                        Asset Image <span className="text-slate-400 font-normal lowercase">(optional)</span>
+                      </label>
+                      <div className="border-2 border-dashed border-slate-250 rounded-xl p-5 bg-slate-50/70 flex flex-col items-center justify-center text-center">
+                        <Upload size={22} className="text-[#0b4a6e] mb-1.5" />
+                        <span className="text-xs font-bold text-slate-700">[ Upload Asset Image ]</span>
+                        <span className="text-[10px] text-slate-400 mt-0.5">JPG, JPEG, PNG, WEBP supported</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

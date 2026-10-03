@@ -1,0 +1,177 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 700" width="1100" height="700">
+  <defs>
+    <filter id="dep_shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0F172A" flood-opacity="0.08"/>
+    </filter>
+    <marker id="dep_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#1E3A8A"/>
+    </marker>
+    <marker id="dep_arrow_bi" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#059669"/>
+    </marker>
+  </defs>
+
+  <rect width="1100" height="700" fill="#FFFFFF"/>
+
+  <!-- Title Header -->
+  <text x="550" y="40" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="22" font-weight="800" fill="#0F172A">
+    Figure 3.3: Deployment Architecture Diagram – Physical Node Topology
+  </text>
+  <text x="550" y="65" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="500" fill="#64748B">
+    Client Nodes, Vercel Serverless Hosting Environment, TLS 1.3 Communication, and Neon Cloud PostgreSQL
+  </text>
+
+  <!-- NODE 1: CLIENT DEVICES TIER (LEFT) -->
+  <g transform="translate(40, 110)">
+    <!-- 3D Node Box -->
+    <path d="M 0 15 L 15 0 L 265 0 L 250 15 Z" fill="#CBD5E1" stroke="#94A3B8" stroke-width="1.5"/>
+    <path d="M 250 15 L 265 0 L 265 485 L 250 500 Z" fill="#94A3B8" stroke="#64748B" stroke-width="1.5"/>
+    <rect x="0" y="15" width="250" height="485" rx="8" fill="#F8FAFC" stroke="#64748B" stroke-width="2" filter="url(#dep_shadow)"/>
+    <rect x="0" y="15" width="250" height="32" rx="6" fill="#334155"/>
+    <text x="125" y="37" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">«Device» Client Tier</text>
+
+    <!-- Artifact: Desktop Browser -->
+    <rect x="15" y="65" width="220" height="95" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="25" y="85" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">Desktop / Laptop Workstation</text>
+    <text x="25" y="103" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Modern Browser (Chrome/Edge)</text>
+    <text x="25" y="118" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Admin, PAO, Head &amp; Auditor</text>
+    <text x="25" y="133" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Recharts &amp; Label Printing</text>
+    <text x="25" y="148" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#0284C7">«Artifact» React Client Bundle</text>
+
+    <!-- Artifact: Mobile Device -->
+    <rect x="15" y="175" width="220" height="95" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="25" y="195" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">Mobile / Tablet Device</text>
+    <text x="25" y="213" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Smartphone Mobile Browser</text>
+    <text x="25" y="228" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Field Inventory &amp; Tech Staff</text>
+    <text x="25" y="243" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• HTML5 Camera (jsQR Scanner)</text>
+    <text x="25" y="258" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#0284C7">«Artifact» Responsive Web App</text>
+
+    <!-- Artifact: Public Device -->
+    <rect x="15" y="285" width="220" height="95" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="25" y="305" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">Public / Gate Security Device</text>
+    <text x="25" y="323" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Any Unauthenticated Mobile Camera</text>
+    <text x="25" y="338" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Gate Security Officers / Visitors</text>
+    <text x="25" y="353" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Direct Public QR Verification</text>
+    <text x="25" y="368" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#0284C7">«Artifact» Public Verification Card</text>
+
+    <rect x="15" y="395" width="220" height="85" rx="6" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="25" y="415" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="700" fill="#334155">Operating Environment:</text>
+    <text x="25" y="432" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">• Windows, macOS, Android, iOS</text>
+    <text x="25" y="448" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">• Zero Native Installation Required</text>
+    <text x="25" y="464" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">• Fully Responsive PWA Readiness</text>
+  </g>
+
+  <!-- PROTOCOL CONNECTOR 1: INTERNET / HTTPS -->
+  <g transform="translate(290, 290)">
+    <line x1="0" y1="60" x2="90" y2="60" stroke="#0284C7" stroke-width="3" stroke-dasharray="6,4"/>
+    <polygon points="90,60 80,55 80,65" fill="#0284C7"/>
+    <polygon points="0,60 10,55 10,65" fill="#0284C7"/>
+    <rect x="10" y="25" width="70" height="24" rx="4" fill="#E0F2FE" stroke="#0284C7" stroke-width="1"/>
+    <text x="45" y="41" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="700" fill="#0369A1">HTTPS</text>
+    <text x="45" y="95" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" font-weight="600" fill="#64748B">TLS 1.3 / TCP 443</text>
+    <text x="45" y="108" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#94A3B8">Encrypted Web</text>
+  </g>
+
+  <!-- NODE 2: APPLICATION HOSTING TIER (VERCEL CLOUD / NODE.JS) -->
+  <g transform="translate(380, 110)">
+    <path d="M 0 15 L 15 0 L 365 0 L 350 15 Z" fill="#93C5FD" stroke="#60A5FA" stroke-width="1.5"/>
+    <path d="M 350 15 L 365 0 L 365 485 L 350 500 Z" fill="#60A5FA" stroke="#3B82F6" stroke-width="1.5"/>
+    <rect x="0" y="15" width="350" height="485" rx="8" fill="#F0F9FF" stroke="#0284C7" stroke-width="2" filter="url(#dep_shadow)"/>
+    <rect x="0" y="15" width="350" height="32" rx="6" fill="#0284C7"/>
+    <text x="175" y="37" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">
+      «Execution Env» Vercel Cloud Platform
+    </text>
+
+    <!-- Vercel Edge CDN -->
+    <rect x="15" y="65" width="320" height="75" rx="6" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.5"/>
+    <text x="25" y="85" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0369A1">Vercel Edge Network / Global Anycast DNS</text>
+    <text x="25" y="103" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Automated TLS Termination &amp; SSL Certificates</text>
+    <text x="25" y="118" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Static Asset Caching (Images, CSS, Fonts, JS Chunks)</text>
+    <text x="25" y="132" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#0284C7">«Artifact» Edge Middleware Router (middleware.ts)</text>
+
+    <!-- Next.js Serverless Container -->
+    <rect x="15" y="155" width="320" height="195" rx="6" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.5"/>
+    <text x="25" y="175" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0369A1">Next.js 14.2.23 Serverless Runtime (Node.js)</text>
+
+    <rect x="25" y="185" width="300" height="42" rx="4" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+    <text x="35" y="202" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="700" fill="#0F172A">NextAuth Session Engine</text>
+    <text x="35" y="217" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#475569">JWT Verification • Role Redirection • Cookie Encryption</text>
+
+    <rect x="25" y="235" width="300" height="50" rx="4" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+    <text x="35" y="252" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="700" fill="#0F172A">Server Actions &amp; Domain Controllers</text>
+    <text x="35" y="267" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#475569">15 Server Action Handlers • Dynamic Form Builder Engine</text>
+    <text x="35" y="279" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#475569">Straight-Line Depreciation • Rate Limiter</text>
+
+    <rect x="25" y="293" width="300" height="45" rx="4" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+    <text x="35" y="310" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="700" fill="#0F172A">Prisma Client ORM Engine v7</text>
+    <text x="35" y="326" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#475569">Connection Pool Adapter (@prisma/adapter-pg) • Query Engine</text>
+
+    <!-- Supporting Services inside node -->
+    <rect x="15" y="360" width="320" height="120" rx="6" fill="#F8FAFC" stroke="#BAE6FD" stroke-width="1"/>
+    <text x="25" y="380" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="700" fill="#0F172A">Embedded Utility Libraries:</text>
+    <text x="25" y="398" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• qrcode (v1.5.4) – SVG &amp; PNG Tag Encoding</text>
+    <text x="25" y="414" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Native Code 39 Barcode SVG Generator</text>
+    <text x="25" y="430" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• bcryptjs (v3.0.3) – Password Hash Salt Engine</text>
+    <text x="25" y="446" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Resend SDK (v6.24.0) – Email Dispatch Module</text>
+    <text x="25" y="465" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#64748B">Environment Variables: DATABASE_URL, NEXTAUTH_SECRET</text>
+  </g>
+
+  <!-- PROTOCOL CONNECTOR 2: DATABASE CONNECTION -->
+  <g transform="translate(730, 290)">
+    <line x1="0" y1="60" x2="80" y2="60" stroke="#7C3AED" stroke-width="3" stroke-dasharray="6,4"/>
+    <polygon points="80,60 70,55 70,65" fill="#7C3AED"/>
+    <polygon points="0,60 10,55 10,65" fill="#7C3AED"/>
+    <rect x="5" y="25" width="70" height="24" rx="4" fill="#FAF5FF" stroke="#7C3AED" stroke-width="1"/>
+    <text x="40" y="41" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="700" fill="#6B21A8">TCP / SSL</text>
+    <text x="40" y="95" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" font-weight="600" fill="#64748B">Port 5432</text>
+    <text x="40" y="108" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#94A3B8">sslmode=verify-full</text>
+  </g>
+
+  <!-- NODE 3: NEON DATABASE TIER (RIGHT) -->
+  <g transform="translate(810, 110)">
+    <path d="M 0 15 L 15 0 L 265 0 L 250 15 Z" fill="#DDD6FE" stroke="#A78BFA" stroke-width="1.5"/>
+    <path d="M 250 15 L 265 0 L 265 485 L 250 500 Z" fill="#A78BFA" stroke="#7C3AED" stroke-width="1.5"/>
+    <rect x="0" y="15" width="250" height="485" rx="8" fill="#FAF5FF" stroke="#7C3AED" stroke-width="2" filter="url(#dep_shadow)"/>
+    <rect x="0" y="15" width="250" height="32" rx="6" fill="#7C3AED"/>
+    <text x="125" y="37" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">
+      «Database» Neon PostgreSQL
+    </text>
+
+    <!-- Cloud Info -->
+    <rect x="15" y="65" width="220" height="75" rx="6" fill="#FFFFFF" stroke="#E9D5FF" stroke-width="1.5"/>
+    <text x="25" y="85" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#6B21A8">Cloud Infrastructure</text>
+    <text x="25" y="103" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• AWS us-east-2 (Ohio, US)</text>
+    <text x="25" y="118" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Serverless Autoscaling Compute</text>
+    <text x="25" y="132" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#7C3AED">ep-mute-recipe-ax4u8oow-pooler</text>
+
+    <!-- PgBouncer Connection Pooler -->
+    <rect x="15" y="150" width="220" height="70" rx="6" fill="#FFFFFF" stroke="#E9D5FF" stroke-width="1.5"/>
+    <text x="25" y="170" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#6B21A8">PgBouncer Connection Pooler</text>
+    <text x="25" y="188" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Transaction-Level Connection Pool</text>
+    <text x="25" y="203" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• High-Concurrency Multiplexing</text>
+
+    <!-- Relational Storage & Tables -->
+    <rect x="15" y="230" width="220" height="150" rx="6" fill="#FFFFFF" stroke="#E9D5FF" stroke-width="1.5"/>
+    <text x="25" y="250" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#6B21A8">Relational Schema Storage</text>
+    <text x="25" y="268" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• 21 Tables (Asset, User, etc.)</text>
+    <text x="25" y="284" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• 8 Business Status Enums</text>
+    <text x="25" y="300" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• UUID (v4) Primary Keys</text>
+    <text x="25" y="316" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Composite B-Tree Indices</text>
+    <text x="25" y="332" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Foreign Key Cascades</text>
+    <text x="25" y="348" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Soft-Delete Timestamp Filters</text>
+    <text x="25" y="368" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#7C3AED">«Artifact» PostgreSQL 16 DB</text>
+
+    <!-- Reliability -->
+    <rect x="15" y="390" width="220" height="90" rx="6" fill="#F8FAFC" stroke="#E9D5FF" stroke-width="1"/>
+    <text x="25" y="410" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="700" fill="#334155">Resilience &amp; Durability:</text>
+    <text x="25" y="428" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">• WAL Stream Replication</text>
+    <text x="25" y="444" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">• Point-in-Time Restore (PITR)</text>
+    <text x="25" y="460" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">• Automated Daily Snapshots</text>
+  </g>
+
+  <!-- Summary Footer Note -->
+  <rect x="40" y="625" width="1020" height="40" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+  <text x="550" y="650" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#475569">
+    Architecture Security: Zero server administration overhead; HTTPS encryption from browser to edge; TLS 1.3 DB tunneling; Zero DB primary keys exposed to public QR endpoints.
+  </text>
+</svg>

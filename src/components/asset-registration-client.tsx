@@ -5,6 +5,7 @@ import QRCode from "qrcode";
 import { registerAssetAction } from "@/app/actions/asset";
 import {
   QrCode,
+  Barcode as BarcodeIcon,
   Printer,
   ChevronLeft,
   ChevronRight,
@@ -26,6 +27,9 @@ import {
   Image as ImageIcon
 } from "lucide-react";
 import { FundingSource } from "@prisma/client";
+import { isBuildingAsset } from "@/lib/barcode";
+import { BarcodeView } from "@/components/barcode-view";
+import { printBarcodeSticker, printQrLabel, printFullAssetLabel } from "@/lib/print-label";
 
 interface FormFieldItem {
   id: string;
@@ -120,91 +124,6 @@ const getCategoryIconAndColor = (code: string) => {
   };
 };
 
-export function generateBarcodeSvg(value: string) {
-  const chars: Record<string, string> = {
-    '0': 'N N W W N N N W N',
-    '1': 'W N N W N N N N W',
-    '2': 'N N W W N N N N W',
-    '3': 'W N W W N N N N N',
-    '4': 'N N N W W N N N W',
-    '5': 'W N N W W N N N N',
-    '6': 'N N W W W N N N N',
-    '7': 'N N N W N N W N W',
-    '8': 'W N N W N N W N N',
-    '9': 'N N W W N N W N N',
-    'A': 'W N N N N W N N W',
-    'B': 'N N W N N W N N W',
-    'C': 'W N W N N W N N N',
-    'D': 'N N N N W W N N W',
-    'E': 'W N N N W W N N N',
-    'F': 'N N W N W W N N N',
-    'G': 'N N N N N W W N W',
-    'H': 'W N N N N W W N N',
-    'I': 'N N W N N W W N N',
-    'J': 'N N N N W W W N N',
-    'K': 'W N N N N N N W W',
-    'L': 'N N W N N N N W W',
-    'M': 'W N W N N N N W N',
-    'N': 'N N N N W N N W W',
-    'O': 'W N N N W N N W N',
-    'P': 'N N W N W N N W N',
-    'Q': 'N N N N N N W W W',
-    'R': 'W N N N N N W W N',
-    'S': 'N N W N N N W W N',
-    'T': 'N N N N W N W W N',
-    'U': 'W W N N N N N N W',
-    'V': 'N W W N N N N N W',
-    'W': 'W W W N N N N N N',
-    'X': 'N W N N W N N N W',
-    'Y': 'W W N N W N N N N',
-    'Z': 'N W W N W N N N N',
-    '-': 'N W N N N N W N W',
-    '.': 'W W N N N N W N N',
-    ' ': 'N W W N N N W N N',
-    '*': 'N W N N W N W N N',
-    '$': 'N W N W N W N N N',
-    '/': 'N W N W N N N W N',
-    '+': 'N W N N N W N W N',
-    '%': 'N N N W N W N W N'
-  };
-
-  const raw = value ? value.toUpperCase() : "TEMP";
-  let clean = "";
-  for (let i = 0; i < raw.length; i++) {
-    if (chars[raw[i]]) clean += raw[i];
-  }
-  const formatted = `*${clean}*`;
-
-  let result = "";
-  for (let i = 0; i < formatted.length; i++) {
-    const pattern = chars[formatted[i]];
-    if (!pattern) continue;
-    const parts = pattern.split(" ");
-    for (let j = 0; j < parts.length; j++) {
-      const isBar = j % 2 === 0;
-      const isWide = parts[j] === "W";
-      const width = isWide ? 3 : 1;
-      result += isBar ? `B${width}` : `W${width}`;
-    }
-    result += "W1";
-  }
-
-  let currentX = 0;
-  const rects: string[] = [];
-  const height = 40;
-
-  for (let i = 0; i < result.length; i += 2) {
-    const type = result[i];
-    const width = parseInt(result[i + 1]);
-    if (type === "B") {
-      rects.push(`<rect x="${currentX}" y="0" width="${width}" height="${height}" fill="black" />`);
-    }
-    currentX += width;
-  }
-
-  return `<svg width="100%" height="45" viewBox="0 0 ${currentX} ${height}" preserveAspectRatio="none">${rects.join("")}</svg>`;
-}
-
 export function AssetRegistrationClient({
   categories,
   departments
@@ -251,6 +170,8 @@ export function AssetRegistrationClient({
   const imageUrl = imageUrls[0] || "";
   const [attachmentUrl, setAttachmentUrl] = useState("");
   const [remarks, setRemarks] = useState("");
+  const [identificationMethod, setIdentificationMethod] = useState<"QR" | "BARCODE" | "NONE">("QR");
+  const [includeAssetImage, setIncludeAssetImage] = useState<boolean>(true);
 
   const [qrCodeUrl, setQrCodeUrl] = useState("");
   const [liveQrUrl, setLiveQrUrl] = useState("");
@@ -284,7 +205,8 @@ export function AssetRegistrationClient({
     assignedToId,
     imageUrls,
     attachmentUrl,
-    remarks
+    remarks,
+    identificationMethod
   ]);
 
   // Dynamic Custodian Staff Filtering by Selected Responsible Unit / Department
@@ -330,6 +252,14 @@ export function AssetRegistrationClient({
   const activeCategories = categories.filter((c) => c.isActive);
   const selectedCategory = categories.find((c) => c.id === categoryId);
   const selectedAssetType = selectedCategory?.assetTypes?.find((t) => t.id === assetTypeId);
+  const isBuilding = isBuildingAsset(selectedCategory, selectedAssetType);
+
+  // Buildings must never have QR or Barcode; default and lock to NONE
+  useEffect(() => {
+    if (isBuilding) {
+      setIdentificationMethod("NONE");
+    }
+  }, [isBuilding]);
 
   // Fetch form configuration for selected Asset Type (Section 10)
   useEffect(() => {
@@ -349,6 +279,7 @@ export function AssetRegistrationClient({
         
         setConfiguredFields(data.fields || []);
         setAvailableSuppliers(data.suppliers || []);
+        setIncludeAssetImage(data.includeAssetImage ?? true);
 
         // Load default values into states
         const defaults: Record<string, string> = {};
@@ -387,8 +318,12 @@ export function AssetRegistrationClient({
   }, [selectedCategory]);
 
   const handleChooseCategory = (id: string) => {
+    const cat = categories.find((c) => c.id === id);
+    const catIsBuilding = isBuildingAsset(cat, null);
     setCategoryId(id);
     setAssetTypeId("");
+    setIdentificationMethod(catIsBuilding ? "NONE" : "QR");
+    setIncludeAssetImage(true);
     setError(null);
     setStep(2);
   };
@@ -446,13 +381,6 @@ export function AssetRegistrationClient({
 
     if (!departmentId) {
       setError("Please select a responsible unit / department.");
-      return;
-    }
-
-    // Validate that at least one photo (primary) is uploaded
-    const activePhotos = imageUrls.filter(Boolean);
-    if (activePhotos.length === 0 || !imageUrls[0]) {
-      setError("Please upload at least one asset photo.");
       return;
     }
 
@@ -534,6 +462,8 @@ export function AssetRegistrationClient({
         }
       });
 
+      const finalMethod = isBuilding ? "NONE" : identificationMethod;
+
       // Submit asset payload
       const res = await registerAssetAction(null, {
         name,
@@ -560,169 +490,37 @@ export function AssetRegistrationClient({
         attachmentUrl,
         remarks,
         assignedToId: assignedToId || undefined,
-        dynamicValues: dynamicFieldsMap
+        dynamicValues: dynamicFieldsMap,
+        identificationMethod: finalMethod,
       });
 
       if (res.error) {
         setError(res.error);
         setStep(2);
       } else {
-        // Generate QR code for review label pointing to public verification page
-        const codeString =
-          res.asset?.qrCode?.qrCodeString ||
-          (res.asset?.publicId
-            ? `${window.location.origin}/asset/verify/${res.asset.publicId}`
-            : res.asset?.assetCode || assetCode);
-        try {
-          const qr = await QRCode.toDataURL(codeString, { width: 200, margin: 1 });
-          setQrCodeUrl(qr);
-        } catch (qrErr) {
-          console.error("QR Code generation error", qrErr);
+        if (res.asset?.assetCode) {
+          setAssetCode(res.asset.assetCode);
+        }
+        // Generate QR code only if QR method was chosen
+        if (finalMethod === "QR") {
+          const codeString =
+            res.asset?.qrCode?.qrCodeString ||
+            (res.asset?.publicId
+              ? `${window.location.origin}/asset/verify/${res.asset.publicId}`
+              : res.asset?.assetCode || assetCode);
+          try {
+            const qr = await QRCode.toDataURL(codeString, { width: 200, margin: 1 });
+            setQrCodeUrl(qr);
+          } catch (qrErr) {
+            console.error("QR Code generation error", qrErr);
+          }
         }
         setStep(4);
       }
     });
   };
 
-  const handlePrintLabel = () => {
-    const printContent = document.getElementById("asset-print-label")?.innerHTML;
-    if (!printContent) return;
-    const win = window.open("", "_blank");
-    if (win) {
-      win.document.write(`
-        <html>
-          <head>
-            <title>DBU Asset Tag Label</title>
-            <style>
-              @media print {
-                body { margin: 0; padding: 0; }
-                .no-print { display: none; }
-              }
-              body {
-                font-family: system-ui, -apple-system, sans-serif;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                min-height: 100vh;
-                background-color: #f8fafc;
-                margin: 0;
-                padding: 20px;
-              }
-              .label-card {
-                background: white;
-                border: 1px solid #e2e8f0;
-                border-radius: 16px;
-                padding: 24px;
-                width: 280px;
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-              }
-              .header {
-                font-size: 9px;
-                font-weight: 800;
-                color: #0b4a6e;
-                letter-spacing: 1.5px;
-                text-transform: uppercase;
-                margin: 0 0 2px 0;
-              }
-              .subheader {
-                font-size: 7px;
-                font-weight: 700;
-                color: #b45309;
-                letter-spacing: 1px;
-                text-transform: uppercase;
-                margin: 0 0 12px 0;
-              }
-              .image-slot {
-                width: 100%;
-                height: 130px;
-                object-fit: cover;
-                border-radius: 10px;
-                border: 1px solid #f1f5f9;
-                margin-bottom: 12px;
-                background-color: #f8fafc;
-              }
-              .asset-name {
-                font-size: 14px;
-                font-weight: 800;
-                color: #1e293b;
-                margin: 0 0 2px 0;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                width: 100%;
-              }
-              .asset-code {
-                font-size: 12px;
-                font-weight: 750;
-                font-family: monospace;
-                color: #0284c7;
-                margin: 0 0 4px 0;
-              }
-              .asset-type {
-                font-size: 8px;
-                font-weight: 800;
-                color: #475569;
-                background-color: #f1f5f9;
-                padding: 3px 8px;
-                border-radius: 6px;
-                text-transform: uppercase;
-                margin-bottom: 12px;
-                display: inline-block;
-              }
-              .qr-image {
-                width: 110px;
-                height: 110px;
-                object-fit: contain;
-                margin-bottom: 12px;
-              }
-              .barcode-slot {
-                width: 100%;
-                border-top: 1px solid #f1f5f9;
-                padding-top: 12px;
-                margin-top: 4px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-              }
-              .barcode-slot svg {
-                width: 100%;
-                height: 40px;
-              }
-              .barcode-text {
-                font-size: 9px;
-                font-family: monospace;
-                font-weight: 700;
-                color: #64748b;
-                margin-top: 4px;
-                margin-bottom: 0;
-              }
-              .footer {
-                font-size: 7px;
-                font-weight: 700;
-                color: #94a3b8;
-                letter-spacing: 1px;
-                text-transform: uppercase;
-                border-top: 1px dashed #e2e8f0;
-                padding-top: 10px;
-                margin-top: 12px;
-                width: 100%;
-              }
-            </style>
-          </head>
-          <body onload="window.print(); window.close();">
-            <div class="label-card">
-              ${printContent}
-            </div>
-          </body>
-        </html>
-      `);
-      win.document.close();
-    }
-  };
+
 
   return (
     <div className="space-y-6 select-none">
@@ -833,210 +631,497 @@ export function AssetRegistrationClient({
               <p className="text-xs text-slate-500 font-semibold">Select an Asset Type to load the registration form</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-              {/* Form Side */}
-              <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-6">
+            <div className="space-y-6">
+              {/* SECTION 1: ASSET INFORMATION */}
+              <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
                 <div className="border-b border-slate-100 pb-3">
-                  <h4 className="text-xs font-extrabold text-[#0b4a6e] uppercase tracking-wider">Dynamic Specs Form</h4>
+                  <h4 className="text-xs font-black text-[#0b4a6e] uppercase tracking-wider flex items-center gap-2">
+                    <Info size={15} />
+                    <span>Asset Information</span>
+                  </h4>
+                  <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                    Core identity, naming, category classification, and condition of the asset.
+                  </p>
                 </div>
 
-              {/* Dynamic form inputs */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                {/* Generated Asset ID (Auto-Generated, read-only) */}
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Asset ID (Auto)</label>
-                  <input
-                    type="text"
-                    disabled
-                    className="w-full p-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-500 font-semibold font-mono"
-                    value={assetCode}
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Asset Name */}
+                  <div className="md:col-span-2">
+                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Asset Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Dell Latitude 5420 Laptop"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-250 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Asset Code (Auto-Generated, read-only) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Asset ID / Code (System Generated)
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      className="w-full p-2.5 bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-bold font-mono text-xs"
+                      value={assetCode}
+                    />
+                  </div>
+
+                  {/* Category (Display) */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                      Category
+                    </label>
+                    <input
+                      type="text"
+                      disabled
+                      className="w-full p-2.5 bg-slate-100 border border-slate-200 rounded-xl text-slate-700 font-semibold text-xs"
+                      value={selectedCategory.name}
+                    />
+                  </div>
+
+                  {/* Asset Type */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Asset Type <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      required
+                      className="w-full p-2.5 bg-white border border-slate-250 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                      value={assetTypeId}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setAssetTypeId(val);
+                        const t = selectedCategory?.assetTypes?.find((x) => x.id === val);
+                        setName(t?.name || "");
+                      }}
+                    >
+                      <option value="">-- Select Type --</option>
+                      {selectedCategory?.assetTypes
+                        ?.filter((t) => t.isActive)
+                        .map((t) => (
+                          <option key={t.id} value={t.id}>
+                            {t.name}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+
+                  {/* Serial Number */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Serial Number / Tag
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. SN-8924021A"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-250 rounded-xl text-xs font-mono font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                      value={serialNumber}
+                      onChange={(e) => setSerialNumber(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Condition */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Physical Condition <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      className="w-full p-2.5 bg-white border border-slate-250 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                      value={condition}
+                      onChange={(e) => setCondition(e.target.value)}
+                    >
+                      <option value="NEW">New / Pristine</option>
+                      <option value="GOOD">Good / Operable</option>
+                      <option value="FAIR">Fair / Functional</option>
+                      <option value="POOR">Poor / Needs Maintenance</option>
+                    </select>
+                  </div>
+
+                  {/* Description */}
+                  <div className="md:col-span-2 lg:col-span-3">
+                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      General Description / Remarks
+                    </label>
+                    <textarea
+                      placeholder="Enter optional description, physical markings, or initial notes..."
+                      className="w-full p-2.5 bg-slate-50 border border-slate-250 rounded-xl text-xs text-slate-800 h-20 resize-none focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 2: TECHNICAL INFORMATION */}
+              <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
+                <div className="border-b border-slate-100 pb-3">
+                  <h4 className="text-xs font-black text-[#0b4a6e] uppercase tracking-wider flex items-center gap-2">
+                    <Zap size={15} />
+                    <span>Technical Information</span>
+                  </h4>
+                  <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                    Specifications configured for <strong className="text-slate-700">{selectedAssetType?.name || selectedCategory.name}</strong>.
+                  </p>
                 </div>
 
-                {configuredFields
-                  .map((cfg) => {
-                    const isRequired = cfg.isRequired;
-                    const isBuiltIn = ["name", "serialNumber", "purchaseCost", "purchaseDate", "usefulLife", "salvageValue", "fundingSource", "warrantyStartDate", "warrantyEndDate", "expiryDate"].includes(cfg.name);
+                {(() => {
+                  const standardNames = ["name", "serialNumber", "purchaseCost", "purchaseDate", "usefulLife", "salvageValue", "fundingSource", "warrantyStartDate", "warrantyEndDate", "expiryDate"];
+                  const techFields = configuredFields.filter((f) => !standardNames.includes(f.name));
 
-                  let val = "";
-                  let setVal: (v: string) => void = () => {};
-
-                  if (isBuiltIn) {
-                    if (cfg.name === "name") {
-                      val = name;
-                      setVal = setName;
-                    } else if (cfg.name === "serialNumber") {
-                      val = serialNumber;
-                      setVal = setSerialNumber;
-                    } else if (cfg.name === "purchaseCost") {
-                      val = purchaseCost;
-                      setVal = setPurchaseCost;
-                    } else if (cfg.name === "purchaseDate") {
-                      val = purchaseDate;
-                      setVal = setPurchaseDate;
-                    } else if (cfg.name === "usefulLife") {
-                      val = usefulLife;
-                      setVal = setUsefulLife;
-                    } else if (cfg.name === "salvageValue") {
-                      val = salvageValue;
-                      setVal = setSalvageValue;
-                    } else if (cfg.name === "fundingSource") {
-                      val = fundingSource;
-                      setVal = (v) => setFundingSource(v as FundingSource);
-                    } else if (cfg.name === "warrantyStartDate") {
-                      val = warrantyStartDate;
-                      setVal = setWarrantyStartDate;
-                    } else if (cfg.name === "warrantyEndDate") {
-                      val = warrantyEndDate;
-                      setVal = setWarrantyEndDate;
-                    } else if (cfg.name === "expiryDate") {
-                      val = expiryDate;
-                      setVal = setExpiryDate;
-                    }
-                  } else {
-                    val = getCustomVal(cfg.id);
-                    setVal = (v) => setCustomVal(cfg.id, v);
+                  if (techFields.length === 0) {
+                    return (
+                      <div className="p-6 bg-slate-50 rounded-xl border border-slate-200/60 text-center text-slate-400 text-xs font-medium">
+                        No additional technical fields configured for {selectedAssetType?.name || "this asset type"}.
+                      </div>
+                    );
                   }
 
                   return (
-                    <div key={cfg.id} className={cfg.fieldType === "TEXTAREA" ? "col-span-2" : ""}>
-                      <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
-                        {cfg.label} {isRequired && <span className="text-red-500">*</span>}
-                      </label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {techFields.map((cfg) => {
+                        const val = getCustomVal(cfg.id);
+                        const isRequired = cfg.isRequired;
 
-                      {cfg.fieldType === "TEXT" && (
-                        <input
-                          type="text"
-                          required={isRequired}
-                          placeholder={cfg.placeholder || `Enter ${cfg.label.toLowerCase()}...`}
-                          className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs"
-                          value={val}
-                          onChange={(e) => setVal(e.target.value)}
-                        />
-                      )}
-
-                      {cfg.fieldType === "TEXTAREA" && (
-                        <textarea
-                          required={isRequired}
-                          placeholder={cfg.placeholder || `Details...`}
-                          className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs h-20 resize-none"
-                          value={val}
-                          onChange={(e) => setVal(e.target.value)}
-                        />
-                      )}
-
-                      {cfg.fieldType === "NUMBER" && (
-                        <input
-                          type="number"
-                          required={isRequired}
-                          placeholder={cfg.placeholder || "0"}
-                          className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono"
-                          value={val}
-                          onChange={(e) => setVal(e.target.value)}
-                        />
-                      )}
-
-                      {cfg.fieldType === "DECIMAL" && (
-                        <input
-                          type="text"
-                          required={isRequired}
-                          placeholder={cfg.placeholder || "0.00"}
-                          className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono"
-                          value={val}
-                          onChange={(e) => setVal(e.target.value)}
-                        />
-                      )}
-
-                      {cfg.fieldType === "DATE" && (
-                        <input
-                          type="date"
-                          required={isRequired}
-                          className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs"
-                          value={val}
-                          onChange={(e) => setVal(e.target.value)}
-                        />
-                      )}
-
-                      {cfg.fieldType === "BOOLEAN" && (
-                        <select
-                          required={isRequired}
-                          className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs"
-                          value={val}
-                          onChange={(e) => setVal(e.target.value)}
-                        >
-                          <option value="">-- Select --</option>
-                          <option value="Yes">Yes</option>
-                          <option value="No">No</option>
-                        </select>
-                      )}
-
-                      {cfg.fieldType === "CHECKBOX" && (
-                        <div className="flex items-center space-x-2 p-2 bg-slate-50 border border-slate-200 rounded-lg">
-                          <input
-                            type="checkbox"
-                            checked={val === "Yes" || val === "true"}
-                            onChange={(e) => setVal(e.target.checked ? "Yes" : "No")}
-                            className="rounded border-slate-350"
-                          />
-                          <span className="text-xs text-slate-650 font-medium">Yes / Active</span>
-                        </div>
-                      )}
-
-                      {cfg.fieldType === "RADIO" && (
-                        <div className="flex flex-wrap gap-3 p-1">
-                          {(cfg.options || "Option A,Option B").split(",").map((o) => (
-                            <label key={o} className="flex items-center space-x-1.5 text-xs text-slate-650 cursor-pointer">
-                              <input
-                                type="radio"
-                                name={`radio-${cfg.id}`}
-                                checked={val === o}
-                                onChange={() => setVal(o)}
-                                className="text-[#0b4a6e]"
-                              />
-                              <span>{o}</span>
+                        return (
+                          <div key={cfg.id} className={cfg.fieldType === "TEXTAREA" ? "md:col-span-2 lg:col-span-3" : ""}>
+                            <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                              {cfg.label} {isRequired && <span className="text-red-500">*</span>}
                             </label>
-                          ))}
-                        </div>
-                      )}
 
-                      {cfg.fieldType === "DROPDOWN" && (
-                        <select
-                          required={isRequired}
-                          className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600"
-                          value={val}
-                          onChange={(e) => setVal(e.target.value)}
-                        >
-                          <option value="">-- Choose Option --</option>
-                          {cfg.name === "supplier" ? (
-                            // Scoped Supplier selection (Section 8)
-                            availableSuppliers.map((sup) => (
-                              <option key={sup.id} value={sup.id}>
-                                {sup.name}
-                              </option>
-                            ))
-                          ) : (
-                            (cfg.options || "").split(",").map((o) => (
-                              <option key={o} value={o}>
-                                {o}
-                              </option>
-                            ))
-                          )}
-                        </select>
-                      )}
+                            {cfg.fieldType === "TEXT" && (
+                              <input
+                                type="text"
+                                required={isRequired}
+                                placeholder={cfg.placeholder || `Enter ${cfg.label.toLowerCase()}...`}
+                                className="w-full p-2.5 bg-slate-50 border border-slate-250 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                                value={val}
+                                onChange={(e) => setCustomVal(cfg.id, e.target.value)}
+                              />
+                            )}
+
+                            {cfg.fieldType === "TEXTAREA" && (
+                              <textarea
+                                required={isRequired}
+                                placeholder={cfg.placeholder || "Enter details..."}
+                                className="w-full p-2.5 bg-slate-50 border border-slate-250 rounded-xl text-xs font-medium text-slate-800 h-20 resize-none focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                                value={val}
+                                onChange={(e) => setCustomVal(cfg.id, e.target.value)}
+                              />
+                            )}
+
+                            {cfg.fieldType === "NUMBER" && (
+                              <input
+                                type="number"
+                                required={isRequired}
+                                placeholder={cfg.placeholder || "0"}
+                                className="w-full p-2.5 bg-slate-50 border border-slate-250 rounded-xl text-xs font-mono font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                                value={val}
+                                onChange={(e) => setCustomVal(cfg.id, e.target.value)}
+                              />
+                            )}
+
+                            {cfg.fieldType === "DECIMAL" && (
+                              <input
+                                type="text"
+                                required={isRequired}
+                                placeholder={cfg.placeholder || "0.00"}
+                                className="w-full p-2.5 bg-slate-50 border border-slate-250 rounded-xl text-xs font-mono font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                                value={val}
+                                onChange={(e) => setCustomVal(cfg.id, e.target.value)}
+                              />
+                            )}
+
+                            {cfg.fieldType === "DATE" && (
+                              <input
+                                type="date"
+                                required={isRequired}
+                                className="w-full p-2.5 bg-slate-50 border border-slate-250 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                                value={val}
+                                onChange={(e) => setCustomVal(cfg.id, e.target.value)}
+                              />
+                            )}
+
+                            {cfg.fieldType === "BOOLEAN" && (
+                              <select
+                                required={isRequired}
+                                className="w-full p-2.5 bg-white border border-slate-250 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                                value={val}
+                                onChange={(e) => setCustomVal(cfg.id, e.target.value)}
+                              >
+                                <option value="">-- Choose Option --</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                              </select>
+                            )}
+
+                            {cfg.fieldType === "DROPDOWN" && (
+                              <select
+                                required={isRequired}
+                                className="w-full p-2.5 bg-white border border-slate-250 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                                value={val}
+                                onChange={(e) => setCustomVal(cfg.id, e.target.value)}
+                              >
+                                <option value="">-- Choose Option --</option>
+                                {(cfg.options || "").split(",").map((opt) => (
+                                  <option key={opt.trim()} value={opt.trim()}>
+                                    {opt.trim()}
+                                  </option>
+                                ))}
+                              </select>
+                            )}
+
+                            {cfg.fieldType === "RADIO" && (
+                              <div className="flex flex-wrap gap-3 pt-1">
+                                {(cfg.options || "").split(",").map((opt) => {
+                                  const trimmed = opt.trim();
+                                  return (
+                                    <label key={trimmed} className="flex items-center space-x-1.5 text-xs text-slate-700 cursor-pointer">
+                                      <input
+                                        type="radio"
+                                        name={`radio-${cfg.id}`}
+                                        value={trimmed}
+                                        checked={val === trimmed}
+                                        onChange={() => setCustomVal(cfg.id, trimmed)}
+                                        className="text-[#0b4a6e] focus:ring-[#0b4a6e]"
+                                      />
+                                      <span>{trimmed}</span>
+                                    </label>
+                                  );
+                                })}
+                              </div>
+                            )}
+
+                            {cfg.description && (
+                              <p className="text-[10px] text-slate-400 mt-1">💡 {cfg.description}</p>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   );
-                })}
+                })()}
+              </div>
 
-                {/* Scoped Supplier Dropdown (Section 7 & 8) - Show only if not overridden in dynamic form config */}
-                {!configuredFields.some((f) => f.name === "supplier") && (
+              {/* SECTION 3: LOCATION & ASSIGNMENT */}
+              <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
+                <div className="border-b border-slate-100 pb-3">
+                  <h4 className="text-xs font-black text-[#0b4a6e] uppercase tracking-wider flex items-center gap-2">
+                    <Building size={15} />
+                    <span>Location & Assignment</span>
+                  </h4>
+                  <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                    Physical location, campus room allocation, and designated responsible custodian.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Responsible Unit */}
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Supplier Vendor</label>
+                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Responsible Unit / Dept <span className="text-red-500">*</span>
+                    </label>
                     <select
-                      className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600"
+                      required
+                      className="w-full p-2.5 bg-white border border-slate-250 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                      value={departmentId}
+                      onChange={(e) => setDepartmentId(e.target.value)}
+                    >
+                      <option value="">-- Choose Unit --</option>
+                      {departments.map((d) => (
+                        <option key={d.id} value={d.id}>
+                          {d.name} ({d.code})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Custodian Staff Member */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Custodian Staff Member (Optional)
+                    </label>
+                    <select
+                      disabled={!departmentId || loadingStaff}
+                      className="w-full p-2.5 bg-white border border-slate-250 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#0b4a6e] disabled:bg-slate-100 disabled:opacity-60"
+                      value={assignedToId}
+                      onChange={(e) => setAssignedToId(e.target.value)}
+                    >
+                      {!departmentId ? (
+                        <option value="">-- Select Department First --</option>
+                      ) : loadingStaff ? (
+                        <option value="">Loading staff members...</option>
+                      ) : staffError ? (
+                        <option value="">{staffError}</option>
+                      ) : departmentStaff.length === 0 ? (
+                        <option value="">No eligible staff found for this department</option>
+                      ) : (
+                        <>
+                          <option value="">-- Choose Staff Member --</option>
+                          {departmentStaff.map((u) => (
+                            <option key={u.id} value={u.id}>
+                              {u.name} ({u.email})
+                            </option>
+                          ))}
+                        </>
+                      )}
+                    </select>
+                  </div>
+
+                  {/* Building / Block */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Building / Block
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Block 04, ICT Center"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-250 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                      value={building}
+                      onChange={(e) => setBuilding(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Room / Area */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Room / Area
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Room 204, Lab B"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-250 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                      value={roomNumber}
+                      onChange={(e) => setRoomNumber(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Quantity */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Quantity <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      required
+                      className="w-full p-2.5 bg-slate-50 border border-slate-250 rounded-xl text-xs font-mono font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                      value={quantity}
+                      onChange={(e) => setQuantity(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 4: FINANCIAL INFORMATION */}
+              <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
+                <div className="border-b border-slate-100 pb-3">
+                  <h4 className="text-xs font-black text-[#0b4a6e] uppercase tracking-wider flex items-center gap-2">
+                    <Armchair size={15} />
+                    <span>Financial Information</span>
+                  </h4>
+                  <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                    Acquisition costs, depreciation parameters, supplier source, and warranty terms.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Purchase Cost */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Purchase Cost (ETB)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="0.00"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                      value={purchaseCost}
+                      onChange={(e) => setPurchaseCost(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Purchase Date */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Purchase Date
+                    </label>
+                    <input
+                      type="date"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-250 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                      value={purchaseDate}
+                      onChange={(e) => setPurchaseDate(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Useful Life */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Useful Life (Years)
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      placeholder="5"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-250 rounded-xl text-xs font-mono font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                      value={usefulLife}
+                      onChange={(e) => setUsefulLife(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Salvage Value */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Salvage Value (ETB)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="0.00"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-250 rounded-xl text-xs font-mono font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                      value={salvageValue}
+                      onChange={(e) => setSalvageValue(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Funding Source */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Funding Source
+                    </label>
+                    <select
+                      className="w-full p-2.5 bg-white border border-slate-250 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                      value={fundingSource}
+                      onChange={(e) => setFundingSource(e.target.value as FundingSource)}
+                    >
+                      <option value={FundingSource.GOVERNMENT_BUDGET}>Government Budget</option>
+                      <option value={FundingSource.UNIVERSITY_INTERNAL_BUDGET}>University Internal Budget</option>
+                      <option value={FundingSource.RESEARCH_GRANT}>Research Grant</option>
+                      <option value={FundingSource.PROJECT_FUND}>Project Fund</option>
+                      <option value={FundingSource.DONATION}>Donation</option>
+                      <option value={FundingSource.OTHER}>Other</option>
+                    </select>
+                  </div>
+
+                  {/* Supplier */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Supplier / Vendor
+                    </label>
+                    <select
+                      className="w-full p-2.5 bg-white border border-slate-250 rounded-xl text-xs font-medium text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
                       value={supplierId}
                       onChange={(e) => setSupplierId(e.target.value)}
                     >
-                      <option value="">-- Scoped Suppliers dropdown --</option>
+                      <option value="">-- Select Supplier --</option>
                       {availableSuppliers.map((s) => (
                         <option key={s.id} value={s.id}>
                           {s.name}
@@ -1044,254 +1129,225 @@ export function AssetRegistrationClient({
                       ))}
                     </select>
                   </div>
-                )}
 
-                {/* Common fields required for physical placement */}
-                <div className="col-span-2 border-t border-slate-100 pt-4 mt-2">
-                  <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
-                    Placement & Assignment Details
-                  </h5>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Responsible Unit / Dept *</label>
-                  <select
-                    required
-                    className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-650"
-                    value={departmentId}
-                    onChange={(e) => setDepartmentId(e.target.value)}
-                  >
-                    <option value="">-- Choose Unit --</option>
-                    {departments.map((d) => (
-                      <option key={d.id} value={d.id}>
-                        {d.name} ({d.code})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Custodian Staff Member (Optional)</label>
-                  <select
-                    disabled={!departmentId || loadingStaff}
-                    className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-650 disabled:opacity-60"
-                    value={assignedToId}
-                    onChange={(e) => setAssignedToId(e.target.value)}
-                  >
-                    {!departmentId ? (
-                      <option value="">-- Select Department First --</option>
-                    ) : loadingStaff ? (
-                      <option value="">Loading staff members...</option>
-                    ) : staffError ? (
-                      <option value="">{staffError}</option>
-                    ) : departmentStaff.length === 0 ? (
-                      <option value="">No eligible staff members found for this department.</option>
-                    ) : (
-                      <>
-                        <option value="">-- Choose Staff --</option>
-                        {departmentStaff.map((u) => (
-                          <option key={u.id} value={u.id}>
-                            {u.name} ({u.email})
-                          </option>
-                        ))}
-                      </>
-                    )}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Building / Block</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Block 03"
-                    className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs"
-                    value={building}
-                    onChange={(e) => setBuilding(e.target.value)}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Room Number</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Room 204"
-                    className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs"
-                    value={roomNumber}
-                    onChange={(e) => setRoomNumber(e.target.value)}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Quantity</label>
-                  <input
-                    type="number"
-                    min="1"
-                    className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono"
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Initial Condition</label>
-                  <select
-                    className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs"
-                    value={condition}
-                    onChange={(e) => setCondition(e.target.value)}
-                  >
-                    <option value="NEW">New</option>
-                    <option value="GOOD">Good / Operable</option>
-                    <option value="FAIR">Fair</option>
-                  </select>
-                </div>
-
-                <div className="col-span-2 space-y-3">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase">Asset Photos</label>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {[0, 1, 2].map((idx) => {
-                      const isRequired = idx === 0;
-                      const hasImage = !!imageUrls[idx];
-                      const label = isRequired ? "Primary Photo *" : `Additional Photo ${idx + 1}`;
-                      
-                      return (
-                        <div key={idx} className="space-y-1.5">
-                          <span className="block text-[9px] font-black text-slate-400 uppercase tracking-wide">
-                            {label}
-                          </span>
-                          
-                          {hasImage ? (
-                            <div className="relative w-full h-36 bg-slate-50 border border-slate-200 rounded-xl overflow-hidden shadow-sm flex items-center justify-center">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={imageUrls[idx]} alt={label} className="max-w-full max-h-full object-contain" />
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveImageSlot(idx)}
-                                className="absolute top-1.5 right-1.5 px-2 py-0.5 bg-red-655 hover:bg-red-750 text-white rounded text-[8px] font-bold shadow-md transition-colors"
-                              >
-                                Remove
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="border border-dashed border-slate-200 hover:border-[#0b4a6e] rounded-xl h-36 bg-slate-50/50 hover:bg-slate-50/80 transition-all text-center flex flex-col items-center justify-center p-3 relative">
-                              <input
-                                type="file"
-                                accept="image/png, image/jpeg, image/jpg, image/webp"
-                                onChange={(e) => handleSlotImageChange(idx, e)}
-                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                              />
-                              <Upload size={14} className="text-slate-400 mb-1" />
-                              <span className="text-[10px] font-bold text-slate-600">
-                                {isRequired ? "Upload Primary *" : `Upload Photo ${idx + 1}`}
-                              </span>
-                              <span className="text-[8px] text-slate-400 mt-0.5">PNG, JPG, WebP (2MB)</span>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
+                  {/* Warranty Start Date */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Warranty Start Date
+                    </label>
+                    <input
+                      type="date"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-250 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                      value={warrantyStartDate}
+                      onChange={(e) => setWarrantyStartDate(e.target.value)}
+                    />
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Document Attachment URL</label>
-                  <input
-                    type="text"
-                    placeholder="https://..."
-                    className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs"
-                    value={attachmentUrl}
-                    onChange={(e) => setAttachmentUrl(e.target.value)}
-                  />
-                </div>
-
-                <div className="col-span-2">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Remarks</label>
-                  <input
-                    type="text"
-                    placeholder="Administrative remarks..."
-                    className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs"
-                    value={remarks}
-                    onChange={(e) => setRemarks(e.target.value)}
-                  />
-                </div>
-
-                <div className="col-span-2">
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">General Description</label>
-                  <textarea
-                    placeholder="Optional notes or asset descriptions..."
-                    className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs h-16 resize-none"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
+                  {/* Warranty End Date */}
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 uppercase mb-1">
+                      Warranty End Date
+                    </label>
+                    <input
+                      type="date"
+                      className="w-full p-2.5 bg-slate-50 border border-slate-250 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#0b4a6e]"
+                      value={warrantyEndDate}
+                      onChange={(e) => setWarrantyEndDate(e.target.value)}
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="flex justify-between items-center pt-4 border-t border-slate-100">
+              {/* SECTION 5: ASSET IMAGE (Conditional per PART 4 & 5) */}
+              {includeAssetImage && (
+                <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div>
+                      <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                        <ImageIcon size={15} className="text-[#0b4a6e]" />
+                        <span>Asset Image</span>
+                      </h4>
+                      <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                        Upload an image of the asset for physical identification and verification (optional).
+                      </p>
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2.5 py-0.5 rounded-full">
+                      Optional
+                    </span>
+                  </div>
+
+                  <div className="max-w-md">
+                    {imageUrls[0] ? (
+                      <div className="space-y-3">
+                        <div className="relative w-full h-48 bg-slate-50 border border-slate-250 rounded-xl overflow-hidden flex items-center justify-center p-2">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={imageUrls[0]} alt="Asset preview" className="max-h-full max-w-full object-contain" />
+                        </div>
+                        <div className="flex gap-2">
+                          <label className="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 text-xs font-bold rounded-lg text-center cursor-pointer transition-colors">
+                            Change Image
+                            <input
+                              type="file"
+                              accept="image/jpeg,image/png,image/webp,image/jpg"
+                              className="hidden"
+                              onChange={(e) => handleSlotImageChange(0, e)}
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveImageSlot(0)}
+                            className="py-2 px-3 bg-red-50 hover:bg-red-100 border border-red-200 text-red-650 text-xs font-bold rounded-lg transition-colors"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <label className="border-2 border-dashed border-slate-250 hover:border-[#0b4a6e] rounded-xl p-8 bg-slate-50/60 hover:bg-slate-50/90 transition-all flex flex-col items-center justify-center text-center cursor-pointer block">
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp,image/jpg"
+                          className="hidden"
+                          onChange={(e) => handleSlotImageChange(0, e)}
+                        />
+                        <Upload size={24} className="text-[#0b4a6e] mb-2" />
+                        <span className="text-xs font-bold text-slate-700">Upload Asset Image</span>
+                        <span className="text-[10px] text-slate-400 mt-1">Supports JPG, JPEG, PNG, WEBP (Max 2MB)</span>
+                      </label>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* SECTION 6: IDENTIFICATION METHOD (PART 7) */}
+              <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
+                <div className="border-b border-slate-100 pb-3">
+                  <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                    <QrCode size={15} />
+                    <span>Identification Method</span>
+                  </h4>
+                  <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                    Select how this asset will be tagged and identified physically.
+                  </p>
+                </div>
+
+                {isBuilding ? (
+                  <div className="p-4 bg-sky-50 border border-sky-200 rounded-xl flex items-start gap-3">
+                    <Building className="text-[#0b4a6e] shrink-0 mt-0.5" size={20} />
+                    <div className="space-y-1">
+                      <p className="text-xs font-bold text-[#0b4a6e]">
+                        Building Asset — Identification Method: NONE
+                      </p>
+                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                        A building itself does not require a QR code or barcode. Physical sticker tags are not generated. Buildings are tracked and identified using Building ID, official name, and campus location records.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {/* QR Code Option */}
+                    <label
+                      className={`p-4 rounded-xl border-2 flex flex-col justify-between cursor-pointer transition-all ${
+                        identificationMethod === "QR"
+                          ? "border-[#0b4a6e] bg-sky-50/40 shadow-xs"
+                          : "border-slate-200 bg-white hover:border-slate-300"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="radio"
+                          name="identificationMethod"
+                          value="QR"
+                          checked={identificationMethod === "QR"}
+                          onChange={() => setIdentificationMethod("QR")}
+                          className="mt-1 text-[#0b4a6e] focus:ring-[#0b4a6e]"
+                        />
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1.5">
+                            <QrCode size={16} className="text-[#0b4a6e]" />
+                            <span className="text-xs font-black text-slate-800">QR Code</span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 leading-normal">
+                            Standard 2D code. Best for medium to large assets and supports public verification.
+                          </p>
+                        </div>
+                      </div>
+                    </label>
+
+                    {/* Barcode Option */}
+                    <label
+                      className={`p-4 rounded-xl border-2 flex flex-col justify-between cursor-pointer transition-all ${
+                        identificationMethod === "BARCODE"
+                          ? "border-[#0b4a6e] bg-sky-50/40 shadow-xs"
+                          : "border-slate-200 bg-white hover:border-slate-300"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="radio"
+                          name="identificationMethod"
+                          value="BARCODE"
+                          checked={identificationMethod === "BARCODE"}
+                          onChange={() => setIdentificationMethod("BARCODE")}
+                          className="mt-1 text-[#0b4a6e] focus:ring-[#0b4a6e]"
+                        />
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1.5">
+                            <BarcodeIcon size={16} className="text-[#0b4a6e]" />
+                            <span className="text-xs font-black text-slate-800">Barcode (Code 128)</span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 leading-normal">
+                            Camera-readable standard Code 128 sticker. Ideal for compact, slim, or IT accessories.
+                          </p>
+                        </div>
+                      </div>
+                    </label>
+
+                    {/* No Code Option */}
+                    <label
+                      className={`p-4 rounded-xl border-2 flex flex-col justify-between cursor-pointer transition-all ${
+                        identificationMethod === "NONE"
+                          ? "border-[#0b4a6e] bg-sky-50/40 shadow-xs"
+                          : "border-slate-200 bg-white hover:border-slate-300"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="radio"
+                          name="identificationMethod"
+                          value="NONE"
+                          checked={identificationMethod === "NONE"}
+                          onChange={() => setIdentificationMethod("NONE")}
+                          className="mt-1 text-[#0b4a6e] focus:ring-[#0b4a6e]"
+                        />
+                        <div className="space-y-1">
+                          <span className="text-xs font-black text-slate-800">No Code</span>
+                          <p className="text-[11px] text-slate-500 leading-normal">
+                            No physical tag generated. Tracked exclusively by Asset ID, serial number, and records.
+                          </p>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                )}
+              </div>
+
+              {/* NAVIGATION BUTTONS */}
+              <div className="flex justify-between items-center pt-2">
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="px-4 py-2 border border-slate-200 text-slate-500 rounded-lg text-xs font-bold flex items-center gap-1 hover:bg-slate-50"
+                  className="px-5 py-2.5 border border-slate-250 text-slate-650 rounded-xl text-xs font-bold flex items-center gap-1.5 hover:bg-slate-50 transition-colors"
                 >
-                  <ChevronLeft size={14} /> Back
+                  <ChevronLeft size={14} /> Back to Category
                 </button>
                 <button
                   type="button"
                   onClick={handleProceedToReview}
-                  className="px-5 py-2.5 bg-[#0b4a6e] hover:bg-sky-850 text-white rounded-lg text-xs font-bold flex items-center gap-1"
+                  className="px-6 py-2.5 bg-[#0b4a6e] hover:bg-sky-850 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-colors"
                 >
                   Proceed to Review <ChevronRight size={14} />
                 </button>
-              </div>
-            </div>
-
-            {/* Sticky Sidebar Live Label Preview (beside the form) */}
-              <div className="lg:col-span-1 space-y-4">
-                <div className="sticky top-6 bg-white p-5 rounded-2xl border border-slate-100 shadow-md flex flex-col items-center space-y-4">
-                  <h4 className="text-[10px] font-extrabold text-slate-450 uppercase tracking-wider mb-2">Live ID Label Preview</h4>
-                  
-                  {/* Printable Label View */}
-                  <div className="w-full border border-slate-200 rounded-xl p-4 bg-white flex flex-col items-center space-y-3 relative shadow-sm">
-                    <p className="text-[8px] font-extrabold text-sky-900 tracking-wider">DEBRE BERHAN UNIVERSITY</p>
-                    
-                    {/* Image display in Label */}
-                    <div className="w-full h-32 bg-slate-50 border border-slate-150 rounded-lg overflow-hidden flex items-center justify-center relative">
-                      {imageUrl ? (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="text-slate-300 flex flex-col items-center">
-                          <ImageIcon size={32} />
-                          <span className="text-[9px] mt-1 font-semibold">Asset Photo Placeholder</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Basic details */}
-                    <div className="text-center w-full space-y-0.5">
-                      <p className="text-xs font-bold text-slate-800 truncate">{name || "Asset Name"}</p>
-                      <p className="text-[10px] text-sky-700 font-mono font-bold leading-none">{assetCode || "DBU-CODE"}</p>
-                      <p className="text-[8px] text-slate-400 font-bold uppercase tracking-wider mt-1">{selectedCategory.name} &rarr; {selectedAssetType?.name || "Type"}</p>
-                    </div>
-                    
-                    {/* QR Code */}
-                    <div className="w-24 h-24 border border-slate-100 bg-white rounded-lg flex items-center justify-center">
-                      {liveQrUrl ? (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img src={liveQrUrl} alt="QR Code Preview" className="w-full h-full object-contain" />
-                      ) : (
-                        <QrCode size={32} className="text-slate-200" />
-                      )}
-                    </div>
-                    
-                    {/* Barcode */}
-                    <div className="w-full flex flex-col items-center space-y-1 pt-1 border-t border-slate-100">
-                      <div className="w-full flex justify-center" dangerouslySetInnerHTML={{ __html: generateBarcodeSvg(assetCode) }} />
-                      <p className="text-[8px] font-mono font-bold text-slate-500">{assetCode}</p>
-                    </div>
-                    
-                    <p className="text-[6px] text-slate-400 font-bold tracking-widest text-center uppercase border-t border-slate-100/50 pt-1.5 w-full">Property Administration</p>
-                  </div>
-                </div>
               </div>
             </div>
           )}
@@ -1310,26 +1366,28 @@ export function AssetRegistrationClient({
               <span className="text-[10px] font-bold text-slate-400 bg-slate-50 border border-slate-150 px-2 py-0.5 rounded">Step 3 of 4</span>
             </div>
 
-            {/* Section 1: Asset Image */}
-            <div className="space-y-2">
-              <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Asset Photo(s) Preview</h5>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {imageUrls.map((url, idx) => {
-                  if (!url) return null;
-                  return (
-                    <div key={idx} className="space-y-1">
-                      <p className="text-[8px] font-bold text-slate-400 uppercase">
-                        {idx === 0 ? "Primary Photo *" : `Additional Photo ${idx + 1}`}
-                      </p>
-                      <div className="w-full h-40 bg-slate-50 border border-slate-200 rounded-xl overflow-hidden flex items-center justify-center relative shadow-sm">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={url} alt={`Asset photo preview ${idx + 1}`} className="max-w-full max-h-full object-contain" />
+            {/* Section 1: Asset Image (If enabled & uploaded) */}
+            {includeAssetImage && imageUrls.some(Boolean) && (
+              <div className="space-y-2">
+                <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Asset Photo(s) Preview</h5>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {imageUrls.map((url, idx) => {
+                    if (!url) return null;
+                    return (
+                      <div key={idx} className="space-y-1">
+                        <p className="text-[8px] font-bold text-slate-400 uppercase">
+                          {idx === 0 ? "Primary Photo" : `Additional Photo ${idx + 1}`}
+                        </p>
+                        <div className="w-full h-40 bg-slate-50 border border-slate-200 rounded-xl overflow-hidden flex items-center justify-center relative shadow-sm">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={url} alt={`Asset photo preview ${idx + 1}`} className="max-w-full max-h-full object-contain" />
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Section 2: Basic Information */}
             <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-2.5">
@@ -1451,25 +1509,47 @@ export function AssetRegistrationClient({
 
             {/* Section 6: Identification */}
             <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-2.5">
-              <h5 className="text-[9px] font-black text-[#0b4a6e] uppercase tracking-widest border-b border-slate-200/50 pb-1.5">
-                Identity Codes
-              </h5>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                <div className="flex flex-col items-center p-3 bg-white border border-slate-200 rounded-lg">
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">QR Code Preview</span>
+              <div className="flex items-center justify-between border-b border-slate-200/50 pb-1.5">
+                <h5 className="text-[9px] font-black text-[#0b4a6e] uppercase tracking-widest m-0">
+                  Identification Method
+                </h5>
+                <span className="text-[10px] font-bold text-sky-850 bg-sky-50 px-2 py-0.5 rounded border border-sky-100">
+                  {isBuilding ? "No Code (Building)" : identificationMethod === "QR" ? "QR Code" : identificationMethod === "BARCODE" ? "Barcode Sticker" : "No Code"}
+                </span>
+              </div>
+
+              {isBuilding || identificationMethod === "NONE" ? (
+                <div className="p-3.5 bg-white border border-slate-200 rounded-lg text-xs space-y-1 text-slate-600">
+                  <div className="flex items-center space-x-1.5 text-slate-800 font-bold">
+                    <Info size={14} className="text-sky-600" />
+                    <span>{isBuilding ? "Building Asset - No Physical Code Generated" : "No Code Configured"}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 m-0">
+                    {isBuilding
+                      ? "Building identification is managed through official building information records. No physical sticker or QR/barcode label is generated."
+                      : "This asset is registered without a physical QR or barcode label. It will be identified by serial number and system records."}
+                  </p>
+                </div>
+              ) : identificationMethod === "BARCODE" ? (
+                <div className="flex flex-col items-center p-3.5 bg-white border border-slate-200 rounded-lg max-w-sm mx-auto w-full">
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Compact Barcode Sticker Preview</span>
+                  <div className="w-full">
+                    <BarcodeView value={assetCode} height={36} width={1.8} />
+                  </div>
+                  <span className="text-[11px] font-mono font-bold mt-1 text-slate-700">{assetCode}</span>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center p-3.5 bg-white border border-slate-200 rounded-lg max-w-sm mx-auto w-full">
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">QR Code Tag Preview</span>
                   {liveQrUrl ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img src={liveQrUrl} alt="QR Code Preview" className="w-24 h-24 object-contain" />
                   ) : (
                     <QrCode size={40} className="text-slate-350 animate-pulse" />
                   )}
+                  <span className="text-[10px] font-mono font-bold mt-1.5 text-sky-700">{assetCode}</span>
                 </div>
-                <div className="flex flex-col items-center p-3 bg-white border border-slate-200 rounded-lg justify-center">
-                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Barcode Preview</span>
-                  <div className="w-full flex justify-center" dangerouslySetInnerHTML={{ __html: generateBarcodeSvg(assetCode) }} />
-                  <span className="text-[10px] font-mono font-bold mt-1 text-slate-500">{assetCode}</span>
-                </div>
-              </div>
+              )}
             </div>
 
             <div className="flex justify-between pt-4 border-t border-slate-100">
@@ -1497,47 +1577,73 @@ export function AssetRegistrationClient({
               <h4 className="text-[10px] font-extrabold text-slate-450 uppercase tracking-wider mb-2">Live ID Label Preview</h4>
               
               {/* Printable Label View */}
-              <div className="w-full border border-slate-200 rounded-xl p-4 bg-white flex flex-col items-center space-y-3 relative shadow-sm">
-                <p className="text-[8px] font-extrabold text-sky-900 tracking-wider">DEBRE BERHAN UNIVERSITY</p>
-                
-                {/* Image display in Label */}
-                <div className="w-full h-32 bg-slate-50 border border-slate-150 rounded-lg overflow-hidden flex items-center justify-center relative">
-                  {imageUrl ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="text-slate-300 flex flex-col items-center">
-                      <ImageIcon size={32} />
-                      <span className="text-[9px] mt-1 font-semibold">Asset Photo Placeholder</span>
-                    </div>
-                  )}
+              {isBuilding || identificationMethod === "NONE" ? (
+                <div className="w-full border border-dashed border-slate-200 rounded-xl p-5 bg-slate-50 flex flex-col items-center space-y-2 text-center">
+                  <div className="w-10 h-10 rounded-full bg-slate-200/70 flex items-center justify-center text-slate-500">
+                    <Info size={18} />
+                  </div>
+                  <span className="text-xs font-bold text-slate-700">No Physical Tag Required</span>
+                  <p className="text-[10px] text-slate-400 leading-relaxed max-w-[200px]">
+                    {isBuilding
+                      ? "Building identification is managed using the building information system. No physical label is generated."
+                      : "This asset is configured without a physical QR or barcode label."}
+                  </p>
                 </div>
-                
-                {/* Basic details */}
-                <div className="text-center w-full space-y-0.5">
-                  <p className="text-xs font-bold text-slate-800 truncate">{name || "Asset Name"}</p>
-                  <p className="text-[10px] text-sky-700 font-mono font-bold leading-none">{assetCode || "DBU-CODE"}</p>
-                  <p className="text-[8px] text-slate-400 font-bold uppercase tracking-wider mt-1">{selectedCategory.name} &rarr; {selectedAssetType?.name || "Type"}</p>
+              ) : identificationMethod === "BARCODE" ? (
+                /* Compact Barcode Sticker Layout for Slim Objects */
+                <div className="w-full border-2 border-slate-800 rounded-lg p-3 bg-white flex flex-col items-center space-y-1 relative shadow-sm max-w-[220px]">
+                  <div className="w-full flex justify-between items-center text-[9px] font-black tracking-wider text-[#0b4a6e] border-b border-slate-200 pb-1">
+                    <span>DBU</span>
+                    <span className="text-amber-700 text-[8px]">ASSET</span>
+                  </div>
+                  <div className="w-full my-1">
+                    <BarcodeView value={assetCode || "DBU-CODE"} height={36} width={1.8} />
+                  </div>
+                  <div className="text-[10px] font-mono font-bold text-slate-800 tracking-wider">
+                    {assetCode || "DBU-CODE"}
+                  </div>
                 </div>
-                
-                {/* QR Code */}
-                <div className="w-24 h-24 border border-slate-100 bg-white rounded-lg flex items-center justify-center">
-                  {liveQrUrl ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={liveQrUrl} alt="QR Code Preview" className="w-full h-full object-contain" />
-                  ) : (
-                    <QrCode size={32} className="text-slate-200" />
-                  )}
+              ) : (
+                /* Dedicated QR Label Layout */
+                <div className="w-full border border-slate-200 rounded-xl p-4 bg-white flex flex-col items-center space-y-3 relative shadow-sm">
+                  <div className="text-center">
+                    <p className="text-[10px] font-extrabold text-sky-900 tracking-wider m-0">DEBRE BERHAN UNIVERSITY</p>
+                    <p className="text-[7px] text-amber-700 font-bold uppercase tracking-widest mt-0.5 mb-0">DBU ASSET TAG</p>
+                  </div>
+                  
+                  {/* Image display in Label */}
+                  <div className="w-full h-28 bg-slate-50 border border-slate-150 rounded-lg overflow-hidden flex items-center justify-center relative">
+                    {imageUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="text-slate-300 flex flex-col items-center">
+                        <ImageIcon size={28} />
+                        <span className="text-[9px] mt-1 font-semibold">Photo Placeholder</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* QR Code */}
+                  <div className="w-24 h-24 border border-slate-100 bg-white rounded-lg flex items-center justify-center">
+                    {liveQrUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={liveQrUrl} alt="QR Code Preview" className="w-full h-full object-contain" />
+                    ) : (
+                      <QrCode size={32} className="text-slate-200" />
+                    )}
+                  </div>
+
+                  {/* Basic details */}
+                  <div className="text-center w-full space-y-0.5 border-t border-slate-100 pt-2">
+                    <p className="text-[10px] text-sky-750 font-mono font-bold leading-none m-0">Asset: {assetCode || "DBU-CODE"}</p>
+                    <p className="text-xs font-bold text-slate-800 truncate m-0">{name || "Asset Name"}</p>
+                    <p className="text-[8px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">{selectedCategory.name} &rarr; {selectedAssetType?.name || "Type"}</p>
+                  </div>
+                  
+                  <p className="text-[6px] text-slate-400 font-bold tracking-widest text-center uppercase border-t border-slate-100/50 pt-1.5 w-full m-0">Property Administration</p>
                 </div>
-                
-                {/* Barcode */}
-                <div className="w-full flex flex-col items-center space-y-1 pt-1 border-t border-slate-100">
-                  <div className="w-full flex justify-center" dangerouslySetInnerHTML={{ __html: generateBarcodeSvg(assetCode) }} />
-                  <p className="text-[8px] font-mono font-bold text-slate-500">{assetCode}</p>
-                </div>
-                
-                <p className="text-[6px] text-slate-400 font-bold tracking-widest text-center uppercase border-t border-slate-100/50 pt-1.5 w-full">Property Administration</p>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -1553,84 +1659,174 @@ export function AssetRegistrationClient({
           <div>
             <h3 className="text-base font-bold text-slate-800">Asset Registered Successfully!</h3>
             <p className="text-xs text-slate-500 mt-1">
-              Properties synchronized with the configured form layout schema.
+              Asset <span className="font-mono font-semibold text-slate-700">{assetCode}</span> has been saved into the asset registry.
             </p>
           </div>
 
-          {/* Print preview tag layout */}
-          <div id="asset-print-label" className="p-4 bg-white border border-slate-200 rounded-xl flex flex-col items-center space-y-3 w-64 shadow-sm">
-            <div className="text-center">
-              <h5 className="text-[10px] font-extrabold text-[#0b4a6e] uppercase tracking-wider leading-none m-0">Debre Berhan University</h5>
-              <p className="text-[6px] text-amber-700 font-bold uppercase tracking-widest mt-1 mb-0">DBU ASSET LABEL</p>
+          {/* Conditional layout based on Identification Method */}
+          {identificationMethod === "NONE" || isBuilding ? (
+            <div className="w-full max-w-md bg-amber-50/70 border border-amber-200/80 rounded-xl p-5 text-center flex flex-col items-center space-y-2">
+              <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-800">
+                {isBuilding ? <Building size={18} /> : <Info size={18} />}
+              </div>
+              <p className="text-xs font-bold text-amber-900">
+                {isBuilding ? "Building Asset — No Physical Label Required" : "No Code Identification Method"}
+              </p>
+              <p className="text-[11px] text-amber-800 leading-relaxed max-w-xs">
+                {isBuilding
+                  ? "QR/barcode identification is not applicable to buildings. Building identification is managed using the building information."
+                  : "This asset is registered without a barcode or QR code. No physical label generated."}
+              </p>
             </div>
-
-            {/* Image display in Label */}
-            <div className="w-full h-32 bg-slate-50 border border-slate-150 rounded-lg overflow-hidden flex items-center justify-center relative">
-              {imageUrl ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={imageUrl} alt="Asset Photo" className="w-full h-full object-cover" />
-              ) : (
-                <div className="text-slate-350 flex flex-col items-center">
-                  <ImageIcon size={32} />
-                  <span className="text-[9px] mt-1 font-semibold">No Photo Uploaded</span>
+          ) : identificationMethod === "BARCODE" ? (
+            <div className="flex flex-col items-center space-y-2">
+              <p className="text-[11px] font-semibold text-slate-500">Compact Barcode Sticker Preview</p>
+              {/* Compact Barcode Sticker Layout for Slim Objects */}
+              <div className="w-full border-2 border-slate-800 rounded-lg p-3 bg-white flex flex-col items-center space-y-1 relative shadow-sm max-w-[220px]">
+                <div className="w-full flex justify-between items-center text-[9px] font-black tracking-wider text-[#0b4a6e] border-b border-slate-200 pb-1">
+                  <span>DBU</span>
+                  <span className="text-amber-700 text-[8px]">ASSET</span>
                 </div>
-              )}
-            </div>
-
-            {/* Basic details */}
-            <div className="text-center w-full space-y-0.5">
-              <p className="text-xs font-bold text-slate-800 truncate m-0">{name || "Asset Name"}</p>
-              <p className="text-[10px] text-sky-750 font-mono font-bold leading-none my-1">{assetCode || "DBU-CODE"}</p>
-              <span className="inline-block bg-slate-100 text-slate-650 text-[7px] font-extrabold px-1.5 py-0.5 rounded uppercase mt-0.5">
-                {selectedCategory.name} &rarr; {selectedAssetType.name}
-              </span>
-            </div>
-
-            {/* QR Code */}
-            <div className="w-24 h-24 border border-slate-150 bg-white rounded-lg flex items-center justify-center">
-              {qrCodeUrl ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={qrCodeUrl} alt="Asset Tag QR Code" className="w-full h-full object-contain" />
-              ) : (
-                <div className="text-slate-350">
-                  <QrCode size={36} />
+                <div className="w-full my-1">
+                  <BarcodeView value={assetCode || "DBU-CODE"} height={36} width={1.8} />
                 </div>
-              )}
+                <div className="text-[10px] font-mono font-bold text-slate-800 tracking-wider">
+                  {assetCode || "DBU-CODE"}
+                </div>
+              </div>
+              <p className="text-[10px] text-slate-400">Suitable for keyboards, mice, cables, small tools, and narrow surfaces.</p>
             </div>
+          ) : (
+            <div className="flex flex-col items-center space-y-2">
+              <p className="text-[11px] font-semibold text-slate-500">QR Code Label Preview</p>
+              {/* Dedicated QR Label Layout */}
+              <div className="w-full border border-slate-200 rounded-xl p-4 bg-white flex flex-col items-center space-y-3 relative shadow-sm max-w-[240px]">
+                <div className="text-center">
+                  <p className="text-[10px] font-extrabold text-sky-900 tracking-wider m-0">DEBRE BERHAN UNIVERSITY</p>
+                  <p className="text-[7px] text-amber-700 font-bold uppercase tracking-widest mt-0.5 mb-0">DBU ASSET TAG</p>
+                </div>
 
-            {/* Barcode */}
-            <div className="w-full flex flex-col items-center space-y-1 pt-1 border-t border-slate-100">
-              <div className="w-full flex justify-center" dangerouslySetInnerHTML={{ __html: generateBarcodeSvg(assetCode) }} />
-              <p className="text-[8px] font-mono font-bold text-slate-500 m-0">{assetCode}</p>
+                <div className="w-24 h-24 border border-slate-100 bg-white rounded-lg flex items-center justify-center">
+                  {qrCodeUrl ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img src={qrCodeUrl} alt="Asset Tag QR Code" className="w-full h-full object-contain" />
+                  ) : (
+                    <QrCode size={36} className="text-slate-300" />
+                  )}
+                </div>
+
+                <div className="text-center w-full space-y-0.5 border-t border-slate-100 pt-2">
+                  <p className="text-[10px] text-sky-750 font-mono font-bold leading-none m-0">Asset: {assetCode || "DBU-CODE"}</p>
+                  <p className="text-xs font-bold text-slate-800 truncate m-0">{name || "Asset Name"}</p>
+                  <p className="text-[8px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">{selectedCategory.name} &rarr; {selectedAssetType.name}</p>
+                </div>
+
+                <p className="text-[6px] text-slate-400 font-bold tracking-widest text-center uppercase border-t border-slate-100/50 pt-1.5 w-full m-0">Property Administration</p>
+              </div>
             </div>
+          )}
 
-            <p className="text-[6px] text-slate-400 font-bold tracking-widest text-center uppercase border-t border-slate-100/50 pt-1.5 w-full m-0">Property Administration</p>
-          </div>
-
+          {/* Action buttons */}
           <div className="w-full flex flex-col sm:flex-row gap-2">
-            <button
-              onClick={handlePrintLabel}
-              className="flex-1 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-650 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all"
-            >
-              <Printer size={12} />
-              <span>Print Label</span>
-            </button>
-            {qrCodeUrl && (
-              <a
-                href={qrCodeUrl}
-                download={`label-${assetCode}.png`}
-                className="flex-1 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-650 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all"
-              >
-                <Download size={12} />
-                <span>Download Label</span>
-              </a>
+            {identificationMethod === "BARCODE" && !isBuilding && (
+              <>
+                <button
+                  type="button"
+                  onClick={() =>
+                    printBarcodeSticker({
+                      assetCode,
+                      name,
+                      categoryName: selectedCategory.name,
+                      typeName: selectedAssetType.name
+                    })
+                  }
+                  className="flex-1 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all shadow-sm"
+                >
+                  <BarcodeIcon size={14} className="text-sky-700" />
+                  <span>Print Barcode Sticker</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    printFullAssetLabel(
+                      {
+                        assetCode,
+                        name,
+                        categoryName: selectedCategory.name,
+                        typeName: selectedAssetType.name,
+                        imageUrl
+                      },
+                      "BARCODE"
+                    )
+                  }
+                  className="flex-1 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all shadow-sm"
+                >
+                  <Printer size={14} />
+                  <span>Print Asset Label</span>
+                </button>
+              </>
             )}
+
+            {identificationMethod === "QR" && !isBuilding && (
+              <>
+                <button
+                  type="button"
+                  onClick={() =>
+                    printQrLabel(
+                      {
+                        assetCode,
+                        name,
+                        categoryName: selectedCategory.name,
+                        typeName: selectedAssetType.name
+                      },
+                      qrCodeUrl
+                    )
+                  }
+                  className="flex-1 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all shadow-sm"
+                >
+                  <QrCode size={14} className="text-sky-700" />
+                  <span>Print QR Label</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    printFullAssetLabel(
+                      {
+                        assetCode,
+                        name,
+                        categoryName: selectedCategory.name,
+                        typeName: selectedAssetType.name,
+                        imageUrl
+                      },
+                      "QR",
+                      qrCodeUrl
+                    )
+                  }
+                  className="flex-1 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all shadow-sm"
+                >
+                  <Printer size={14} />
+                  <span>Print Asset Label</span>
+                </button>
+                {qrCodeUrl && (
+                  <a
+                    href={qrCodeUrl}
+                    download={`qr-${assetCode}.png`}
+                    className="flex-1 py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all shadow-sm"
+                  >
+                    <Download size={14} />
+                    <span>Download QR</span>
+                  </a>
+                )}
+              </>
+            )}
+
             <button
+              type="button"
               onClick={() => {
                 setCategoryId("");
                 setStep(1);
               }}
-              className="flex-1 py-2.5 bg-sky-700 hover:bg-sky-850 text-white rounded-xl text-xs font-bold transition-all"
+              className="flex-1 py-2.5 bg-sky-700 hover:bg-sky-850 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
             >
               Register Another
             </button>

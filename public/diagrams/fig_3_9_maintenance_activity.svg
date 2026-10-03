@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 620" width="1000" height="620">
+  <defs>
+    <marker id="maint_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#1E3A8A"/>
+    </marker>
+  </defs>
+
+  <rect width="1000" height="620" fill="#FFFFFF"/>
+
+  <!-- Title Header -->
+  <text x="500" y="35" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="20" font-weight="800" fill="#0F172A">
+    Figure 3.9: Activity Diagram – Maintenance &amp; Repair Lifecycle
+  </text>
+  <text x="500" y="58" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="500" fill="#64748B">
+    Swimlanes: Defect Reporting, System Routing, Technician Execution, Cost Logging &amp; Asset Reactivation
+  </text>
+
+  <!-- SWIMLANES -->
+  <!-- Lane 1: Reporter (Staff / Return) -->
+  <rect x="50" y="80" width="280" height="510" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+  <rect x="50" y="80" width="280" height="30" fill="#E2E8F0"/>
+  <text x="190" y="100" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#1E293B">Reporter / Damaged Return</text>
+
+  <!-- Lane 2: System Controller & Database -->
+  <rect x="330" y="80" width="340" height="510" fill="#F0F9FF" stroke="#0284C7" stroke-width="1.5"/>
+  <rect x="330" y="80" width="340" height="30" fill="#BAE6FD"/>
+  <text x="500" y="100" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#0369A1">System Transaction &amp; Notifications</text>
+
+  <!-- Lane 3: Maintenance Technician -->
+  <rect x="670" y="80" width="280" height="510" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
+  <rect x="670" y="80" width="280" height="30" fill="#FDE68A"/>
+  <text x="810" y="100" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#B45309">Maintenance Technician</text>
+
+  <!-- Start -->
+  <circle cx="190" cy="135" r="10" fill="#0F172A"/>
+
+  <!-- Step 1: Fault Reported -->
+  <rect x="90" y="165" width="200" height="42" rx="8" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <text x="190" y="185" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0F172A">File Fault Ticket OR</text>
+  <text x="190" y="198" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">Return Asset as DAMAGED</text>
+
+  <line x1="190" y1="145" x2="190" y2="165" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#maint_arrow)"/>
+
+  <!-- Flow to System -->
+  <path d="M 290 186 L 380 186" fill="none" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#maint_arrow)"/>
+
+  <!-- Step 2: System sets UNDER_MAINTENANCE -->
+  <rect x="380" y="165" width="240" height="52" rx="8" fill="#FFFFFF" stroke="#0284C7" stroke-width="1.5"/>
+  <text x="500" y="185" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0369A1">Create Maintenance Record</text>
+  <text x="500" y="198" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">Status: PENDING</text>
+  <text x="500" y="210" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#0284C7">Asset Status: UNDER_MAINTENANCE</text>
+
+  <!-- Flow to Technician Notification -->
+  <line x1="500" y1="217" x2="500" y2="245" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#maint_arrow)"/>
+
+  <rect x="380" y="245" width="240" height="38" rx="8" fill="#FFFFFF" stroke="#0284C7" stroke-width="1.5"/>
+  <text x="500" y="268" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0369A1">Notify Available Technicians</text>
+
+  <!-- Flow to Technician -->
+  <path d="M 620 264 L 720 264" fill="none" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#maint_arrow)"/>
+
+  <!-- Step 3: Technician picks up ticket -->
+  <rect x="720" y="245" width="180" height="42" rx="8" fill="#FFFFFF" stroke="#D97706" stroke-width="1.5"/>
+  <text x="810" y="265" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#B45309">Accept Ticket &amp; Set</text>
+  <text x="810" y="278" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#78350F">Status: IN_PROGRESS</text>
+
+  <!-- Step 4: Perform Repair -->
+  <line x1="810" y1="287" x2="810" y2="315" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#maint_arrow)"/>
+
+  <rect x="720" y="315" width="180" height="52" rx="8" fill="#FFFFFF" stroke="#D97706" stroke-width="1.5"/>
+  <text x="810" y="335" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#B45309">Execute Physical Repair,</text>
+  <text x="810" y="348" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">Replace Spare Parts &amp;</text>
+  <text x="810" y="360" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#B45309">Log Labor/Material Cost</text>
+
+  <!-- Flow to System: Complete -->
+  <path d="M 720 341 L 620 341" fill="none" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#maint_arrow)"/>
+
+  <rect x="380" y="320" width="240" height="58" rx="8" fill="#FFFFFF" stroke="#16A34A" stroke-width="1.5"/>
+  <text x="500" y="340" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#15803D">Close Ticket: COMPLETED</text>
+  <text x="500" y="354" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">Asset Status Reverts to ACTIVE</text>
+  <text x="500" y="368" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#16A34A">Accumulate Total Maintenance Cost</text>
+
+  <!-- Flow to Reporter notification -->
+  <path d="M 380 349 L 290 349" fill="none" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#maint_arrow)"/>
+
+  <rect x="90" y="328" width="200" height="42" rx="8" fill="#FFFFFF" stroke="#16A34A" stroke-width="1.5"/>
+  <text x="190" y="348" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#15803D">Receive Resolution Alert</text>
+  <text x="190" y="361" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#475569">Asset Ready for Re-assignment</text>
+
+  <!-- Final State -->
+  <circle cx="190" cy="425" r="10" fill="#FFFFFF" stroke="#0F172A" stroke-width="2"/>
+  <circle cx="190" cy="425" r="6" fill="#0F172A"/>
+  <line x1="190" y1="370" x2="190" y2="415" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#maint_arrow)"/>
+</svg>

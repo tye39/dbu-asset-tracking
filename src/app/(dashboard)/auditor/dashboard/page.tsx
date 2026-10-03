@@ -42,6 +42,7 @@ interface AuditorDashboardProps {
     action?: string;
     page?: string;
     tab?: string;
+    subtab?: string;
   };
 }
 
@@ -256,6 +257,7 @@ export default async function AuditorDashboardPage({ searchParams }: AuditorDash
           depreciations={depreciations}
           history={history}
           departments={deptsList}
+          initialSubtab={searchParams.subtab}
         />
       ) : (
         /* Physical Audit & Event Logs Section */

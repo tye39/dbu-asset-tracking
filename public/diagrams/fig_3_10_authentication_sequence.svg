@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 680" width="1050" height="680">
+  <defs>
+    <marker id="seq_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#1E3A8A"/>
+    </marker>
+    <marker id="seq_arrow_ret" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#0284C7"/>
+    </marker>
+  </defs>
+
+  <rect width="1050" height="680" fill="#FFFFFF"/>
+
+  <!-- Title Header -->
+  <text x="525" y="35" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="20" font-weight="800" fill="#0F172A">
+    Figure 3.10: Sequence Diagram – Authentication &amp; Role Redirection
+  </text>
+  <text x="525" y="58" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="500" fill="#64748B">
+    Credentials Verification, bcrypt Salt Comparison, JWT Token Emission, and Edge Route Guarding
+  </text>
+
+  <!-- PARTICIPANTS -->
+  <!-- 1. User -->
+  <g transform="translate(60, 80)">
+    <rect width="120" height="36" rx="6" fill="#F8FAFC" stroke="#64748B" stroke-width="1.5"/>
+    <text x="60" y="23" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#0F172A">User / Actor</text>
+    <line x1="60" y1="36" x2="60" y2="550" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4,4"/>
+  </g>
+
+  <!-- 2. Login UI -->
+  <g transform="translate(240, 80)">
+    <rect width="130" height="36" rx="6" fill="#F0F9FF" stroke="#0284C7" stroke-width="1.5"/>
+    <text x="65" y="23" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#0369A1">:LoginClient (UI)</text>
+    <line x1="65" y1="36" x2="65" y2="550" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4,4"/>
+  </g>
+
+  <!-- 3. NextAuth / Server Action -->
+  <g transform="translate(430, 80)">
+    <rect width="160" height="36" rx="6" fill="#FAF5FF" stroke="#7C3AED" stroke-width="1.5"/>
+    <text x="80" y="23" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#6B21A8">:NextAuth (v5)</text>
+    <line x1="80" y1="36" x2="80" y2="550" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4,4"/>
+  </g>
+
+  <!-- 4. bcryptjs -->
+  <g transform="translate(640, 80)">
+    <rect width="130" height="36" rx="6" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
+    <text x="65" y="23" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#B45309">:bcryptjs</text>
+    <line x1="65" y1="36" x2="65" y2="550" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4,4"/>
+  </g>
+
+  <!-- 5. Neon PostgreSQL DB -->
+  <g transform="translate(830, 80)">
+    <rect width="140" height="36" rx="6" fill="#F0FDF4" stroke="#16A34A" stroke-width="1.5"/>
+    <text x="70" y="23" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#15803D">:Prisma (DB)</text>
+    <line x1="70" y1="36" x2="70" y2="550" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4,4"/>
+  </g>
+
+  <!-- ACTIVATION BOXES -->
+  <rect x="115" y="140" width="10" height="400" fill="#E2E8F0" stroke="#64748B"/>
+  <rect x="300" y="150" width="10" height="380" fill="#BAE6FD" stroke="#0284C7"/>
+  <rect x="505" y="170" width="10" height="330" fill="#E9D5FF" stroke="#7C3AED"/>
+  <rect x="700" y="270" width="10" height="50" fill="#FEF3C7" stroke="#D97706"/>
+  <rect x="895" y="200" width="10" height="60" fill="#BBF7D0" stroke="#16A34A"/>
+
+  <!-- MESSAGE 1: Submit Form -->
+  <line x1="125" y1="155" x2="300" y2="155" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#seq_arrow)"/>
+  <text x="210" y="148" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#1E3A8A">1: submit(email, pass)</text>
+
+  <!-- MESSAGE 2: NextAuth Credentials Signin -->
+  <line x1="310" y1="175" x2="505" y2="175" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#seq_arrow)"/>
+  <text x="407" y="168" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#1E3A8A">2: signIn("credentials", creds)</text>
+
+  <!-- MESSAGE 3: Lookup User -->
+  <line x1="515" y1="205" x2="895" y2="205" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#seq_arrow)"/>
+  <text x="705" y="198" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#1E3A8A">3: findFirst(email/username)</text>
+
+  <!-- MESSAGE 4: Return User Record -->
+  <line x1="895" y1="250" x2="515" y2="250" stroke="#0284C7" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#seq_arrow_ret)"/>
+  <text x="705" y="242" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0284C7">4: userRecord (hash, role, dept)</text>
+
+  <!-- MESSAGE 5: Compare Hash -->
+  <line x1="515" y1="275" x2="700" y2="275" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#seq_arrow)"/>
+  <text x="607" y="268" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#1E3A8A">5: compare(pass, passwordHash)</text>
+
+  <!-- MESSAGE 6: Hash Result -->
+  <line x1="700" y1="315" x2="515" y2="315" stroke="#0284C7" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#seq_arrow_ret)"/>
+  <text x="607" y="307" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0284C7">6: isValid = true</text>
+
+  <!-- MESSAGE 7: Issue Audit Log -->
+  <path d="M 515 345 L 565 345 L 565 365 L 515 365" fill="none" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#seq_arrow)"/>
+  <text x="575" y="360" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#6B21A8">7: log("LOGIN", userId)</text>
+
+  <!-- MESSAGE 8: Generate JWT & Set Cookie -->
+  <path d="M 515 390 L 565 390 L 565 410 L 515 410" fill="none" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#seq_arrow)"/>
+  <text x="575" y="405" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#6B21A8">8: signJWT(id, role, dept)</text>
+
+  <!-- MESSAGE 9: Return Session Cookie -->
+  <line x1="505" y1="440" x2="310" y2="440" stroke="#0284C7" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#seq_arrow_ret)"/>
+  <text x="407" y="432" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0284C7">9: Set-Cookie: authjs.session-token</text>
+
+  <!-- MESSAGE 10: Route to Dashboard via Middleware -->
+  <line x1="300" y1="480" x2="125" y2="480" stroke="#16A34A" stroke-width="1.5" marker-end="url(#seq_arrow)"/>
+  <text x="210" y="472" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#15803D">10: 302 Redirect (/admin/dashboard)</text>
+
+  <!-- MESSAGE 11: Render Protected View -->
+  <line x1="300" y1="520" x2="125" y2="520" stroke="#16A34A" stroke-width="1.5" marker-end="url(#seq_arrow)"/>
+  <text x="210" y="512" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#15803D">11: Render Role-Specific Dashboard</text>
+
+  <!-- Footer Bottom Participants -->
+  <g transform="translate(60, 560)">
+    <rect width="120" height="28" rx="6" fill="#F8FAFC" stroke="#64748B" stroke-width="1"/>
+    <text x="60" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0F172A">User</text>
+  </g>
+  <g transform="translate(240, 560)">
+    <rect width="130" height="28" rx="6" fill="#F0F9FF" stroke="#0284C7" stroke-width="1"/>
+    <text x="65" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0369A1">:LoginClient</text>
+  </g>
+  <g transform="translate(430, 560)">
+    <rect width="160" height="28" rx="6" fill="#FAF5FF" stroke="#7C3AED" stroke-width="1"/>
+    <text x="80" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#6B21A8">:NextAuth</text>
+  </g>
+  <g transform="translate(640, 560)">
+    <rect width="130" height="28" rx="6" fill="#FFFBEB" stroke="#D97706" stroke-width="1"/>
+    <text x="65" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#B45309">:bcryptjs</text>
+  </g>
+  <g transform="translate(830, 560)">
+    <rect width="140" height="28" rx="6" fill="#F0FDF4" stroke="#16A34A" stroke-width="1"/>
+    <text x="70" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#15803D">:Prisma (DB)</text>
+  </g>
+</svg>

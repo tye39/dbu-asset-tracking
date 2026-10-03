@@ -4,6 +4,14 @@ import React, { useState, useRef, useEffect, useTransition, useCallback } from "
 import Link from "next/link";
 import jsQR from "jsqr";
 import {
+  MultiFormatReader,
+  BarcodeFormat,
+  DecodeHintType,
+  RGBLuminanceSource,
+  BinaryBitmap,
+  HybridBinarizer
+} from "@zxing/library";
+import {
   scanAssetAction,
   completeInventoryAction,
   cancelInventoryAction,
@@ -13,6 +21,7 @@ import {
 import {
   Camera,
   QrCode,
+  Barcode as BarcodeIcon,
   CheckCircle,
   AlertTriangle,
   XCircle,
@@ -278,33 +287,115 @@ export function InventorySessionClient({
     });
   }, [session.id, session.inventoryPerson.name]);
 
-  // Scan frame processing loop
+  // Scan frame processing loop with dual QR Code & 1D Barcode decoding
   useEffect(() => {
     if (!activeScan) return;
 
-    const processFrame = () => {
+    let isProcessing = false;
+
+    // Initialize ZXing MultiFormatReader for 1D Barcode & QR decoding
+    const zxingReader = new MultiFormatReader();
+    const hints = new Map();
+    hints.set(DecodeHintType.POSSIBLE_FORMATS, [
+      BarcodeFormat.QR_CODE,
+      BarcodeFormat.CODE_128,
+      BarcodeFormat.CODE_39,
+      BarcodeFormat.EAN_13,
+      BarcodeFormat.EAN_8,
+    ]);
+    hints.set(DecodeHintType.TRY_HARDER, true);
+    zxingReader.setHints(hints);
+
+    // Native BarcodeDetector for hardware-accelerated decoding when supported
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let barcodeDetector: any = null;
+    if (typeof window !== "undefined" && "BarcodeDetector" in window) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        barcodeDetector = new (window as any).BarcodeDetector({
+          formats: ["qr_code", "code_128", "code_39", "ean_13", "ean_8"],
+        });
+      } catch {
+        barcodeDetector = null;
+      }
+    }
+
+    const processFrame = async () => {
       const video = videoRef.current;
       const canvas = canvasRef.current;
-      if (!video || !canvas) return;
+      if (!video || !canvas || isProcessing) {
+        if (activeScan) {
+          animationFrameId.current = requestAnimationFrame(processFrame);
+        }
+        return;
+      }
 
       if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        isProcessing = true;
         const ctx = canvas.getContext("2d");
         if (ctx) {
           canvas.width = video.videoWidth;
           canvas.height = video.videoHeight;
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const code = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: "attemptBoth"
-          });
 
-          if (code && code.data) {
-            // Found QR tag - stop camera and verify
+          let detectedValue: string | null = null;
+
+          // 1. Try Native BarcodeDetector if available (instant hardware decode)
+          if (barcodeDetector) {
+            try {
+              const barcodes = await barcodeDetector.detect(canvas);
+              if (barcodes && barcodes.length > 0 && barcodes[0].rawValue) {
+                detectedValue = barcodes[0].rawValue;
+              }
+            } catch {
+              // fallback
+            }
+          }
+
+          // 2. Try jsQR for fast 2D QR decoding
+          if (!detectedValue) {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const qrCode = jsQR(imageData.data, imageData.width, imageData.height, {
+              inversionAttempts: "attemptBoth",
+            });
+            if (qrCode && qrCode.data) {
+              detectedValue = qrCode.data;
+            }
+
+            // 3. Try ZXing MultiFormatReader for 1D barcodes (Code 128 / Code 39)
+            if (!detectedValue) {
+              try {
+                // Convert RGBA to single-channel grayscale luminance buffer
+                const lum = new Uint8ClampedArray(imageData.width * imageData.height);
+                const data = imageData.data;
+                for (let i = 0, j = 0; i < data.length; i += 4, j++) {
+                  lum[j] = ((data[i] * 299 + data[i + 1] * 587 + data[i + 2] * 114) / 1000) | 0;
+                }
+                const lumSource = new RGBLuminanceSource(
+                  lum,
+                  imageData.width,
+                  imageData.height
+                );
+                const bitmap = new BinaryBitmap(new HybridBinarizer(lumSource));
+                const zxResult = zxingReader.decode(bitmap);
+                if (zxResult && zxResult.getText()) {
+                  detectedValue = zxResult.getText();
+                }
+              } catch {
+                // No barcode or QR found in current frame
+              }
+            }
+          }
+
+          if (detectedValue) {
+            // Found QR tag or Barcode - stop camera and verify
             stopCamera();
-            handleScanVerify(code.data);
+            handleScanVerify(detectedValue);
+            isProcessing = false;
             return;
           }
         }
+        isProcessing = false;
       }
       animationFrameId.current = requestAnimationFrame(processFrame);
     };
@@ -645,8 +736,12 @@ export function InventorySessionClient({
               <>
                 {/* Webcam Scanner Frame */}
                 <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm space-y-4">
-                  <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest border-b border-slate-50 pb-2">
-                    QR Tag Scanner
+                  <h3 className="text-xs font-black text-slate-800 uppercase tracking-widest border-b border-slate-50 pb-2 flex items-center justify-between">
+                    <span>QR & Barcode Scanner</span>
+                    <span className="flex items-center space-x-1.5 text-slate-400">
+                      <QrCode size={14} />
+                      <BarcodeIcon size={14} />
+                    </span>
                   </h3>
 
                   {activeScan ? (
@@ -663,7 +758,7 @@ export function InventorySessionClient({
                         
                         {/* Scanner sight overlay */}
                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                          <div className="w-36 h-36 border-2 border-emerald-500/80 rounded-xl relative shadow-[0_0_0_9999px_rgba(15,23,42,0.6)] animate-pulse">
+                          <div className="w-48 h-32 border-2 border-emerald-500/80 rounded-xl relative shadow-[0_0_0_9999px_rgba(15,23,42,0.6)] animate-pulse">
                             <div className="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-emerald-400 -mt-1 -ml-1 rounded-tl" />
                             <div className="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-emerald-400 -mt-1 -mr-1 rounded-tr" />
                             <div className="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-emerald-400 -mb-1 -ml-1 rounded-bl" />
@@ -680,17 +775,20 @@ export function InventorySessionClient({
                     </div>
                   ) : (
                     <div className="text-center py-6 border-2 border-dashed border-slate-150 rounded-xl space-y-3 bg-slate-50/50">
-                      <Camera className="mx-auto text-slate-400" size={32} />
+                      <div className="flex justify-center items-center space-x-2 text-slate-400">
+                        <Camera size={28} />
+                        <BarcodeIcon size={24} />
+                      </div>
                       <div>
-                        <p className="text-xs font-bold text-slate-700">Scan QR Code via Device Camera</p>
-                        <p className="text-[10px] text-slate-400 mt-0.5">Compatible with webcams & mobile cameras</p>
+                        <p className="text-xs font-bold text-slate-700">Scan QR Code or Barcode via Camera</p>
+                        <p className="text-[10px] text-slate-400 mt-0.5">Compatible with webcams, mobile cameras & 1D/2D tags</p>
                       </div>
                       <button
                         onClick={startCamera}
                         className="px-4 py-2 bg-sky-700 hover:bg-sky-850 text-white rounded-lg text-xs font-bold transition-all shadow-sm flex items-center space-x-1 mx-auto"
                       >
                         <Camera size={12} />
-                        <span>Open QR Camera</span>
+                        <span>Open Scanner Camera</span>
                       </button>
 
                       {cameraPermission === false && (
@@ -703,11 +801,11 @@ export function InventorySessionClient({
 
                   {/* Manual Input Fallback */}
                   <div className="border-t border-slate-100 pt-4 mt-2">
-                    <p className="text-[10px] text-slate-400 font-bold uppercase mb-2">Manual Asset Tag Fallback</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase mb-2">Manual Tag / Handheld Scanner Input</p>
                     <form onSubmit={handleManualSubmit} className="flex space-x-2">
                       <input
                         type="text"
-                        placeholder="e.g. DBU-ELEC-4532"
+                        placeholder="Scan barcode or enter code (e.g. DBU-00125)"
                         className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-sky-500 uppercase font-mono"
                         value={manualInput}
                         onChange={(e) => setManualInput(e.target.value)}

@@ -9,6 +9,7 @@ import { createMaintenanceAction } from "@/app/actions/maintenance";
 import {
   Package,
   QrCode,
+  Barcode as BarcodeIcon,
   Download,
   Printer,
   ChevronLeft,
@@ -16,8 +17,16 @@ import {
   Copy,
   Check,
   ExternalLink,
-  ShieldCheck
+  ShieldCheck,
+  Info,
+  Building,
+  Edit3,
+  Loader2
 } from "lucide-react";
+import { isBuildingAsset } from "@/lib/barcode";
+import { BarcodeView } from "@/components/barcode-view";
+import { printBarcodeSticker, printQrLabel, printFullAssetLabel } from "@/lib/print-label";
+import { updateAssetAction } from "@/app/actions/asset";
 
 interface AssignmentRecord {
   id: string;
@@ -60,6 +69,7 @@ interface AssetDetails {
   department: { name: string; faculty?: { name: string } | null };
   images?: { url: string }[];
   qrCode?: { qrCodeString: string } | null;
+  identificationMethod?: "QR" | "BARCODE" | "NONE" | null;
   assignments?: AssignmentRecord[];
   maintenances?: MaintenanceRecord[];
   transfers?: TransferRecord[];
@@ -122,90 +132,7 @@ interface DepartmentOption {
   code: string;
 }
 
-export function generateBarcodeSvg(value: string) {
-  const chars: Record<string, string> = {
-    '0': 'N N W W N N N W N',
-    '1': 'W N N W N N N N W',
-    '2': 'N N W W N N N N W',
-    '3': 'W N W W N N N N N',
-    '4': 'N N N W W N N N W',
-    '5': 'W N N W W N N N N',
-    '6': 'N N W W W N N N N',
-    '7': 'N N N W N N W N W',
-    '8': 'W N N W N N W N N',
-    '9': 'N N W W N N W N N',
-    'A': 'W N N N N W N N W',
-    'B': 'N N W N N W N N W',
-    'C': 'W N W N N W N N N',
-    'D': 'N N N N W W N N W',
-    'E': 'W N N N W W N N N',
-    'F': 'N N W N W W N N N',
-    'G': 'N N N N N W W N W',
-    'H': 'W N N N N W W N N',
-    'I': 'N N W N N W W N N',
-    'J': 'N N N N W W W N N',
-    'K': 'W N N N N N N W W',
-    'L': 'N N W N N N N W W',
-    'M': 'W N W N N N N W N',
-    'N': 'N N N N W N N W W',
-    'O': 'W N N N W N N W N',
-    'P': 'N N W N W N N W N',
-    'Q': 'N N N N N N W W W',
-    'R': 'W N N N N N W W N',
-    'S': 'N N W N N N W W N',
-    'T': 'N N N N W N W W N',
-    'U': 'W W N N N N N N W',
-    'V': 'N W W N N N N N W',
-    'W': 'W W W N N N N N N',
-    'X': 'N W N N W N N N W',
-    'Y': 'W W N N W N N N N',
-    'Z': 'N W W N W N N N N',
-    '-': 'N W N N N N W N W',
-    '.': 'W W N N N N W N N',
-    ' ': 'N W W N N N W N N',
-    '*': 'N W N N W N W N N',
-    '$': 'N W N W N W N N N',
-    '/': 'N W N W N N N W N',
-    '+': 'N W N N N W N W N',
-    '%': 'N N N W N W N W N'
-  };
-
-  const raw = value ? value.toUpperCase() : "TEMP";
-  let clean = "";
-  for (let i = 0; i < raw.length; i++) {
-    if (chars[raw[i]]) clean += raw[i];
-  }
-  const formatted = `*${clean}*`;
-
-  let result = "";
-  for (let i = 0; i < formatted.length; i++) {
-    const pattern = chars[formatted[i]];
-    if (!pattern) continue;
-    const parts = pattern.split(" ");
-    for (let j = 0; j < parts.length; j++) {
-      const isBar = j % 2 === 0;
-      const isWide = parts[j] === "W";
-      const width = isWide ? 3 : 1;
-      result += isBar ? `B${width}` : `W${width}`;
-    }
-    result += "W1";
-  }
-
-  let currentX = 0;
-  const rects: string[] = [];
-  const height = 40;
-
-  for (let i = 0; i < result.length; i += 2) {
-    const type = result[i];
-    const width = parseInt(result[i + 1]);
-    if (type === "B") {
-      rects.push(`<rect x="${currentX}" y="0" width="${width}" height="${height}" fill="black" />`);
-    }
-    currentX += width;
-  }
-
-  return `<svg width="100%" height="45" viewBox="0 0 ${currentX} ${height}" preserveAspectRatio="none">${rects.join("")}</svg>`;
-}
+export { generateCode128Svg as generateBarcodeSvg } from "@/lib/barcode";
 
 export interface AssetLiveFinancials {
   cost: number;
@@ -242,145 +169,16 @@ export function AssetDetailsClient({ asset, session, departments, staffUsers, en
   const [isPending, startTransition] = useTransition();
   const [activeTab, setActiveTab] = useState<"overview" | "assignments" | "maintenance" | "transfers">("overview");
 
-  const handlePrintLabel = () => {
-    const printContent = document.getElementById("print-label-box")?.innerHTML;
-    if (!printContent) return;
-    const win = window.open("", "_blank");
-    if (win) {
-      win.document.write(`
-        <html>
-          <head>
-            <title>DBU Asset Tag Label</title>
-            <style>
-              @media print {
-                body { margin: 0; padding: 0; }
-                .no-print { display: none; }
-              }
-              body {
-                font-family: system-ui, -apple-system, sans-serif;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                min-height: 105vh;
-                background-color: #f8fafc;
-                margin: 0;
-                padding: 20px;
-              }
-              .label-card {
-                background: white;
-                border: 1px solid #e2e8f0;
-                border-radius: 16px;
-                padding: 24px;
-                width: 280px;
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-              }
-              .header {
-                font-size: 9px;
-                font-weight: 800;
-                color: #0b4a6e;
-                letter-spacing: 1.5px;
-                text-transform: uppercase;
-                margin: 0 0 2px 0;
-              }
-              .subheader {
-                font-size: 7px;
-                font-weight: 700;
-                color: #b45309;
-                letter-spacing: 1px;
-                text-transform: uppercase;
-                margin: 0 0 12px 0;
-              }
-              .image-slot {
-                width: 105%;
-                height: 130px;
-                object-fit: cover;
-                border-radius: 10px;
-                border: 1px solid #f1f5f9;
-                margin-bottom: 12px;
-                background-color: #f8fafc;
-              }
-              .asset-name {
-                font-size: 14px;
-                font-weight: 800;
-                color: #1e293b;
-                margin: 0 0 2px 0;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                width: 100%;
-              }
-              .asset-code {
-                font-size: 12px;
-                font-weight: 750;
-                font-family: monospace;
-                color: #0284c7;
-                margin: 0 0 4px 0;
-              }
-              .asset-type {
-                font-size: 8px;
-                font-weight: 800;
-                color: #475569;
-                background-color: #f1f5f9;
-                padding: 3px 8px;
-                border-radius: 6px;
-                text-transform: uppercase;
-                margin-bottom: 12px;
-                display: inline-block;
-              }
-              .qr-image {
-                width: 110px;
-                height: 110px;
-                object-fit: contain;
-                margin-bottom: 12px;
-              }
-              .barcode-slot {
-                width: 100%;
-                border-top: 1px solid #f1f5f9;
-                padding-top: 12px;
-                margin-top: 4px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-              }
-              .barcode-slot svg {
-                width: 100%;
-                height: 40px;
-              }
-              .barcode-text {
-                font-size: 9px;
-                font-family: monospace;
-                font-weight: 700;
-                color: #64748b;
-                margin-top: 4px;
-                margin-bottom: 0;
-              }
-              .footer {
-                font-size: 7px;
-                font-weight: 700;
-                color: #94a3b8;
-                letter-spacing: 1px;
-                text-transform: uppercase;
-                border-top: 1px dashed #e2e8f0;
-                padding-top: 10px;
-                margin-top: 12px;
-                width: 100%;
-              }
-            </style>
-          </head>
-          <body onload="window.print(); window.close();">
-            <div class="label-card">
-              ${printContent}
-            </div>
-          </body>
-        </html>
-      `);
-      win.document.close();
-    }
-  };
+  const isBuilding = isBuildingAsset(asset.category, asset.assetType);
+  const [currentMethod, setCurrentMethod] = useState<"QR" | "BARCODE" | "NONE">(
+    isBuilding ? "NONE" : (asset.identificationMethod || (asset.qrCode ? "QR" : "NONE"))
+  );
+  const [isEditingMethod, setIsEditingMethod] = useState(false);
+  const [selectedMethodToSave, setSelectedMethodToSave] = useState<"QR" | "BARCODE" | "NONE">(
+    isBuilding ? "NONE" : (asset.identificationMethod || (asset.qrCode ? "QR" : "NONE"))
+  );
+  const [methodSaveLoading, setMethodSaveLoading] = useState(false);
+
 
   const parseDescription = () => {
     try {
@@ -525,6 +323,34 @@ export function AssetDetailsClient({ asset, session, departments, staffUsers, en
   // Form errors / states
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  const handleSaveIdentificationMethod = async () => {
+    if (isBuilding && selectedMethodToSave !== "NONE") {
+      setError("QR/barcode identification is not applicable to buildings. Building identification is managed using the building information.");
+      return;
+    }
+    setMethodSaveLoading(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const res = await updateAssetAction(null, asset.id, {
+        identificationMethod: selectedMethodToSave,
+      });
+      if (res.error) {
+        setError(res.error);
+      } else {
+        setCurrentMethod(selectedMethodToSave);
+        setIsEditingMethod(false);
+        setSuccess("Identification method updated successfully.");
+        router.refresh();
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to update identification method.";
+      setError(msg);
+    } finally {
+      setMethodSaveLoading(false);
+    }
+  };
 
   // Form Fields
   const [assigneeId, setAssigneeId] = useState("");
@@ -717,6 +543,8 @@ export function AssetDetailsClient({ asset, session, departments, staffUsers, en
   const isPao = userRole === "PROPERTY_ADMINISTRATION_OFFICER";
   const isHead = userRole === "DEPARTMENT_HEAD";
   const isStaff = userRole === "STAFF_MEMBER";
+  const isAdmin = userRole === "SYSTEM_ADMINISTRATOR";
+  const canEditIdentification = isPao || isAdmin;
 
   return (
     <div className="space-y-6">
@@ -895,78 +723,297 @@ export function AssetDetailsClient({ asset, session, departments, staffUsers, en
             </div>
           </div>
 
-          {/* QR Code + Barcode label print box */}
-          <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center">
-            <h4 className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-4">Printable ID Label</h4>
-            
-            <div id="print-label-box" className="p-4 border border-slate-200 rounded-xl bg-white flex flex-col items-center space-y-3 w-64 shadow-sm">
-              <div className="text-center">
-                <h5 className="text-[10px] font-extrabold text-[#0b4a6e] uppercase tracking-wider leading-none m-0">Debre Berhan University</h5>
-                <p className="text-[6px] text-amber-700 font-bold uppercase tracking-widest mt-1 mb-0">DBU ASSET LABEL</p>
-              </div>
-
-              {/* Image display in Label */}
-              <div className="w-full h-32 bg-slate-50 border border-slate-150 rounded-lg overflow-hidden flex items-center justify-center relative">
-                {asset.images && asset.images.length > 0 ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img src={asset.images[0].url} alt="Asset Photo" className="w-full h-full object-cover" />
+          {/* Asset Identification & Label Section */}
+          <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+            {/* Header with current identification method badge and edit toggle */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center space-x-2">
+                {currentMethod === "QR" ? (
+                  <QrCode size={18} className="text-sky-700" />
+                ) : currentMethod === "BARCODE" ? (
+                  <BarcodeIcon size={18} className="text-indigo-700" />
                 ) : (
-                  <div className="text-slate-350 flex flex-col items-center">
-                    <Package size={32} />
-                    <span className="text-[9px] mt-1 font-semibold">No Photo Uploaded</span>
-                  </div>
+                  <Building size={18} className="text-amber-700" />
                 )}
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-800 m-0">
+                  Identification Method
+                </h4>
               </div>
 
-              {/* Basic details */}
-              <div className="text-center w-full space-y-0.5">
-                <p className="text-xs font-bold text-slate-800 truncate m-0">{asset.name}</p>
-                <p className="text-[10px] text-sky-750 font-mono font-bold leading-none my-1">{asset.assetCode}</p>
-                <span className="inline-block bg-slate-100 text-slate-650 text-[7px] font-extrabold px-1.5 py-0.5 rounded uppercase mt-0.5">
-                  {asset.category.name} {asset.assetType ? `→ ${asset.assetType.name}` : ""}
-                </span>
-              </div>
-
-              {/* QR Code */}
-              <div className="w-24 h-24 border border-slate-150 bg-white rounded-lg flex items-center justify-center">
-                {qrCodeUrl ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img src={qrCodeUrl} alt="Asset Tag QR Code" className="w-full h-full object-contain" />
-                ) : (
-                  <div className="text-slate-350">
-                    <QrCode size={36} />
-                  </div>
-                )}
-              </div>
-
-              {/* Barcode */}
-              <div className="w-full flex flex-col items-center space-y-1 pt-1 border-t border-slate-100">
-                <div className="w-full flex justify-center" dangerouslySetInnerHTML={{ __html: generateBarcodeSvg(asset.assetCode) }} />
-                <p className="text-[8px] font-mono font-bold text-slate-500 m-0">{asset.assetCode}</p>
-              </div>
-
-              <p className="text-[6px] text-slate-400 font-bold tracking-widest text-center uppercase border-t border-slate-100/50 pt-1.5 w-full m-0">Property Administration</p>
-            </div>
-
-            <div className="flex space-x-2 w-full mt-4">
-              <button
-                onClick={handlePrintLabel}
-                className="flex-1 flex items-center justify-center space-x-1.5 py-1.5 border border-slate-200 rounded-lg text-xs font-bold text-slate-605 bg-white hover:bg-slate-50 transition-colors"
-              >
-                <Printer size={12} />
-                <span>Print Label</span>
-              </button>
-              {qrCodeUrl && (
-                <a
-                  href={qrCodeUrl}
-                  download={`label-${asset.assetCode}.png`}
-                  className="flex-1 flex items-center justify-center space-x-1.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-605 hover:bg-slate-100 transition-colors"
+              <div className="flex items-center space-x-2">
+                <span
+                  className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full border ${
+                    currentMethod === "QR"
+                      ? "bg-sky-50 text-sky-700 border-sky-200"
+                      : currentMethod === "BARCODE"
+                      ? "bg-indigo-50 text-indigo-700 border-indigo-200"
+                      : "bg-amber-50 text-amber-800 border-amber-200"
+                  }`}
                 >
-                  <Download size={12} />
-                  <span>Download</span>
-                </a>
-              )}
+                  {currentMethod === "QR"
+                    ? "QR Code"
+                    : currentMethod === "BARCODE"
+                    ? "Barcode"
+                    : "No Code"}
+                </span>
+
+                {canEditIdentification && !isBuilding && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedMethodToSave(currentMethod);
+                      setIsEditingMethod(!isEditingMethod);
+                    }}
+                    className="text-[10px] font-bold text-sky-750 hover:text-sky-900 bg-sky-50 hover:bg-sky-100 px-2 py-0.5 rounded-md border border-sky-200 flex items-center space-x-1 transition-colors"
+                  >
+                    <Edit3 size={11} />
+                    <span>{isEditingMethod ? "Cancel" : "Change"}</span>
+                  </button>
+                )}
+              </div>
             </div>
+
+            {/* Inline Method Switcher for Authorized PAO / System Admin */}
+            {isEditingMethod && canEditIdentification && !isBuilding && (
+              <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                <div className="text-[11px] font-bold text-slate-700">Change Identification Method</div>
+                <div className="space-y-2">
+                  <label
+                    className={`flex items-start space-x-2.5 p-2 rounded-lg border cursor-pointer transition-all ${
+                      selectedMethodToSave === "QR" ? "bg-sky-50/80 border-sky-400 shadow-2xs" : "bg-white border-slate-200"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="editMethodRadio"
+                      value="QR"
+                      checked={selectedMethodToSave === "QR"}
+                      onChange={() => setSelectedMethodToSave("QR")}
+                      className="mt-0.5 text-sky-700"
+                    />
+                    <div>
+                      <p className="text-xs font-bold text-slate-800 m-0">QR Code</p>
+                      <p className="text-[10px] text-slate-500 m-0">Standard 2D QR Code tag with public verification and full specs.</p>
+                    </div>
+                  </label>
+
+                  <label
+                    className={`flex items-start space-x-2.5 p-2 rounded-lg border cursor-pointer transition-all ${
+                      selectedMethodToSave === "BARCODE" ? "bg-sky-50/80 border-sky-400 shadow-2xs" : "bg-white border-slate-200"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="editMethodRadio"
+                      value="BARCODE"
+                      checked={selectedMethodToSave === "BARCODE"}
+                      onChange={() => setSelectedMethodToSave("BARCODE")}
+                      className="mt-0.5 text-sky-700"
+                    />
+                    <div>
+                      <p className="text-xs font-bold text-slate-800 m-0">Barcode</p>
+                      <p className="text-[10px] text-slate-500 m-0">Compact 1D barcode sticker for slim objects (keyboard, mouse, cables, tools).</p>
+                    </div>
+                  </label>
+
+                  <label
+                    className={`flex items-start space-x-2.5 p-2 rounded-lg border cursor-pointer transition-all ${
+                      selectedMethodToSave === "NONE" ? "bg-sky-50/80 border-sky-400 shadow-2xs" : "bg-white border-slate-200"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="editMethodRadio"
+                      value="NONE"
+                      checked={selectedMethodToSave === "NONE"}
+                      onChange={() => setSelectedMethodToSave("NONE")}
+                      className="mt-0.5 text-sky-700"
+                    />
+                    <div>
+                      <p className="text-xs font-bold text-slate-800 m-0">No Code</p>
+                      <p className="text-[10px] text-slate-500 m-0">No physical barcode or QR label will be generated.</p>
+                    </div>
+                  </label>
+                </div>
+
+                <div className="flex space-x-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleSaveIdentificationMethod}
+                    disabled={methodSaveLoading}
+                    className="flex-1 py-1.5 bg-sky-700 hover:bg-sky-850 text-white rounded-lg text-xs font-bold transition-colors flex items-center justify-center space-x-1 shadow-2xs"
+                  >
+                    {methodSaveLoading ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
+                    <span>Save Method</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingMethod(false)}
+                    className="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Layout based on active identification method */}
+            {currentMethod === "NONE" || isBuilding ? (
+              <div className="w-full bg-amber-50/70 border border-amber-200/80 rounded-xl p-4 text-center flex flex-col items-center space-y-2">
+                <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-800">
+                  {isBuilding ? <Building size={18} /> : <Info size={18} />}
+                </div>
+                <p className="text-xs font-bold text-amber-900 m-0">
+                  {isBuilding ? "Building Asset — No Physical Label Required" : "No Code Identification Method"}
+                </p>
+                <p className="text-[11px] text-amber-800 leading-relaxed max-w-xs m-0">
+                  {isBuilding
+                    ? "QR/barcode identification is not applicable to buildings. Building identification is managed using the building information."
+                    : "This asset is registered without a barcode or QR code. No physical label is generated."}
+                </p>
+              </div>
+            ) : currentMethod === "BARCODE" ? (
+              <div className="flex flex-col items-center space-y-3 w-full">
+                <p className="text-[11px] font-semibold text-slate-500 m-0">Compact Barcode Sticker Preview</p>
+
+                {/* Compact Barcode Sticker Layout */}
+                <div className="w-full border-2 border-slate-800 rounded-lg p-3 bg-white flex flex-col items-center space-y-1 relative shadow-sm max-w-[220px]">
+                  <div className="w-full flex justify-between items-center text-[9px] font-black tracking-wider text-[#0b4a6e] border-b border-slate-200 pb-1">
+                    <span>DBU</span>
+                    <span className="text-amber-700 text-[8px]">ASSET</span>
+                  </div>
+                  <div className="w-full my-1">
+                    <BarcodeView value={asset.assetCode} height={36} width={1.8} />
+                  </div>
+                  <div className="text-[10px] font-mono font-bold text-slate-800 tracking-wider">
+                    {asset.assetCode}
+                  </div>
+                </div>
+
+                <p className="text-[10px] text-slate-400 text-center m-0">
+                  Compact dimensions for keyboards, mice, cables, small tools, and slim surfaces.
+                </p>
+
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full pt-1">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      printBarcodeSticker({
+                        assetCode: asset.assetCode,
+                        name: asset.name,
+                        categoryName: asset.category.name,
+                        typeName: asset.assetType?.name
+                      })
+                    }
+                    className="flex-1 flex items-center justify-center space-x-1.5 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-2xs"
+                  >
+                    <BarcodeIcon size={13} className="text-sky-700" />
+                    <span>Print Barcode Sticker</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      printFullAssetLabel(
+                        {
+                          assetCode: asset.assetCode,
+                          name: asset.name,
+                          categoryName: asset.category.name,
+                          typeName: asset.assetType?.name,
+                          imageUrl: asset.images?.[0]?.url
+                        },
+                        "BARCODE"
+                      )
+                    }
+                    className="flex-1 flex items-center justify-center space-x-1.5 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-2xs"
+                  >
+                    <Printer size={13} />
+                    <span>Print Asset Label</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center space-y-3 w-full">
+                <p className="text-[11px] font-semibold text-slate-500 m-0">QR Code Label Preview</p>
+
+                {/* Dedicated QR Label Layout */}
+                <div className="w-full border border-slate-200 rounded-xl p-4 bg-white flex flex-col items-center space-y-3 relative shadow-sm max-w-[240px]">
+                  <div className="text-center">
+                    <p className="text-[10px] font-extrabold text-sky-900 tracking-wider m-0">DEBRE BERHAN UNIVERSITY</p>
+                    <p className="text-[7px] text-amber-700 font-bold uppercase tracking-widest mt-0.5 mb-0">DBU ASSET TAG</p>
+                  </div>
+
+                  <div className="w-24 h-24 border border-slate-100 bg-white rounded-lg flex items-center justify-center">
+                    {qrCodeUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={qrCodeUrl} alt="Asset Tag QR Code" className="w-full h-full object-contain" />
+                    ) : (
+                      <QrCode size={36} className="text-slate-300" />
+                    )}
+                  </div>
+
+                  <div className="text-center w-full space-y-0.5 border-t border-slate-100 pt-2">
+                    <p className="text-[10px] text-sky-750 font-mono font-bold leading-none m-0">Asset: {asset.assetCode}</p>
+                    <p className="text-xs font-bold text-slate-800 truncate m-0">{asset.name}</p>
+                    <span className="inline-block bg-slate-100 text-slate-650 text-[7px] font-extrabold px-1.5 py-0.5 rounded uppercase mt-0.5">
+                      {asset.category.name} {asset.assetType ? `→ ${asset.assetType.name}` : ""}
+                    </span>
+                  </div>
+
+                  <p className="text-[6px] text-slate-400 font-bold tracking-widest text-center uppercase border-t border-slate-100/50 pt-1.5 w-full m-0">Property Administration</p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full pt-1">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      printQrLabel(
+                        {
+                          assetCode: asset.assetCode,
+                          name: asset.name,
+                          categoryName: asset.category.name,
+                          typeName: asset.assetType?.name
+                        },
+                        qrCodeUrl || ""
+                      )
+                    }
+                    className="flex-1 flex items-center justify-center space-x-1.5 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-2xs"
+                  >
+                    <QrCode size={13} className="text-sky-700" />
+                    <span>Print QR Label</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      printFullAssetLabel(
+                        {
+                          assetCode: asset.assetCode,
+                          name: asset.name,
+                          categoryName: asset.category.name,
+                          typeName: asset.assetType?.name,
+                          imageUrl: asset.images?.[0]?.url
+                        },
+                        "QR",
+                        qrCodeUrl
+                      )
+                    }
+                    className="flex-1 flex items-center justify-center space-x-1.5 py-2 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-2xs"
+                  >
+                    <Printer size={13} />
+                    <span>Print Asset Label</span>
+                  </button>
+                  {qrCodeUrl && (
+                    <a
+                      href={qrCodeUrl}
+                      download={`qr-${asset.assetCode}.png`}
+                      className="flex items-center justify-center space-x-1 py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors shadow-2xs text-center"
+                    >
+                      <Download size={13} />
+                      <span>Download</span>
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Public QR Verification Card */}
@@ -979,72 +1026,129 @@ export function AssetDetailsClient({ asset, session, departments, staffUsers, en
                 </h4>
               </div>
               <span className="text-[10px] bg-emerald-50 text-emerald-700 font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">
-                Privacy Safe
+                {currentMethod === "NONE" || isBuilding ? "Digital Record" : "Privacy Safe"}
               </span>
             </div>
 
-            <div className="flex items-center space-x-3.5">
-              <div className="w-20 h-20 bg-white border border-slate-200 rounded-xl p-1 flex items-center justify-center shrink-0 shadow-2xs">
-                {qrCodeUrl ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img src={qrCodeUrl} alt="Public Verification QR Code" className="w-full h-full object-contain" />
-                ) : (
-                  <QrCode size={32} className="text-slate-300" />
+            {currentMethod === "NONE" || isBuilding ? (
+              <div className="space-y-3">
+                <p className="text-xs text-slate-600 leading-relaxed m-0">
+                  {isBuilding
+                    ? "Buildings do not require a physical QR code tag. Verification is accessible via digital registry lookup."
+                    : "This asset uses No Code identification. Digital verification is accessible via the direct verification link."}
+                </p>
+                {verificationUrl && (
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-mono text-slate-600 truncate bg-slate-50 p-2 rounded-md border border-slate-150 select-all m-0">
+                      {verificationUrl}
+                    </p>
+                    <div className="flex space-x-2">
+                      <button
+                        type="button"
+                        onClick={handleCopyUrl}
+                        className="flex-1 flex items-center justify-center space-x-1.5 py-2 px-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 transition-colors shadow-2xs"
+                      >
+                        {copiedUrl ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
+                        <span>{copiedUrl ? "Copied!" : "Copy URL"}</span>
+                      </button>
+                      <a
+                        href={verificationUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center space-x-1.5 py-2 px-3 bg-sky-50 hover:bg-sky-100 text-sky-850 border border-sky-200 rounded-xl text-xs font-bold transition-colors shadow-2xs"
+                      >
+                        <ExternalLink size={13} />
+                        <span>Preview Page</span>
+                      </a>
+                    </div>
+                  </div>
                 )}
               </div>
-              <div className="flex-1 min-w-0 space-y-1">
-                <p className="text-[11px] font-bold text-slate-700 m-0">Public Verification URL</p>
-                <p className="text-[10px] font-mono text-slate-600 truncate bg-slate-50 p-1.5 rounded-md border border-slate-150 select-all m-0">
-                  {verificationUrl || "Generating..."}
-                </p>
-                <p className="text-[9px] text-slate-400 leading-tight m-0">
-                  Allows anyone to scan and verify asset registration without logging in.
-                </p>
-              </div>
-            </div>
+            ) : (
+              <>
+                <div className="flex items-center space-x-3.5">
+                  <div className="w-20 h-20 bg-white border border-slate-200 rounded-xl p-1 flex items-center justify-center shrink-0 shadow-2xs">
+                    {qrCodeUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={qrCodeUrl} alt="Public Verification QR Code" className="w-full h-full object-contain" />
+                    ) : (
+                      <QrCode size={32} className="text-slate-300" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0 space-y-1">
+                    <p className="text-[11px] font-bold text-slate-700 m-0">Public Verification URL</p>
+                    <p className="text-[10px] font-mono text-slate-600 truncate bg-slate-50 p-1.5 rounded-md border border-slate-150 select-all m-0">
+                      {verificationUrl || "Generating..."}
+                    </p>
+                    <p className="text-[9px] text-slate-400 leading-tight m-0">
+                      Allows anyone to scan and verify asset registration without logging in.
+                    </p>
+                  </div>
+                </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-1">
-              <button
-                type="button"
-                onClick={handleCopyUrl}
-                className="flex items-center justify-center space-x-1.5 py-2 px-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 transition-colors"
-              >
-                {copiedUrl ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
-                <span>{copiedUrl ? "Copied!" : "Copy URL"}</span>
-              </button>
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={handleCopyUrl}
+                    className="flex items-center justify-center space-x-1.5 py-2 px-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 transition-colors shadow-2xs"
+                  >
+                    {copiedUrl ? <Check size={13} className="text-emerald-600" /> : <Copy size={13} />}
+                    <span>{copiedUrl ? "Copied!" : "Copy URL"}</span>
+                  </button>
 
-              {qrCodeUrl && (
-                <a
-                  href={qrCodeUrl}
-                  download={`qr-verify-${asset.assetCode}.png`}
-                  className="flex items-center justify-center space-x-1.5 py-2 px-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 transition-colors text-center"
-                >
-                  <Download size={13} />
-                  <span>Download QR</span>
-                </a>
-              )}
+                  {qrCodeUrl && (
+                    <a
+                      href={qrCodeUrl}
+                      download={`qr-verify-${asset.assetCode}.png`}
+                      className="flex items-center justify-center space-x-1.5 py-2 px-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 transition-colors text-center shadow-2xs"
+                    >
+                      <Download size={13} />
+                      <span>Download QR</span>
+                    </a>
+                  )}
 
-              <button
-                type="button"
-                onClick={handlePrintLabel}
-                className="flex items-center justify-center space-x-1.5 py-2 px-2.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 transition-colors"
-              >
-                <Printer size={13} />
-                <span>Print Label</span>
-              </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (currentMethod === "BARCODE") {
+                        printBarcodeSticker({
+                          assetCode: asset.assetCode,
+                          name: asset.name,
+                          categoryName: asset.category.name,
+                          typeName: asset.assetType?.name
+                        });
+                      } else {
+                        printQrLabel(
+                          {
+                            assetCode: asset.assetCode,
+                            name: asset.name,
+                            categoryName: asset.category.name,
+                            typeName: asset.assetType?.name
+                          },
+                          qrCodeUrl || ""
+                        );
+                      }
+                    }}
+                    className="flex items-center justify-center space-x-1.5 py-2 px-2.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 transition-colors shadow-2xs"
+                  >
+                    <Printer size={13} />
+                    <span>Print Tag</span>
+                  </button>
 
-              {verificationUrl && (
-                <a
-                  href={verificationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center space-x-1.5 py-2 px-2.5 bg-sky-50 hover:bg-sky-100 text-sky-850 border border-sky-200 rounded-xl text-xs font-bold transition-colors text-center"
-                >
-                  <ExternalLink size={13} />
-                  <span>Preview Page</span>
-                </a>
-              )}
-            </div>
+                  {verificationUrl && (
+                    <a
+                      href={verificationUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center space-x-1.5 py-2 px-2.5 bg-sky-50 hover:bg-sky-100 text-sky-850 border border-sky-200 rounded-xl text-xs font-bold transition-colors text-center shadow-2xs"
+                    >
+                      <ExternalLink size={13} />
+                      <span>Preview Page</span>
+                    </a>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         </div>
 

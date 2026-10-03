@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 650" width="1000" height="650">
+  <defs>
+    <marker id="act_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#1E3A8A"/>
+    </marker>
+  </defs>
+
+  <rect width="1000" height="650" fill="#FFFFFF"/>
+
+  <!-- Title Header -->
+  <text x="500" y="35" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="20" font-weight="800" fill="#0F172A">
+    Figure 3.7: Activity Diagram – Dynamic Asset Registration Workflow
+  </text>
+  <text x="500" y="58" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="500" fill="#64748B">
+    Swimlane Representation: Property Officer, Server Validation, Storage &amp; QR Tag Engine
+  </text>
+
+  <!-- SWIMLANES -->
+  <!-- Lane 1: Property Admin Officer -->
+  <rect x="50" y="80" width="280" height="540" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+  <rect x="50" y="80" width="280" height="30" fill="#E2E8F0"/>
+  <text x="190" y="100" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#1E293B">Property Admin Officer (PAO)</text>
+
+  <!-- Lane 2: Next.js Server & Business Logic -->
+  <rect x="330" y="80" width="340" height="540" fill="#F0F9FF" stroke="#0284C7" stroke-width="1.5"/>
+  <rect x="330" y="80" width="340" height="30" fill="#BAE6FD"/>
+  <text x="500" y="100" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#0369A1">Application Server (Actions &amp; Validation)</text>
+
+  <!-- Lane 3: Database & QR Generator -->
+  <rect x="670" y="80" width="280" height="540" fill="#FAF5FF" stroke="#7C3AED" stroke-width="1.5"/>
+  <rect x="670" y="80" width="280" height="30" fill="#E9D5FF"/>
+  <text x="810" y="100" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#6B21A8">Database &amp; Tag Services</text>
+
+  <!-- Initial State (PAO) -->
+  <circle cx="190" cy="135" r="10" fill="#0F172A"/>
+
+  <!-- Action 1: Select Category & Type -->
+  <rect x="90" y="165" width="200" height="42" rx="8" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <text x="190" y="190" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0F172A">Select Category &amp; Asset Type</text>
+
+  <line x1="190" y1="145" x2="190" y2="165" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#act_arrow)"/>
+
+  <!-- Flow to Server: Load Dynamic Fields -->
+  <path d="M 290 186 L 380 186" fill="none" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#act_arrow)"/>
+
+  <!-- Action 2: Fetch Dynamic Form Fields -->
+  <rect x="380" y="165" width="240" height="42" rx="8" fill="#FFFFFF" stroke="#0284C7" stroke-width="1.5"/>
+  <text x="500" y="190" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0369A1">Resolve Type Fields &amp; Rules</text>
+
+  <!-- Flow back to PAO -->
+  <path d="M 500 207 L 500 235 L 190 235 L 190 255" fill="none" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#act_arrow)"/>
+
+  <!-- Action 3: Fill Core & Custom Details -->
+  <rect x="90" y="255" width="200" height="48" rx="8" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <text x="190" y="275" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0F172A">Enter Financials, Specs,</text>
+  <text x="190" y="291" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0F172A">Location &amp; Upload Images</text>
+
+  <!-- Flow to Server: Submit -->
+  <path d="M 290 279 L 380 279" fill="none" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#act_arrow)"/>
+
+  <!-- Action 4: Validate Duplicates & Constraints -->
+  <rect x="380" y="258" width="240" height="42" rx="8" fill="#FFFFFF" stroke="#0284C7" stroke-width="1.5"/>
+  <text x="500" y="283" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0369A1">Validate Uniqueness &amp; Types</text>
+
+  <!-- Decision: Valid? -->
+  <polygon points="500,325 540,345 500,365 460,345" fill="#FEF08A" stroke="#CA8A04" stroke-width="1.5"/>
+  <line x1="500" y1="300" x2="500" y2="325" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#act_arrow)"/>
+  <text x="500" y="349" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="700" fill="#854D0E">Valid?</text>
+
+  <!-- Invalid Flow: Return Error -->
+  <path d="M 460 345 L 290 345" fill="none" stroke="#DC2626" stroke-width="1.5" marker-end="url(#act_arrow)"/>
+  <text x="350" y="340" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="700" fill="#DC2626">[No] Show Errors</text>
+
+  <!-- Valid Flow: To Transaction -->
+  <path d="M 540 345 L 720 345" fill="none" stroke="#16A34A" stroke-width="1.5" marker-end="url(#act_arrow)"/>
+  <text x="610" y="340" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="700" fill="#16A34A">[Yes] Open Tx</text>
+
+  <!-- Action 5: Save Asset & Field Values -->
+  <rect x="720" y="325" width="200" height="42" rx="8" fill="#FFFFFF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="820" y="350" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#6B21A8">Save Asset &amp; Public UUID</text>
+
+  <!-- Action 6: Generate QR Code & Barcode -->
+  <rect x="720" y="395" width="200" height="42" rx="8" fill="#FFFFFF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="820" y="420" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#6B21A8">Generate QR &amp; Code 39 SVG</text>
+
+  <line x1="820" y1="367" x2="820" y2="395" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#act_arrow)"/>
+
+  <!-- Action 7: Calculate Baseline Amortization -->
+  <rect x="720" y="465" width="200" height="42" rx="8" fill="#FFFFFF" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="820" y="490" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#6B21A8">Compute Straight-Line Baseline</text>
+
+  <line x1="820" y1="437" x2="820" y2="465" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#act_arrow)"/>
+
+  <!-- Flow back to PAO: Print Tag & Complete -->
+  <path d="M 820 507 L 820 545 L 190 545 L 190 560" fill="none" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#act_arrow)"/>
+
+  <!-- Action 8: View Asset Details & Print Label -->
+  <rect x="90" y="560" width="200" height="38" rx="8" fill="#FFFFFF" stroke="#16A34A" stroke-width="1.5"/>
+  <text x="190" y="583" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#15803D">Print Asset Label Tag</text>
+
+  <!-- Final State -->
+  <circle cx="190" cy="620" r="10" fill="#FFFFFF" stroke="#0F172A" stroke-width="2"/>
+  <circle cx="190" cy="620" r="6" fill="#0F172A"/>
+  <line x1="190" y1="598" x2="190" y2="610" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#act_arrow)"/>
+</svg>

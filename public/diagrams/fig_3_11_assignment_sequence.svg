@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 700" width="1080" height="700">
+  <defs>
+    <marker id="asg_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#1E3A8A"/>
+    </marker>
+    <marker id="asg_arrow_ret" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#059669"/>
+    </marker>
+  </defs>
+
+  <rect width="1080" height="700" fill="#FFFFFF"/>
+
+  <!-- Title Header -->
+  <text x="540" y="35" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="20" font-weight="800" fill="#0F172A">
+    Figure 3.11: Sequence Diagram – Custody Assignment &amp; Acceptance Handshake
+  </text>
+  <text x="540" y="58" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="500" fill="#64748B">
+    Interactive Transaction Sequence: Initiation by PAO, Database ACID Guard, and Reciprocal Confirmation by Staff
+  </text>
+
+  <!-- PARTICIPANTS -->
+  <!-- 1. PAO -->
+  <g transform="translate(40, 80)">
+    <rect width="130" height="36" rx="6" fill="#F8FAFC" stroke="#0D9488" stroke-width="1.5"/>
+    <text x="65" y="23" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#0F766E">PAO Officer</text>
+    <line x1="65" y1="36" x2="65" y2="570" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4,4"/>
+  </g>
+
+  <!-- 2. Assignment Action -->
+  <g transform="translate(220, 80)">
+    <rect width="150" height="36" rx="6" fill="#F0F9FF" stroke="#0284C7" stroke-width="1.5"/>
+    <text x="75" y="23" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#0369A1">:AssignmentAction</text>
+    <line x1="75" y1="36" x2="75" y2="570" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4,4"/>
+  </g>
+
+  <!-- 3. Assignment Service -->
+  <g transform="translate(420, 80)">
+    <rect width="160" height="36" rx="6" fill="#FAF5FF" stroke="#7C3AED" stroke-width="1.5"/>
+    <text x="80" y="23" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#6B21A8">:AssignmentService</text>
+    <line x1="80" y1="36" x2="80" y2="570" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4,4"/>
+  </g>
+
+  <!-- 4. Prisma DB -->
+  <g transform="translate(630, 80)">
+    <rect width="140" height="36" rx="6" fill="#F0FDF4" stroke="#16A34A" stroke-width="1.5"/>
+    <text x="70" y="23" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#15803D">:Prisma (DB)</text>
+    <line x1="70" y1="36" x2="70" y2="570" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4,4"/>
+  </g>
+
+  <!-- 5. Staff Member -->
+  <g transform="translate(830, 80)">
+    <rect width="140" height="36" rx="6" fill="#FFFBEB" stroke="#D97706" stroke-width="1.5"/>
+    <text x="70" y="23" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#B45309">Staff Assignee</text>
+    <line x1="70" y1="36" x2="70" y2="570" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4,4"/>
+  </g>
+
+  <!-- ACTIVATION BARS -->
+  <rect x="100" y="140" width="10" height="230" fill="#E2E8F0" stroke="#64748B"/>
+  <rect x="290" y="150" width="10" height="180" fill="#BAE6FD" stroke="#0284C7"/>
+  <rect x="495" y="165" width="10" height="150" fill="#E9D5FF" stroke="#7C3AED"/>
+  <rect x="695" y="180" width="10" height="120" fill="#BBF7D0" stroke="#16A34A"/>
+  <rect x="895" y="320" width="10" height="240" fill="#FEF3C7" stroke="#D97706"/>
+
+  <!-- PHASE 1: ASSIGNMENT INITIATION -->
+  <line x1="110" y1="155" x2="290" y2="155" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#asg_arrow)"/>
+  <text x="200" y="148" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#1E3A8A">1: assignAsset(assetId, staffId)</text>
+
+  <line x1="300" y1="175" x2="495" y2="175" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#asg_arrow)"/>
+  <text x="397" y="168" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#1E3A8A">2: assignAsset(data, actorId)</text>
+
+  <!-- DB Transaction -->
+  <line x1="505" y1="195" x2="695" y2="195" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#asg_arrow)"/>
+  <text x="600" y="188" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#1E3A8A">3: $transaction(create Assignment)</text>
+
+  <line x1="505" y1="225" x2="695" y2="225" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#asg_arrow)"/>
+  <text x="600" y="218" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#1E3A8A">4: update Asset status = PENDING_ASSIGNMENT</text>
+
+  <line x1="505" y1="255" x2="695" y2="255" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#asg_arrow)"/>
+  <text x="600" y="248" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#1E3A8A">5: create AuditLog("ASSET_ASSIGNMENT_CREATED")</text>
+
+  <line x1="695" y1="285" x2="505" y2="285" stroke="#059669" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#asg_arrow_ret)"/>
+  <text x="600" y="278" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#059669">6: commit transaction</text>
+
+  <!-- Notify Staff -->
+  <line x1="505" y1="310" x2="895" y2="310" stroke="#D97706" stroke-width="1.5" marker-end="url(#asg_arrow)"/>
+  <text x="700" y="303" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#B45309">7: dispatchNotification("New Assignment Awaiting Acceptance")</text>
+
+  <!-- Ack to PAO -->
+  <line x1="290" y1="330" x2="110" y2="330" stroke="#059669" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#asg_arrow_ret)"/>
+  <text x="200" y="322" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#059669">8: Assignment Pending Confirmation</text>
+
+  <!-- PHASE 2: CUSTODIAN ACCEPTANCE -->
+  <!-- Divider Line -->
+  <line x1="80" y1="365" x2="980" y2="365" stroke="#CBD5E1" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <text x="120" y="360" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="700" fill="#64748B">[Phase 2: Reciprocal Confirmation]</text>
+
+  <rect x="495" y="400" width="10" height="150" fill="#E9D5FF" stroke="#7C3AED"/>
+  <rect x="695" y="420" width="10" height="110" fill="#BBF7D0" stroke="#16A34A"/>
+
+  <!-- Step 9: Staff clicks Accept -->
+  <line x1="895" y1="390" x2="505" y2="390" stroke="#16A34A" stroke-width="1.5" marker-end="url(#asg_arrow)"/>
+  <text x="700" y="383" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#15803D">9: acceptAssignment(assignmentId, staffId)</text>
+
+  <!-- Step 10: Verify Auth & Status -->
+  <path d="M 505 405 L 545 405 L 545 420 L 505 420" fill="none" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#asg_arrow)"/>
+  <text x="555" y="416" font-family="'Segoe UI', Arial, sans-serif" font-size="9" font-weight="600" fill="#6B21A8">10: verify user &amp; pending status</text>
+
+  <!-- Step 11: Execute Acceptance Transaction -->
+  <line x1="505" y1="435" x2="695" y2="435" stroke="#16A34A" stroke-width="1.5" marker-end="url(#asg_arrow)"/>
+  <text x="600" y="428" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#15803D">11: update Assignment status = ACCEPTED</text>
+
+  <line x1="505" y1="465" x2="695" y2="465" stroke="#16A34A" stroke-width="1.5" marker-end="url(#asg_arrow)"/>
+  <text x="600" y="458" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#15803D">12: update Asset status = ASSIGNED</text>
+
+  <line x1="505" y1="495" x2="695" y2="495" stroke="#16A34A" stroke-width="1.5" marker-end="url(#asg_arrow)"/>
+  <text x="600" y="488" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#15803D">13: log Audit("ASSET_ASSIGNMENT_ACCEPTED")</text>
+
+  <line x1="695" y1="520" x2="505" y2="520" stroke="#059669" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#asg_arrow_ret)"/>
+  <text x="600" y="513" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#059669">14: commit acceptance</text>
+
+  <!-- Notify PAO -->
+  <line x1="505" y1="545" x2="110" y2="545" stroke="#059669" stroke-width="1.5" marker-end="url(#asg_arrow)"/>
+  <text x="300" y="538" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#047857">15: dispatchNotification("Assignment Accepted by Staff Member")</text>
+
+  <!-- Ack to Staff -->
+  <line x1="505" y1="565" x2="895" y2="565" stroke="#059669" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#asg_arrow_ret)"/>
+  <text x="700" y="558" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#059669">16: Custody Confirmed (Active)</text>
+
+  <!-- Bottom Labels -->
+  <g transform="translate(40, 585)">
+    <rect width="130" height="26" rx="6" fill="#F8FAFC" stroke="#0D9488" stroke-width="1"/>
+    <text x="65" y="17" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0F766E">PAO Officer</text>
+  </g>
+  <g transform="translate(220, 585)">
+    <rect width="150" height="26" rx="6" fill="#F0F9FF" stroke="#0284C7" stroke-width="1"/>
+    <text x="75" y="17" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0369A1">:AssignmentAction</text>
+  </g>
+  <g transform="translate(420, 585)">
+    <rect width="160" height="26" rx="6" fill="#FAF5FF" stroke="#7C3AED" stroke-width="1"/>
+    <text x="80" y="17" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#6B21A8">:AssignmentService</text>
+  </g>
+  <g transform="translate(630, 585)">
+    <rect width="140" height="26" rx="6" fill="#F0FDF4" stroke="#16A34A" stroke-width="1"/>
+    <text x="70" y="17" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#15803D">:Prisma (DB)</text>
+  </g>
+  <g transform="translate(830, 585)">
+    <rect width="140" height="26" rx="6" fill="#FFFBEB" stroke="#D97706" stroke-width="1"/>
+    <text x="70" y="17" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#B45309">Staff Assignee</text>
+  </g>
+</svg>

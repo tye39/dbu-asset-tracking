@@ -31,9 +31,9 @@ async function runLiveTests() {
     // Fetch fresh CSRF token
     const csrfRes = await fetch(`${baseUrl}/api/auth/csrf`);
     const setCookies = csrfRes.headers.getSetCookie();
-    const csrfCookie = setCookies.find(c => c.startsWith("authjs.csrf-token="));
-    const csrfCookieVal = csrfCookie ? csrfCookie.split(";")[0] : "";
     const { csrfToken } = await csrfRes.json();
+    const csrfCookie = setCookies.find(c => c.includes(csrfToken)) || setCookies[setCookies.length - 1];
+    const csrfCookieVal = csrfCookie ? csrfCookie.split(";")[0] : "";
 
     const params = new URLSearchParams();
     params.append("email", acc.email);

@@ -1,0 +1,165 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
+  <defs>
+    <filter id="cls_shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0F172A" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="800" fill="#FFFFFF"/>
+
+  <!-- Title Header -->
+  <text x="600" y="40" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="22" font-weight="800" fill="#0F172A">
+    Figure 3.6: Domain Class Diagram – Core Architectural Domain Entities
+  </text>
+  <text x="600" y="65" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="500" fill="#64748B">
+    Domain Entities, Encapsulated Attributes, Business Operations, and Associative Multiplicities
+  </text>
+
+  <!-- CLASS 1: USER (Top Left) -->
+  <g transform="translate(40, 90)">
+    <rect width="250" height="185" rx="8" fill="#F8FAFC" stroke="#1E3A8A" stroke-width="2" filter="url(#cls_shadow)"/>
+    <rect width="250" height="28" rx="6" fill="#1E3A8A"/>
+    <text x="125" y="19" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">User</text>
+    <text x="10" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- id : UUID</text>
+    <text x="10" y="64" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- name : String</text>
+    <text x="10" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- email : String</text>
+    <text x="10" y="96" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- role : RoleName</text>
+    <text x="10" y="112" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- departmentId : UUID?</text>
+    <text x="10" y="128" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- mustChangePassword : Boolean</text>
+    <line x1="0" y1="136" x2="250" y2="136" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="10" y="154" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#1E40AF">+ authenticate(password) : Boolean</text>
+    <text x="10" y="172" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#1E40AF">+ updatePassword(newPass) : Void</text>
+  </g>
+
+  <!-- CLASS 2: ASSET (Center Top) -->
+  <g transform="translate(370, 90)">
+    <rect width="320" height="240" rx="8" fill="#FFFBEB" stroke="#D97706" stroke-width="2" filter="url(#cls_shadow)"/>
+    <rect width="320" height="28" rx="6" fill="#D97706"/>
+    <text x="160" y="19" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">Asset</text>
+    <text x="10" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- id : UUID</text>
+    <text x="10" y="64" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- publicId : UUID (Unique QR Target)</text>
+    <text x="10" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- assetCode : String (Unique)</text>
+    <text x="10" y="96" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- serialNumber : String (Unique)</text>
+    <text x="10" y="112" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- status : AssetStatus</text>
+    <text x="10" y="128" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- purchaseCost : Decimal</text>
+    <text x="10" y="144" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- usefulLifeYears : Int</text>
+    <text x="10" y="160" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- salvageValue : Decimal</text>
+    <text x="10" y="176" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- location : String (Campus/Building/Room)</text>
+    <line x1="0" y1="184" x2="320" y2="184" stroke="#FDE68A" stroke-width="1"/>
+    <text x="10" y="202" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#B45309">+ register(assetData, actorId) : Asset</text>
+    <text x="10" y="218" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#B45309">+ updateStatus(newStatus) : Void</text>
+    <text x="10" y="234" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#B45309">+ getValuation(asOfDate) : ValuationResult</text>
+  </g>
+
+  <!-- CLASS 3: ASSIGNMENT (Top Right) -->
+  <g transform="translate(780, 90)">
+    <rect width="280" height="200" rx="8" fill="#F0FDF4" stroke="#16A34A" stroke-width="2" filter="url(#cls_shadow)"/>
+    <rect width="280" height="28" rx="6" fill="#16A34A"/>
+    <text x="140" y="19" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">Assignment</text>
+    <text x="10" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- id : UUID</text>
+    <text x="10" y="64" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- assetId : UUID</text>
+    <text x="10" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- assignedToUserId : UUID?</text>
+    <text x="10" y="96" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- status : AssignmentStatus</text>
+    <text x="10" y="112" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- assignedAt : DateTime</text>
+    <text x="10" y="128" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- rejectionReason : String?</text>
+    <line x1="0" y1="136" x2="280" y2="136" stroke="#BBF7D0" stroke-width="1"/>
+    <text x="10" y="154" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#15803D">+ assignAsset(data, actorId) : Assignment</text>
+    <text x="10" y="172" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#15803D">+ acceptAssignment(userId) : Assignment</text>
+    <text x="10" y="190" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#15803D">+ rejectAssignment(userId, reason) : Void</text>
+  </g>
+
+  <!-- CLASS 4: RETURN (Center Left) -->
+  <g transform="translate(40, 370)">
+    <rect width="250" height="175" rx="8" fill="#F8FAFC" stroke="#0D9488" stroke-width="2" filter="url(#cls_shadow)"/>
+    <rect width="250" height="28" rx="6" fill="#0D9488"/>
+    <text x="125" y="19" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">Return</text>
+    <text x="10" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- id : UUID</text>
+    <text x="10" y="64" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- assignmentId : UUID</text>
+    <text x="10" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- conditionAtReturn : ReturnCondition</text>
+    <text x="10" y="96" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- isDamaged : Boolean</text>
+    <text x="10" y="112" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- returnedAt : DateTime</text>
+    <line x1="0" y1="120" x2="250" y2="120" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="10" y="140" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0F766E">+ returnAsset(data, actorId) : Result</text>
+    <text x="10" y="160" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0F766E">+ autoFlagMaintenance() : Maintenance</text>
+  </g>
+
+  <!-- CLASS 5: MAINTENANCE (Center Middle) -->
+  <g transform="translate(370, 370)">
+    <rect width="320" height="175" rx="8" fill="#FFFBEB" stroke="#D97706" stroke-width="2" filter="url(#cls_shadow)"/>
+    <rect width="320" height="28" rx="6" fill="#B45309"/>
+    <text x="160" y="19" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">Maintenance</text>
+    <text x="10" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- id : UUID</text>
+    <text x="10" y="64" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- assetId : UUID</text>
+    <text x="10" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- reportedById : UUID</text>
+    <text x="10" y="96" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- assignedToId : UUID? (Technician)</text>
+    <text x="10" y="112" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- status : MaintenanceStatus</text>
+    <text x="10" y="128" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- cost : Decimal?</text>
+    <line x1="0" y1="136" x2="320" y2="136" stroke="#FDE68A" stroke-width="1"/>
+    <text x="10" y="154" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#B45309">+ createTicket(data, actorId) : Ticket</text>
+    <text x="10" y="170" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#B45309">+ updateStatus(status, cost) : Void</text>
+  </g>
+
+  <!-- CLASS 6: INVENTORY SESSION (Center Right) -->
+  <g transform="translate(780, 370)">
+    <rect width="280" height="175" rx="8" fill="#F8FAFC" stroke="#4F46E5" stroke-width="2" filter="url(#cls_shadow)"/>
+    <rect width="280" height="28" rx="6" fill="#4338CA"/>
+    <text x="140" y="19" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">InventorySession</text>
+    <text x="10" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- id : UUID</text>
+    <text x="10" y="64" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- sessionNumber : String</text>
+    <text x="10" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- departmentId : UUID</text>
+    <text x="10" y="96" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- inventoryPersonId : UUID</text>
+    <text x="10" y="112" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F172A">- status : SessionStatus</text>
+    <line x1="0" y1="120" x2="280" y2="120" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="10" y="140" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#4338CA">+ startSession(data) : Session</text>
+    <text x="10" y="156" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#4338CA">+ scanAsset(tag, scannerId) : Verification</text>
+    <text x="10" y="170" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#4338CA">+ completeSession(actorId) : Void</text>
+  </g>
+
+  <!-- UTILITY / SERVICE CLASS: FINANCIAL VALUATION ENGINE (Bottom Left) -->
+  <g transform="translate(40, 580)">
+    <rect width="470" height="150" rx="8" fill="#FAF5FF" stroke="#7C3AED" stroke-width="2" filter="url(#cls_shadow)"/>
+    <rect width="470" height="28" rx="6" fill="#7C3AED"/>
+    <text x="235" y="19" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">«Service» FinancialValuationEngine</text>
+    <text x="10" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#475569">+ calculateSingleAssetFinancials(asset, asOfDate) : AssetFinancialResult</text>
+    <text x="10" y="66" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#475569">+ calculateDepreciation(cost, purchaseDate, lifeYears, salvage) : ValuationResult</text>
+    <text x="10" y="84" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#475569">+ calculateReplacementScore(assetId) : ReplacementScoreResult (0..100)</text>
+    <text x="10" y="102" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#475569">+ safeNumber(val, defaultVal) : Number</text>
+    <text x="10" y="120" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#475569">+ formatCurrencyETB(amount) : String ("ETB X,XXX.XX")</text>
+    <text x="10" y="138" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#7C3AED">Applies pure straight-line amortization: Cost - Salvage over clamped months</text>
+  </g>
+
+  <!-- UTILITY / SERVICE CLASS: PUBLIC VERIFICATION SERVICE (Bottom Right) -->
+  <g transform="translate(560, 580)">
+    <rect width="500" height="150" rx="8" fill="#F0F9FF" stroke="#0284C7" stroke-width="2" filter="url(#cls_shadow)"/>
+    <rect width="500" height="28" rx="6" fill="#0284C7"/>
+    <text x="250" y="19" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">«Service» PublicAssetVerificationService</text>
+    <text x="10" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#475569">+ getPublicAssetVerification(identifier) : Promise&lt;PublicAssetVerification | null&gt;</text>
+    <text x="10" y="66" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#475569">+ maskPersonName(fullName) : String | null ("Abebe Kebede" -&gt; "Abebe K.")</text>
+    <text x="10" y="84" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#475569">+ checkVerificationRateLimit(ipAddress) : { allowed, remaining, reset }</text>
+    <text x="10" y="102" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#475569">+ generateBarcodeSvg(assetCode) : String (Code 39 SVG)</text>
+    <text x="10" y="120" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#475569">+ formatSafeDate(date) : String | null</text>
+    <text x="10" y="138" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#0284C7">Privacy Guarantee: Suppresses financial, procurement, and full personal details</text>
+  </g>
+
+  <!-- CLASS RELATIONSHIPS -->
+  <!-- Asset (1) <-> Assignment (0..*) -->
+  <line x1="690" y1="180" x2="780" y2="180" stroke="#16A34A" stroke-width="2"/>
+  <text x="700" y="172" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="700" fill="#16A34A">1</text>
+  <text x="760" y="172" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="700" fill="#16A34A">0..*</text>
+
+  <!-- User (1) <-> Assignment (0..*) -->
+  <path d="M 165 275 L 165 320 L 850 320 L 850 290" fill="none" stroke="#1E3A8A" stroke-width="1.5"/>
+  <text x="175" y="300" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#1E3A8A">1</text>
+  <text x="860" y="305" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#1E3A8A">0..*</text>
+
+  <!-- Asset (1) <-> Maintenance (0..*) -->
+  <line x1="530" y1="330" x2="530" y2="370" stroke="#D97706" stroke-width="2"/>
+  <text x="540" y="345" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="700" fill="#D97706">1</text>
+  <text x="540" y="365" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="700" fill="#D97706">0..*</text>
+
+  <!-- Asset (1) <-> Return (0..*) -->
+  <path d="M 400 330 L 400 350 L 290 350 L 290 410" fill="none" stroke="#0D9488" stroke-width="1.5"/>
+  <text x="380" y="345" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#0D9488">1</text>
+  <text x="300" y="405" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#0D9488">0..*</text>
+
+</svg>

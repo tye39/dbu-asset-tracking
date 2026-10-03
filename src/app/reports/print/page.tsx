@@ -1,8 +1,9 @@
 import React from "react";
 import { prisma } from "@/lib/db";
 import { auth } from "@/auth";
-import { Printer, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { PrintButton } from "@/components/print-button";
 import { Prisma, FundingSource, AssetStatus } from "@prisma/client";
 import { calculateSingleAssetFinancials } from "@/services/financials";
 
@@ -425,13 +426,7 @@ export default async function PrintReportPage({ searchParams }: PrintReportPageP
           <ArrowLeft size={14} />
           <span>Back to Dashboard</span>
         </Link>
-        <button
-          onClick={() => { if (typeof window !== "undefined") window.print(); }}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
-        >
-          <Printer size={12} />
-          <span>Print Document</span>
-        </button>
+        <PrintButton />
       </div>
 
       {/* Report Sheet Head */}

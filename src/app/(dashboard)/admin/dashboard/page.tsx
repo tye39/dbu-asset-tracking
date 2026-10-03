@@ -144,9 +144,13 @@ export default async function AdminDashboardPage() {
   totalSalvageValue = Math.round(totalSalvageValue * 100) / 100;
   totalMaintenanceCostVal = Math.round(totalMaintenanceCostVal * 100) / 100;
 
-  // Format charts datasets
-  const deptChartData = Object.entries(deptValueMap).map(([name, value]) => ({ name, value: Math.round(value * 100) / 100 }));
-  const catChartData = Object.entries(catValueMap).map(([name, value]) => ({ name, value: Math.round(value * 100) / 100 }));
+  // Format charts datasets (sorted descending by value)
+  const deptChartData = Object.entries(deptValueMap)
+    .map(([name, value]) => ({ name, value: Math.round(value * 100) / 100 }))
+    .sort((a, b) => b.value - a.value);
+  const catChartData = Object.entries(catValueMap)
+    .map(([name, value]) => ({ name, value: Math.round(value * 100) / 100 }))
+    .sort((a, b) => b.value - a.value);
   const fundingChartData = Object.entries(fundingSourceMap).map(([name, value]) => ({ name, value: Math.round(value * 100) / 100 }));
   const purchaseChartData = Object.entries(annualPurchaseMap)
     .map(([year, value]) => ({ name: year, value: Math.round(value * 100) / 100 }))

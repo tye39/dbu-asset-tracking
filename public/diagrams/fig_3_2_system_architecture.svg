@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 780" width="1100" height="780">
+  <defs>
+    <filter id="arch_shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0F172A" flood-opacity="0.08"/>
+    </filter>
+    <marker id="arch_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#1E3A8A"/>
+    </marker>
+  </defs>
+
+  <rect width="1100" height="780" fill="#FFFFFF"/>
+
+  <!-- Title Header -->
+  <text x="550" y="40" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="22" font-weight="800" fill="#0F172A">
+    Figure 3.2: System Architecture Diagram – Layered Component Structure
+  </text>
+  <text x="550" y="65" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="500" fill="#64748B">
+    Full-Stack Next.js 14 App Router, NextAuth RBAC, Domain Services, and Prisma PostgreSQL Persistence
+  </text>
+
+  <!-- LAYER 1: PRESENTATION LAYER (CLIENT & UI) -->
+  <g transform="translate(60, 90)">
+    <rect width="980" height="135" rx="12" fill="#F0F9FF" stroke="#0284C7" stroke-width="2" filter="url(#arch_shadow)"/>
+    <rect width="980" height="28" rx="10" fill="#0284C7"/>
+    <text x="20" y="20" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">
+      1. PRESENTATION LAYER (Browser Client &amp; React Server Components)
+    </text>
+
+    <!-- Sub-boxes -->
+    <rect x="20" y="42" width="220" height="75" rx="8" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.5"/>
+    <text x="130" y="62" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#0369A1">Dashboard Views (7 Roles)</text>
+    <text x="30" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Admin, PAO, Head Panels</text>
+    <text x="30" y="95" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Staff, Tech, Auditor, Inventory</text>
+    <text x="30" y="108" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#0284C7">• Tailored KPI Cards &amp; Action Modals</text>
+
+    <rect x="260" y="42" width="220" height="75" rx="8" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.5"/>
+    <text x="370" y="62" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#0369A1">Forms &amp; Management UI</text>
+    <text x="270" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Dynamic Asset Form Builder</text>
+    <text x="270" y="95" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Assignment &amp; Transfer Actions</text>
+    <text x="270" y="108" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#0284C7">• Interactive Category Taxonomy</text>
+
+    <rect x="500" y="42" width="220" height="75" rx="8" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.5"/>
+    <text x="610" y="62" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#0369A1">Visualization &amp; Reports</text>
+    <text x="510" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Recharts Financial Analytics</text>
+    <text x="510" y="95" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Asset Depreciation Curves</text>
+    <text x="510" y="108" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#0284C7">• Printable Inventory Slips &amp; Tags</text>
+
+    <rect x="740" y="42" width="220" height="75" rx="8" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.5"/>
+    <text x="850" y="62" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#0369A1">Mobile &amp; Public Interfaces</text>
+    <text x="750" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Camera QR Scanner (jsQR)</text>
+    <text x="750" y="95" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Public Verification Card</text>
+    <text x="750" y="108" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#0284C7">• Zero-Auth Gate Verification</text>
+  </g>
+
+  <!-- Flow Arrows 1 -> 2 -->
+  <path d="M 300 225 L 300 255" fill="none" stroke="#1E3A8A" stroke-width="2" marker-end="url(#arch_arrow)"/>
+  <path d="M 550 225 L 550 255" fill="none" stroke="#1E3A8A" stroke-width="2" marker-end="url(#arch_arrow)"/>
+  <path d="M 800 225 L 800 255" fill="none" stroke="#1E3A8A" stroke-width="2" marker-end="url(#arch_arrow)"/>
+
+  <!-- LAYER 2: APPLICATION & SECURITY LAYER (NEXT.JS RUNTIME) -->
+  <g transform="translate(60, 255)">
+    <rect width="980" height="140" rx="12" fill="#F8FAFC" stroke="#334155" stroke-width="2" filter="url(#arch_shadow)"/>
+    <rect width="980" height="28" rx="10" fill="#334155"/>
+    <text x="20" y="20" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">
+      2. APPLICATION ROUTING &amp; SECURITY LAYER (Next.js 14 App Router &amp; NextAuth.js)
+    </text>
+
+    <!-- Sub-boxes -->
+    <rect x="20" y="42" width="295" height="82" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="167" y="62" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#1E293B">NextAuth.js (v5) Authentication</text>
+    <text x="30" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Credentials Provider with bcryptjs Verification</text>
+    <text x="30" y="95" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Encrypted JWT Session Strategy (authjs.session-token)</text>
+    <text x="30" y="110" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#0284C7">• First-Login Password Reset Enforcer</text>
+
+    <rect x="342" y="42" width="295" height="82" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="489" y="62" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#1E293B">Edge Route Middleware &amp; RBAC</text>
+    <text x="352" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Route Guarding for /admin, /pao, /head, /staff, etc.</text>
+    <text x="352" y="95" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Automatic Role-Based Dashboard Redirection</text>
+    <text x="352" y="110" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#0284C7">• Whitelist Bypass for /asset/verify/[publicId]</text>
+
+    <rect x="664" y="42" width="295" height="82" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="811" y="62" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#1E293B">Server Actions &amp; API Routes</text>
+    <text x="674" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• 15 Type-Safe "use server" Action Handlers</text>
+    <text x="674" y="95" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Automatic Path Revalidation (revalidatePath)</text>
+    <text x="674" y="110" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#0284C7">• Rate Limiter for Public Lookups (privacy.ts)</text>
+  </g>
+
+  <!-- Flow Arrows 2 -> 3 -->
+  <path d="M 300 395 L 300 425" fill="none" stroke="#1E3A8A" stroke-width="2" marker-end="url(#arch_arrow)"/>
+  <path d="M 550 395 L 550 425" fill="none" stroke="#1E3A8A" stroke-width="2" marker-end="url(#arch_arrow)"/>
+  <path d="M 800 395 L 800 425" fill="none" stroke="#1E3A8A" stroke-width="2" marker-end="url(#arch_arrow)"/>
+
+  <!-- LAYER 3: DOMAIN BUSINESS LOGIC SERVICES -->
+  <g transform="translate(60, 425)">
+    <rect width="980" height="155" rx="12" fill="#F0FDF4" stroke="#16A34A" stroke-width="2" filter="url(#arch_shadow)"/>
+    <rect width="980" height="28" rx="10" fill="#16A34A"/>
+    <text x="20" y="20" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">
+      3. DOMAIN BUSINESS LOGIC LAYER (Core Services &amp; Workflow Engines)
+    </text>
+
+    <!-- 4 Domain Grid Boxes -->
+    <rect x="20" y="42" width="220" height="98" rx="8" fill="#FFFFFF" stroke="#BBF7D0" stroke-width="1.5"/>
+    <text x="130" y="62" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#15803D">Asset Cataloging &amp; Tags</text>
+    <text x="30" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• asset.ts &amp; category.ts</text>
+    <text x="30" y="95" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Dynamic Field Validation</text>
+    <text x="30" y="110" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• QRCode &amp; Code 39 SVG Engine</text>
+    <text x="30" y="125" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#16A34A">• public-asset.ts &amp; privacy.ts</text>
+
+    <rect x="260" y="42" width="220" height="98" rx="8" fill="#FFFFFF" stroke="#BBF7D0" stroke-width="1.5"/>
+    <text x="370" y="62" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#15803D">Custody &amp; Requests</text>
+    <text x="270" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• assignment.ts &amp; return.ts</text>
+    <text x="270" y="95" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Handshake: Pending/Accept/Reject</text>
+    <text x="270" y="110" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• transfer.ts &amp; asset-request.ts</text>
+    <text x="270" y="125" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#16A34A">• appeal.ts Dispute Resolution</text>
+
+    <rect x="500" y="42" width="220" height="98" rx="8" fill="#FFFFFF" stroke="#BBF7D0" stroke-width="1.5"/>
+    <text x="610" y="62" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#15803D">Maintenance &amp; Verification</text>
+    <text x="510" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• maintenance.ts (Auto-ticket on damage)</text>
+    <text x="510" y="95" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Technician Work Order Triage</text>
+    <text x="510" y="110" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• inventory.ts &amp; inventory-person.ts</text>
+    <text x="510" y="125" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#16A34A">• Duplicate Scan &amp; Dept Cross-Check</text>
+
+    <rect x="740" y="42" width="220" height="98" rx="8" fill="#FFFFFF" stroke="#BBF7D0" stroke-width="1.5"/>
+    <text x="850" y="62" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#15803D">Financial Valuation &amp; Audit</text>
+    <text x="750" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• financials.ts &amp; valuation.ts</text>
+    <text x="750" y="95" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Straight-Line Depreciation Engine</text>
+    <text x="750" y="110" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Carrying Book Value &amp; Salvage Floor</text>
+    <text x="750" y="125" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#16A34A">• audit.ts Immutable Activity Logging</text>
+  </g>
+
+  <!-- Flow Arrows 3 -> 4 -->
+  <path d="M 300 580 L 300 610" fill="none" stroke="#1E3A8A" stroke-width="2" marker-end="url(#arch_arrow)"/>
+  <path d="M 550 580 L 550 610" fill="none" stroke="#1E3A8A" stroke-width="2" marker-end="url(#arch_arrow)"/>
+  <path d="M 800 580 L 800 610" fill="none" stroke="#1E3A8A" stroke-width="2" marker-end="url(#arch_arrow)"/>
+
+  <!-- LAYER 4: DATA ACCESS & PERSISTENCE LAYER -->
+  <g transform="translate(60, 610)">
+    <rect width="980" height="130" rx="12" fill="#FAF5FF" stroke="#7C3AED" stroke-width="2" filter="url(#arch_shadow)"/>
+    <rect width="980" height="28" rx="10" fill="#7C3AED"/>
+    <text x="20" y="20" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">
+      4. DATA ACCESS &amp; PERSISTENCE LAYER (Prisma ORM &amp; Neon Serverless PostgreSQL)
+    </text>
+
+    <!-- Sub-boxes -->
+    <rect x="20" y="42" width="295" height="74" rx="8" fill="#FFFFFF" stroke="#E9D5FF" stroke-width="1.5"/>
+    <text x="167" y="62" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#6B21A8">Prisma ORM Client v7</text>
+    <text x="30" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Prisma Client with PostgreSQL Adapter</text>
+    <text x="30" y="95" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• ACID Transactions ($transaction API)</text>
+    <text x="30" y="108" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#7C3AED">• Strict Foreign Key Cascades &amp; Soft Deletes</text>
+
+    <rect x="342" y="42" width="295" height="74" rx="8" fill="#FFFFFF" stroke="#E9D5FF" stroke-width="1.5"/>
+    <text x="489" y="62" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#6B21A8">Connection Pooling (@prisma/adapter-pg)</text>
+    <text x="352" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Node pg.Pool Connection Reuse</text>
+    <text x="352" y="95" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• Serverless Cold-Start Connection Optimization</text>
+    <text x="352" y="108" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#7C3AED">• SSL Mode: verify-full Encrypted Pipeline</text>
+
+    <rect x="664" y="42" width="295" height="74" rx="8" fill="#FFFFFF" stroke="#E9D5FF" stroke-width="1.5"/>
+    <text x="811" y="62" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#6B21A8">Neon PostgreSQL Database (Cloud)</text>
+    <text x="674" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• 21 Relational Tables &amp; 8 Enumerations</text>
+    <text x="674" y="95" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">• UUID Primary Keys &amp; Composite Indices</text>
+    <text x="674" y="108" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#7C3AED">• Automated Backups &amp; Point-in-Time Recovery</text>
+  </g>
+
+</svg>

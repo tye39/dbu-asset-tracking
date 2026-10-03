@@ -30,6 +30,8 @@ export const AssetCategorySchema = z.object({
   description: z.string().optional(),
 });
 
+export const IdentificationMethodSchema = z.enum(["QR", "BARCODE", "NONE"]);
+
 export const AssetRegistrationSchema = z.object({
   name: z.string().min(2, { message: "Asset name must be at least 2 characters" }),
   assetCode: z.string().min(3, { message: "Asset code must be at least 3 characters" }),
@@ -38,6 +40,7 @@ export const AssetRegistrationSchema = z.object({
   categoryId: z.string().uuid({ message: "Invalid category selection" }),
   departmentId: z.string().uuid({ message: "Invalid department selection" }),
   imageUrl: z.string().url({ message: "Invalid image URL" }).optional().or(z.literal("")),
+  identificationMethod: IdentificationMethodSchema.default("NONE"),
 });
 
 export const AssignmentSchema = z.object({

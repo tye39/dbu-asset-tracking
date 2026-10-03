@@ -1,0 +1,891 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3600 2320" width="3600" height="2320">
+  <defs>
+    <!-- Arrow Markers -->
+    <marker id="arrow_blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <polyline points="1,1 8,5 1,9" fill="none" stroke="#0284C7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+    </marker>
+    <marker id="arrow_amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <polyline points="1,1 8,5 1,9" fill="none" stroke="#D97706" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+    </marker>
+
+    <!-- Drop Shadows -->
+    <filter id="boundary_shadow" x="-3%" y="-2%" width="106%" height="104%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#0F172A" flood-opacity="0.08"/>
+    </filter>
+    <filter id="hub_shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#D97706" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="3600" height="2320" fill="#FFFFFF" />
+
+  <!-- Title Header -->
+  <g id="header">
+    <text x="1800" y="65" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="38" font-weight="800" fill="#0F172A" letter-spacing="0.5">
+      DBU Asset Tracking System – UML Use Case Diagram
+    </text>
+    <text x="1800" y="105" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="500" fill="#475569">
+      Institutional Property Administration, Custody Lifecycle, Maintenance, Financial Valuation &amp; QR Verification Architecture
+    </text>
+    <line x1="430" y1="128" x2="3170" y2="128" stroke="#CBD5E1" stroke-width="2" />
+  </g>
+
+  <!-- System Boundary Container -->
+  <g id="system_boundary">
+    <rect x="430" y="150" width="2740" height="1750" rx="20" fill="#F8FAFC" stroke="#1E3A8A" stroke-width="4" filter="url(#boundary_shadow)" />
+    
+    <!-- Boundary Header Badge -->
+    <path d="M 430 170 A 20 20 0 0 1 450 150 L 880 150 L 850 200 L 430 200 Z" fill="#1E3A8A" />
+    <text x="460" y="186" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF">
+      System Boundary: DBU Asset Tracking System
+    </text>
+
+    <!-- Subsystem Zones for Academic Clarity -->
+    <!-- Zone 1: Admin & Security -->
+    <rect x="460" y="215" width="600" height="315" rx="12" fill="#FFFFFF" fill-opacity="0.8" stroke="#CBD5E1" stroke-width="1.4" stroke-dasharray="6,4" />
+    <text x="480" y="238" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#475569">
+      SECURITY &amp; SYSTEM ADMINISTRATION SUBSYSTEM
+    </text>
+
+    <!-- Zone 2: Asset Registration -->
+    <rect x="460" y="550" width="1020" height="390" rx="12" fill="#FFFFFF" fill-opacity="0.8" stroke="#CBD5E1" stroke-width="1.4" stroke-dasharray="6,4" />
+    <text x="480" y="574" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#475569">
+      ASSET CATALOGING &amp; IDENTIFICATION (QR/BARCODE)
+    </text>
+
+    <!-- Zone 3: Custody & Lifecycle -->
+    <rect x="460" y="970" width="1020" height="370" rx="12" fill="#FFFFFF" fill-opacity="0.8" stroke="#CBD5E1" stroke-width="1.4" stroke-dasharray="6,4" />
+    <text x="480" y="994" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#475569">
+      ASSET CUSTODY, ALLOCATION, TRANSFER &amp; SEARCH
+    </text>
+
+    <!-- Central Hub Highlight Box -->
+    <rect x="1560" y="1080" width="480" height="200" rx="16" fill="#FEF3C7" fill-opacity="0.4" stroke="#D97706" stroke-width="2" stroke-dasharray="6,4" />
+    <text x="1585" y="1110" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="800" fill="#B45309">
+      CENTRAL INSTITUTIONAL AUDIT TRAIL
+    </text>
+
+    <!-- Zone 4: Financial Valuation -->
+    <rect x="2100" y="200" width="1040" height="260" rx="12" fill="#FFFFFF" fill-opacity="0.8" stroke="#CBD5E1" stroke-width="1.4" stroke-dasharray="6,4" />
+    <text x="2120" y="224" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#475569">
+      DEPRECIATION &amp; CAPITAL VALUATION SUBSYSTEM
+    </text>
+
+    <!-- Zone 5: Reporting & Compliance Auditing -->
+    <rect x="2100" y="490" width="1040" height="260" rx="12" fill="#FFFFFF" fill-opacity="0.8" stroke="#CBD5E1" stroke-width="1.4" stroke-dasharray="6,4" />
+    <text x="2120" y="514" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#475569">
+      COMPLIANCE AUDITING, LOGS &amp; MANAGEMENT REPORTING
+    </text>
+
+    <!-- Zone 6: Maintenance Management -->
+    <rect x="2100" y="880" width="1040" height="340" rx="12" fill="#FFFFFF" fill-opacity="0.8" stroke="#CBD5E1" stroke-width="1.4" stroke-dasharray="6,4" />
+    <text x="2120" y="904" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#475569">
+      MAINTENANCE &amp; FIELD SERVICE OPERATIONS
+    </text>
+
+    <!-- Zone 7: Physical Inventory Auditing -->
+    <rect x="2100" y="1250" width="1040" height="180" rx="12" fill="#FFFFFF" fill-opacity="0.8" stroke="#CBD5E1" stroke-width="1.4" stroke-dasharray="6,4" />
+    <text x="2340" y="1274" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#475569">
+      PHYSICAL INVENTORY AUDITING &amp; RECONCILIATION
+    </text>
+
+    <!-- Zone 8: Public QR Verification -->
+    <rect x="1560" y="1630" width="1120" height="210" rx="14" fill="#F0FDF4" fill-opacity="0.95" stroke="#86EFAC" stroke-width="2" stroke-dasharray="6,4" />
+    <text x="1580" y="1658" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="800" fill="#15803D">
+      PUBLIC QR VERIFICATION SERVICE (NO NORMAL STAFF LOGIN REQUIRED)
+    </text>
+  </g>
+  
+
+  <!-- Legend & Specification Notes (Positioned outside system boundary for zero line collision) -->
+  <g id="legend_and_notes" transform="translate(430, 1930)">
+    <rect width="2740" height="340" rx="14" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.6" filter="url(#boundary_shadow)" />
+    
+    <!-- Title -->
+    <text x="30" y="32" font-family="'Segoe UI', Roboto, sans-serif" font-size="17" font-weight="800" fill="#0F172A">
+      UML 2.5 SPECIFICATION NOTATION &amp; ARCHITECTURAL RULES MATRIX
+    </text>
+    <line x1="30" y1="46" x2="2710" y2="46" stroke="#E2E8F0" stroke-width="1.5" />
+
+    <!-- Left Column: Legend items -->
+    <g transform="translate(30, 60)">
+      <line x1="0" y1="20" x2="50" y2="20" stroke="#334155" stroke-width="2.2" />
+      <text x="65" y="25" font-family="'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" fill="#334155">Actor Association</text>
+      <text x="260" y="25" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" fill="#64748B">Direct operational execution authorization</text>
+
+      <line x1="0" y1="65" x2="45" y2="65" stroke="#0284C7" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrow_blue)" />
+      <text x="65" y="70" font-family="'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" fill="#0284C7">&lt;&lt;include&gt;&gt; Dependency</text>
+      <text x="260" y="70" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" fill="#64748B">Mandatory invoked sub-routine (e.g., Auth, QR Tagging, Audit Log)</text>
+
+      <line x1="0" y1="110" x2="45" y2="110" stroke="#D97706" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrow_amber)" />
+      <text x="65" y="115" font-family="'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" fill="#D97706">&lt;&lt;extend&gt;&gt; Extension</text>
+      <text x="260" y="115" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" fill="#64748B">Conditional enhancement (e.g., Export Reports, Public QR Scan)</text>
+
+      <ellipse cx="25" cy="155" rx="18" ry="11" fill="#FEF3C7" stroke="#D97706" stroke-width="2" />
+      <text x="65" y="160" font-family="'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" fill="#B45309">Core Audit / Calculation Hub</text>
+      <text x="260" y="160" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" fill="#64748B">Central Track Asset History &amp; Calculate Depreciation calculation engines</text>
+
+      <ellipse cx="25" cy="200" rx="18" ry="11" fill="#DCFCE7" stroke="#16A34A" stroke-width="2" />
+      <text x="65" y="205" font-family="'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" fill="#15803D">Public Unauthenticated Service</text>
+      <text x="260" y="205" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" fill="#64748B">Directly accessible by students, campus visitors or external auditors via QR</text>
+    </g>
+
+    <!-- Vertical Separator -->
+    <line x1="1020" y1="56" x2="1020" y2="320" stroke="#E2E8F0" stroke-width="1.5" />
+
+    <!-- Right Column: Formal Specification Rules -->
+    <g transform="translate(1050, 60)">
+      <text x="0" y="20" font-family="'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="800" fill="#0F172A">FORMAL SYSTEM CONSTRAINTS &amp; ARCHITECTURAL RULES:</text>
+      
+      <text x="0" y="55" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" fill="#1E293B">
+        1. <tspan font-weight="700" fill="#0F172A">Mandatory Authentication Barrier:</tspan> All administrative, custody, maintenance, inventory, and audit use cases require &lt;&lt;include&gt;&gt; Login / Authentication prior to execution.
+      </text>
+      
+      <text x="0" y="95" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" fill="#1E293B">
+        2. <tspan font-weight="700" fill="#0F172A">Automated Identification Pipeline:</tspan> Register Assets inherently executes &lt;&lt;include&gt;&gt; Generate / Print QR Code, Generate Asset Barcode, and Upload Asset Images.
+      </text>
+
+      <text x="0" y="135" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" fill="#1E293B">
+        3. <tspan font-weight="700" fill="#0F172A">Public Asset Verification Autonomy:</tspan> Public Asset Verification extends Scan QR Code for public/external stakeholders without requiring login credentials.
+      </text>
+
+      <text x="0" y="175" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" fill="#1E293B">
+        4. <tspan font-weight="700" fill="#0F172A">Immutable Lifecycle Audit Trail:</tspan> Track Asset History centrally logs all state changes triggered by Assignment, Transfer, Return, Maintenance Updates, and Inventory Audits.
+      </text>
+
+      <text x="0" y="215" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" fill="#1E293B">
+        5. <tspan font-weight="700" fill="#0F172A">Financial Depreciation Engine:</tspan> Calculate Depreciation provides real-time straight-line/declining asset book valuation feeding University Capital Valuation and Financial Reports.
+      </text>
+    </g>
+  </g>
+  
+
+  <!-- Actor Associations -->
+  <g id="associations">
+<line x1="248" y1="350" x2="575" y2="240" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="248" y1="350" x2="595" y2="325" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="248" y1="350" x2="565" y2="410" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="248" y1="350" x2="555" y2="495" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="248" y1="780" x2="575" y2="610" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="248" y1="780" x2="580" y2="695" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="248" y1="780" x2="585" y2="790" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="248" y1="780" x2="585" y2="885" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="248" y1="780" x2="1135" y2="1060" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="248" y1="780" x2="1135" y2="1160" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="248" y1="1180" x2="565" y2="1060" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="248" y1="1180" x2="1135" y2="1160" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="248" y1="1180" x2="1135" y2="1260" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="248" y1="1180" x2="585" y2="1150" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="248" y1="1180" x2="580" y2="1240" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="248" y1="1560" x2="565" y2="1060" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="248" y1="1560" x2="1135" y2="1260" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="248" y1="1560" x2="585" y2="1150" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="248" y1="1560" x2="1640" y2="1740" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="3352" y1="400" x2="3035" y2="250" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="3352" y1="400" x2="3055" y2="340" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="3352" y1="400" x2="3025" y2="590" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="3352" y1="400" x2="3010" y2="700" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="3352" y1="400" x2="2475" y2="590" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="3352" y1="400" x2="2470" y2="700" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="3352" y1="1040" x2="3025" y2="1080" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="3352" y1="1040" x2="2500" y2="990" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="3352" y1="1040" x2="2500" y2="1080" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="3352" y1="1040" x2="2495" y2="1170" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="3352" y1="1040" x2="1960" y2="1740" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="3352" y1="1400" x2="3020" y2="1360" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="3352" y1="1400" x2="2495" y2="1360" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="3352" y1="1400" x2="1960" y2="1740" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+<line x1="3352" y1="1740" x2="2605" y2="1740" stroke="#334155" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+  </g>
+
+
+  <!-- UML Relationships (Include & Extend) -->
+  <g id="relationships">
+
+    <g class="relationship">
+      <line x1="884.536045045445" y1="322.28230858697896" x2="1635.5279487413902" y2="243.1972840153189" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="1156.0319968934177" y="270.73979630114894" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="1260.0319968934177" y="287.73979630114894" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="877.5823025670992" y1="772.4986602334001" x2="1653.5414198479266" y2="258.42246291221045" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="1161.561861207513" y="503.4605615728053" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="1265.561861207513" y="520.4605615728053" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="2703.3200726613386" y1="578.0855172464026" x2="1956.6799273386614" y2="252.5415607932605" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="2226" y="403.3135390198315" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="2330" y="420.3135390198315" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="2730.681930375436" y1="1056.3988977563404" x2="1929.318069624564" y2="264.8432655196418" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="2226" y="648.6210816379911" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="2330" y="665.6210816379911" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="892.8910581939823" y1="783.7528384823964" x2="1127.1089418060178" y2="705.5895655683821" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="906" y="732.6712020253892" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="1010" y="749.6712020253892" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="895" y1="790" x2="1115" y2="790" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="901" y="778" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="1005" y="795" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="892.8910581939823" y1="796.2471615176036" x2="1107.381063329375" y2="874.0816364570071" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="896.1360607616787" y="823.1643989873053" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="1000.1360607616787" y="840.1643989873053" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="915" y1="1060" x2="1135" y2="1060" stroke="#D97706" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_amber)" />
+      <rect x="925" y="1048" width="200" height="24" rx="5" fill="#FFFFFF" stroke="#FED7AA" stroke-width="1.2" />
+      <text x="1025" y="1065" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#B45309">
+        &lt;&lt;extend&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="1421.28672337572" y1="1068.544661254553" x2="1629.4815407534415" y2="1170.1061817052546" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="1421.3841320645806" y="1107.3254214799038" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="1525.3841320645806" y="1124.3254214799038" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="1424.8928703215406" y1="1161.306726151441" x2="1625.12929443952" y2="1178.308942627547" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="1421.0110823805303" y="1157.807834389494" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="1525.0110823805303" y="1174.807834389494" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="1423.3138961593395" y1="1254.830055735366" x2="1627.034952911142" y2="1186.6905161071734" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="1421.1744245352406" y="1208.7602859212698" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="1525.1744245352406" y="1225.7602859212698" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="2697.2450025676962" y1="1073.7528384823963" x2="2497.550906289786" y2="995.5895655683821" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="2493.3979544287413" y="1022.6712020253892" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="2597.3979544287413" y="1039.6712020253892" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="2695" y1="1080" x2="2500" y2="1080" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="2493.5" y="1068" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="2597.5" y="1085" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="2697.2450025676962" y1="1086.2471615176037" x2="2492.6189366706253" y2="1164.410434431618" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="2490.9319696191606" y="1113.3287979746108" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="2594.9319696191606" y="1130.3287979746108" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="2143.2388395434837" y1="1086.4208113841041" x2="1971.8511282216132" y2="1171.6907146793944" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="1953.5449838825484" y="1117.0557630317494" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="2057.5449838825484" y="1134.0557630317494" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="2700" y1="1360" x2="2495" y2="1360" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="2493.5" y="1348" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="2597.5" y="1365" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="2154.627437147955" y1="1348.224019700206" x2="1965.3725628520451" y2="1194.3928648108592" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="1956" y="1259.3084422555326" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="2060" y="1276.3084422555326" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="2686.070346432117" y1="253.75467188654477" x2="2483.9908162211473" y2="305.58273895700614" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="2481.0305813266323" y="267.6687054217755" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="2585.0305813266323" y="284.6687054217755" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="2665.3002311249447" y1="338.11401933283423" x2="2484.745958278893" y2="312.2188007849009" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="2471.023094701919" y="313.16641005886754" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="2575.023094701919" y="330.16641005886754" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="2320" y1="376" x2="2320" y2="350" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="2216" y="351" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="2320" y="368" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="2727.850835605166" y1="682.9674410335547" x2="2469.769052980812" y2="426.0863056905316" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="2494.809944292989" y="542.5268733620431" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="2598.809944292989" y="559.5268733620431" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="2695" y1="590" x2="2475" y2="590" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="2481" y="578" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="2585" y="595" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="2715.828251840672" y1="608.4810211191088" x2="1952.909429865954" y2="1158.6009229147162" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_blue)" />
+      <rect x="2230.368840853313" y="871.5409720169125" width="208" height="24" rx="5" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="1.2" />
+      <text x="2334.368840853313" y="888.5409720169125" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#0369A1">
+        &lt;&lt;include&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="2470" y1="700" x2="2710" y2="700" stroke="#D97706" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_amber)" />
+      <rect x="2490" y="688" width="200" height="24" rx="5" fill="#FFFFFF" stroke="#FED7AA" stroke-width="1.2" />
+      <text x="2590" y="705" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#B45309">
+        &lt;&lt;extend&gt;&gt;
+      </text>
+    </g>
+  
+
+    <g class="relationship">
+      <line x1="2235" y1="1740" x2="1960" y2="1740" stroke="#D97706" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#arrow_amber)" />
+      <rect x="1941.5" y="1728" width="312" height="24" rx="5" fill="#FFFFFF" stroke="#FED7AA" stroke-width="1.2" />
+      <text x="2097.5" y="1745" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#B45309">
+        &lt;&lt;extend&gt;&gt; [Public Scan]
+      </text>
+    </g>
+  
+  </g>
+
+
+  <!-- Use Cases -->
+  <g id="usecases">
+
+    <g id="uc_pwd_reset" class="usecase" >
+      <ellipse cx="740" cy="240" rx="165" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="740" y="246" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        Manage Password Reset
+      </text>
+    </g>
+  
+
+    <g id="uc_users" class="usecase" >
+      <ellipse cx="740" cy="325" rx="145" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="740" y="331" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        Manage Users
+      </text>
+    </g>
+  
+
+    <g id="uc_roles" class="usecase" >
+      <ellipse cx="740" cy="410" rx="175" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="740" y="416" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        Manage Roles & Permissions
+      </text>
+    </g>
+  
+
+    <g id="uc_depts" class="usecase" >
+      <ellipse cx="740" cy="495" rx="185" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="740" y="501" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        Manage Departments & Branches
+      </text>
+    </g>
+  
+
+    <g id="uc_categories" class="usecase" >
+      <ellipse cx="740" cy="610" rx="165" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="740" y="616" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        Manage Asset Categories
+      </text>
+    </g>
+  
+
+    <g id="uc_fields" class="usecase" >
+      <ellipse cx="740" cy="695" rx="160" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="740" y="701" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        Configure Asset Fields
+      </text>
+    </g>
+  
+
+    <g id="uc_register" class="usecase" >
+      <ellipse cx="740" cy="790" rx="155" ry="38" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="3" />
+      <text x="740" y="796" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        Register Assets
+      </text>
+    </g>
+  
+
+    <g id="uc_edit_asset" class="usecase" >
+      <ellipse cx="740" cy="885" rx="155" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="740" y="891" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        Edit / Update Assets
+      </text>
+    </g>
+  
+
+    <g id="uc_accept_reject" class="usecase" >
+      <ellipse cx="740" cy="1060" rx="175" ry="36" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="740" y="1066" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        Accept / Reject Assignment
+      </text>
+    </g>
+  
+
+    <g id="uc_view_details" class="usecase" >
+      <ellipse cx="740" cy="1150" rx="155" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="740" y="1156" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        View Asset Details
+      </text>
+    </g>
+  
+
+    <g id="uc_search_filter" class="usecase" >
+      <ellipse cx="740" cy="1240" rx="160" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="740" y="1246" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        Search / Filter Assets
+      </text>
+    </g>
+  
+
+    <g id="uc_upload_img" class="usecase" >
+      <ellipse cx="1280" cy="700" rx="155" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="1280" y="706" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        Upload Asset Images
+      </text>
+    </g>
+  
+
+    <g id="uc_gen_barcode" class="usecase" >
+      <ellipse cx="1280" cy="790" rx="165" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="1280" y="796" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        Generate Asset Barcode
+      </text>
+    </g>
+  
+
+    <g id="uc_gen_qr" class="usecase" >
+      <ellipse cx="1280" cy="880" rx="175" ry="36" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="3" />
+      <text x="1280" y="886" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        Generate / Print QR Code
+      </text>
+    </g>
+  
+
+    <g id="uc_assign" class="usecase" >
+      <ellipse cx="1280" cy="1060" rx="145" ry="38" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="3" />
+      <text x="1280" y="1066" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        Assign Asset
+      </text>
+    </g>
+  
+
+    <g id="uc_transfer" class="usecase" >
+      <ellipse cx="1280" cy="1160" rx="145" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="1280" y="1166" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        Transfer Asset
+      </text>
+    </g>
+  
+
+    <g id="uc_return_asset" class="usecase" >
+      <ellipse cx="1280" cy="1260" rx="145" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="1280" y="1266" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        Return Asset
+      </text>
+    </g>
+  
+
+    <g id="uc_login" class="usecase" >
+      <ellipse cx="1800" cy="240" rx="165" ry="40" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="3" />
+      <text x="1800" y="246" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        Login / Authentication
+      </text>
+    </g>
+  
+
+    <g id="uc_track_history" class="usecase" filter="url(#hub_shadow)">
+      <ellipse cx="1800" cy="1180" rx="175" ry="44" fill="#FEF3C7" stroke="#D97706" stroke-width="3" />
+      <text x="1800" y="1186" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        Track Asset History
+      </text>
+    </g>
+  
+
+    <g id="uc_scan_qr" class="usecase" >
+      <ellipse cx="1800" cy="1740" rx="160" ry="40" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="3" />
+      <text x="1800" y="1746" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        Scan QR Code
+      </text>
+    </g>
+  
+
+    <g id="uc_calc_deprec" class="usecase" >
+      <ellipse cx="2320" cy="310" rx="165" ry="40" fill="#FEF3C7" stroke="#D97706" stroke-width="3" />
+      <text x="2320" y="316" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        Calculate Depreciation
+      </text>
+    </g>
+  
+
+    <g id="uc_view_fin_sum" class="usecase" >
+      <ellipse cx="2320" cy="410" rx="170" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="2320" y="416" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        View Financial Summary
+      </text>
+    </g>
+  
+
+    <g id="uc_view_audit_logs" class="usecase" >
+      <ellipse cx="2320" cy="590" rx="155" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="2320" y="596" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        View Audit Logs
+      </text>
+    </g>
+  
+
+    <g id="uc_export_reports" class="usecase" >
+      <ellipse cx="2320" cy="700" rx="150" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="2320" y="706" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        Export Reports
+      </text>
+    </g>
+  
+
+    <g id="uc_create_maint" class="usecase" >
+      <ellipse cx="2320" cy="990" rx="180" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="2320" y="996" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        Create Maintenance Record
+      </text>
+    </g>
+  
+
+    <g id="uc_update_maint" class="usecase" >
+      <ellipse cx="2320" cy="1080" rx="180" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="2320" y="1086" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        Update Maintenance Status
+      </text>
+    </g>
+  
+
+    <g id="uc_view_maint_hist" class="usecase" >
+      <ellipse cx="2320" cy="1170" rx="175" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="2320" y="1176" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        View Maintenance History
+      </text>
+    </g>
+  
+
+    <g id="uc_record_inv" class="usecase" >
+      <ellipse cx="2320" cy="1360" rx="175" ry="36" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="3" />
+      <text x="2320" y="1366" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        Record Inventory Results
+      </text>
+    </g>
+  
+
+    <g id="uc_public_verify" class="usecase" >
+      <ellipse cx="2420" cy="1740" rx="185" ry="42" fill="#DCFCE7" stroke="#16A34A" stroke-width="3" />
+      <text x="2420" y="1746" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        Public Asset Verification
+      </text>
+    </g>
+  
+
+    <g id="uc_view_book_val" class="usecase" >
+      <ellipse cx="2860" cy="250" rx="175" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="2860" y="256" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        View Current Book Value
+      </text>
+    </g>
+  
+
+    <g id="uc_view_cap_val" class="usecase" >
+      <ellipse cx="2860" cy="340" rx="195" ry="34" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="2860" y="346" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        View University Capital Valuation
+      </text>
+    </g>
+  
+
+    <g id="uc_audit_records" class="usecase" >
+      <ellipse cx="2860" cy="590" rx="165" ry="38" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="3" />
+      <text x="2860" y="596" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        Audit Asset Records
+      </text>
+    </g>
+  
+
+    <g id="uc_view_reports" class="usecase" >
+      <ellipse cx="2860" cy="700" rx="150" ry="36" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="3" />
+      <text x="2860" y="706" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        View Reports
+      </text>
+    </g>
+  
+
+    <g id="uc_manage_maint" class="usecase" >
+      <ellipse cx="2860" cy="1080" rx="165" ry="38" fill="#EFF6FF" stroke="#1D4ED8" stroke-width="3" />
+      <text x="2860" y="1086" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        Manage Maintenance
+      </text>
+    </g>
+  
+
+    <g id="uc_perform_inv" class="usecase" >
+      <ellipse cx="2860" cy="1360" rx="160" ry="36" fill="#FFFFFF" stroke="#1E3A8A" stroke-width="2" />
+      <text x="2860" y="1366" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="600" fill="#1E293B">
+        Perform Inventory
+      </text>
+    </g>
+  
+  </g>
+
+
+  <!-- Actors -->
+  <g id="actors">
+
+    <g id="actor_admin" class="actor">
+      <!-- Head -->
+      <circle cx="210" cy="316" r="22" fill="#FFFFFF" stroke="#0F172A" stroke-width="3.5" />
+      <!-- Torso -->
+      <line x1="210" y1="338" x2="210" y2="378" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Arms -->
+      <line x1="182" y1="350" x2="238" y2="350" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Legs -->
+      <line x1="210" y1="378" x2="186" y2="414" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <line x1="210" y1="378" x2="234" y2="414" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Name -->
+      <text x="210" y="424" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        <tspan x="210" dy="0">System Administrator</tspan>
+      </text>
+      <!-- Subtitle Role -->
+      <text x="210" y="450" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-style="italic" fill="#64748B">
+        User & System Governance
+      </text>
+    </g>
+  
+
+    <g id="actor_pao" class="actor">
+      <!-- Head -->
+      <circle cx="210" cy="746" r="22" fill="#FFFFFF" stroke="#0F172A" stroke-width="3.5" />
+      <!-- Torso -->
+      <line x1="210" y1="768" x2="210" y2="808" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Arms -->
+      <line x1="182" y1="780" x2="238" y2="780" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Legs -->
+      <line x1="210" y1="808" x2="186" y2="844" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <line x1="210" y1="808" x2="234" y2="844" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Name -->
+      <text x="210" y="854" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        <tspan x="210" dy="0">Property Administration</tspan><tspan x="210" dy="22">Officer (PAO)</tspan>
+      </text>
+      <!-- Subtitle Role -->
+      <text x="210" y="902" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-style="italic" fill="#64748B">
+        Central Asset Custodian
+      </text>
+    </g>
+  
+
+    <g id="actor_dept_head" class="actor">
+      <!-- Head -->
+      <circle cx="210" cy="1146" r="22" fill="#FFFFFF" stroke="#0F172A" stroke-width="3.5" />
+      <!-- Torso -->
+      <line x1="210" y1="1168" x2="210" y2="1208" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Arms -->
+      <line x1="182" y1="1180" x2="238" y2="1180" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Legs -->
+      <line x1="210" y1="1208" x2="186" y2="1244" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <line x1="210" y1="1208" x2="234" y2="1244" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Name -->
+      <text x="210" y="1254" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        <tspan x="210" dy="0">Department Head</tspan>
+      </text>
+      <!-- Subtitle Role -->
+      <text x="210" y="1280" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-style="italic" fill="#64748B">
+        Department Custody & Approvals
+      </text>
+    </g>
+  
+
+    <g id="actor_staff" class="actor">
+      <!-- Head -->
+      <circle cx="210" cy="1526" r="22" fill="#FFFFFF" stroke="#0F172A" stroke-width="3.5" />
+      <!-- Torso -->
+      <line x1="210" y1="1548" x2="210" y2="1588" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Arms -->
+      <line x1="182" y1="1560" x2="238" y2="1560" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Legs -->
+      <line x1="210" y1="1588" x2="186" y2="1624" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <line x1="210" y1="1588" x2="234" y2="1624" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Name -->
+      <text x="210" y="1634" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        <tspan x="210" dy="0">Staff Member</tspan>
+      </text>
+      <!-- Subtitle Role -->
+      <text x="210" y="1660" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-style="italic" fill="#64748B">
+        Asset End-User / Requester
+      </text>
+    </g>
+  
+
+    <g id="actor_auditor" class="actor">
+      <!-- Head -->
+      <circle cx="3390" cy="366" r="22" fill="#FFFFFF" stroke="#0F172A" stroke-width="3.5" />
+      <!-- Torso -->
+      <line x1="3390" y1="388" x2="3390" y2="428" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Arms -->
+      <line x1="3362" y1="400" x2="3418" y2="400" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Legs -->
+      <line x1="3390" y1="428" x2="3366" y2="464" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <line x1="3390" y1="428" x2="3414" y2="464" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Name -->
+      <text x="3390" y="474" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        <tspan x="3390" dy="0">Internal Auditor</tspan>
+      </text>
+      <!-- Subtitle Role -->
+      <text x="3390" y="500" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-style="italic" fill="#64748B">
+        Compliance & Asset Audit
+      </text>
+    </g>
+  
+
+    <g id="actor_tech" class="actor">
+      <!-- Head -->
+      <circle cx="3390" cy="1006" r="22" fill="#FFFFFF" stroke="#0F172A" stroke-width="3.5" />
+      <!-- Torso -->
+      <line x1="3390" y1="1028" x2="3390" y2="1068" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Arms -->
+      <line x1="3362" y1="1040" x2="3418" y2="1040" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Legs -->
+      <line x1="3390" y1="1068" x2="3366" y2="1104" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <line x1="3390" y1="1068" x2="3414" y2="1104" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Name -->
+      <text x="3390" y="1114" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        <tspan x="3390" dy="0">Maintenance</tspan><tspan x="3390" dy="22">Technician</tspan>
+      </text>
+      <!-- Subtitle Role -->
+      <text x="3390" y="1162" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-style="italic" fill="#64748B">
+        Repairs & Field Service
+      </text>
+    </g>
+  
+
+    <g id="actor_inventory" class="actor">
+      <!-- Head -->
+      <circle cx="3390" cy="1366" r="22" fill="#FFFFFF" stroke="#0F172A" stroke-width="3.5" />
+      <!-- Torso -->
+      <line x1="3390" y1="1388" x2="3390" y2="1428" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Arms -->
+      <line x1="3362" y1="1400" x2="3418" y2="1400" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Legs -->
+      <line x1="3390" y1="1428" x2="3366" y2="1464" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <line x1="3390" y1="1428" x2="3414" y2="1464" stroke="#0F172A" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Name -->
+      <text x="3390" y="1474" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        <tspan x="3390" dy="0">Inventory Person</tspan>
+      </text>
+      <!-- Subtitle Role -->
+      <text x="3390" y="1500" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-style="italic" fill="#64748B">
+        Physical Stock Auditor
+      </text>
+    </g>
+  
+
+    <g id="actor_public_user" class="actor">
+      <!-- Head -->
+      <circle cx="3390" cy="1706" r="22" fill="#FFFFFF" stroke="#15803D" stroke-width="3.5" />
+      <!-- Torso -->
+      <line x1="3390" y1="1728" x2="3390" y2="1768" stroke="#15803D" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Arms -->
+      <line x1="3362" y1="1740" x2="3418" y2="1740" stroke="#15803D" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Legs -->
+      <line x1="3390" y1="1768" x2="3366" y2="1804" stroke="#15803D" stroke-width="3.5" stroke-linecap="round" />
+      <line x1="3390" y1="1768" x2="3414" y2="1804" stroke="#15803D" stroke-width="3.5" stroke-linecap="round" />
+      <!-- Name -->
+      <text x="3390" y="1814" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#0F172A">
+        <tspan x="3390" dy="0">Public User / Anyone</tspan>
+      </text>
+      <!-- Subtitle Role -->
+      <text x="3390" y="1840" text-anchor="middle" font-family="'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="13" font-style="italic" fill="#64748B">
+        Unauthenticated Verification
+      </text>
+    </g>
+  
+  </g>
+
+</svg>

@@ -159,7 +159,7 @@ export async function createAssetTypeAction(
 
 export async function updateAssetTypeAction(
   id: string,
-  data: { name?: string; categoryId?: string; description?: string; icon?: string; isActive?: boolean; displayOrder?: number }
+  data: { name?: string; categoryId?: string; description?: string; icon?: string; isActive?: boolean; displayOrder?: number; includeAssetImage?: boolean }
 ) {
   try {
     await verifyAdmin();
@@ -171,6 +171,7 @@ export async function updateAssetTypeAction(
         description: data.description,
         icon: data.icon,
         isActive: data.isActive,
+        includeAssetImage: data.includeAssetImage,
         displayOrder: data.displayOrder
       }
     });
@@ -180,6 +181,22 @@ export async function updateAssetTypeAction(
   } catch (error: unknown) {
     const err = error as Error;
     return { error: err.message || "Failed to update asset type." };
+  }
+}
+
+export async function toggleAssetTypeImageAction(id: string, includeAssetImage: boolean) {
+  try {
+    await verifyAdmin();
+    const type = await prisma.assetType.update({
+      where: { id },
+      data: { includeAssetImage }
+    });
+
+    revalidatePath("/admin/asset-form-builder");
+    return { success: true, type };
+  } catch (error: unknown) {
+    const err = error as Error;
+    return { error: err.message || "Failed to update asset image setting." };
   }
 }
 

@@ -94,10 +94,10 @@ export default auth((req) => {
   if (effectivePath.startsWith("/staff") && userRole !== ROLES.STAFF_MEMBER) {
     return NextResponse.redirect(new URL(getRoleDashboard(userRole), nextUrl));
   }
-  if (effectivePath.startsWith("/tech") && userRole !== ROLES.MAINTENANCE_TECHNICIAN) {
+  if (effectivePath.startsWith("/tech") && userRole !== ROLES.MAINTENANCE_TECHNICIAN && userRole !== ROLES.SYSTEM_ADMINISTRATOR) {
     return NextResponse.redirect(new URL(getRoleDashboard(userRole), nextUrl));
   }
-  if (effectivePath.startsWith("/auditor") && userRole !== ROLES.INTERNAL_AUDITOR) {
+  if (effectivePath.startsWith("/auditor") && userRole !== ROLES.INTERNAL_AUDITOR && userRole !== ROLES.SYSTEM_ADMINISTRATOR) {
     return NextResponse.redirect(new URL(getRoleDashboard(userRole), nextUrl));
   }
   if (

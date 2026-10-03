@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 660" width="1000" height="660">
+  <defs>
+    <marker id="assign_arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#1E3A8A"/>
+    </marker>
+  </defs>
+
+  <rect width="1000" height="660" fill="#FFFFFF"/>
+
+  <!-- Title Header -->
+  <text x="500" y="35" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="20" font-weight="800" fill="#0F172A">
+    Figure 3.8: Activity Diagram – Two-Phase Custody Handshake Workflow
+  </text>
+  <text x="500" y="58" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="500" fill="#64748B">
+    Assignment Creation, Pending Acceptance State, Custodian Verification &amp; Rejection Routing
+  </text>
+
+  <!-- SWIMLANES -->
+  <!-- Lane 1: Property Admin Officer -->
+  <rect x="50" y="80" width="280" height="550" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+  <rect x="50" y="80" width="280" height="30" fill="#E2E8F0"/>
+  <text x="190" y="100" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#1E293B">Property Admin Officer (PAO)</text>
+
+  <!-- Lane 2: Application System & Database -->
+  <rect x="330" y="80" width="340" height="550" fill="#F0F9FF" stroke="#0284C7" stroke-width="1.5"/>
+  <rect x="330" y="80" width="340" height="30" fill="#BAE6FD"/>
+  <text x="500" y="100" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#0369A1">System Engine &amp; DB Transaction</text>
+
+  <!-- Lane 3: Staff Member (Custodian) -->
+  <rect x="670" y="80" width="280" height="550" fill="#FEF3C7" stroke="#D97706" stroke-width="1.5"/>
+  <rect x="670" y="80" width="280" height="30" fill="#FDE68A"/>
+  <text x="810" y="100" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#B45309">Staff Member (Assignee)</text>
+
+  <!-- Start -->
+  <circle cx="190" cy="135" r="10" fill="#0F172A"/>
+
+  <!-- Step 1: PAO selects asset & staff -->
+  <rect x="90" y="165" width="200" height="42" rx="8" fill="#FFFFFF" stroke="#64748B" stroke-width="1.5"/>
+  <text x="190" y="185" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0F172A">Select Available Asset</text>
+  <text x="190" y="198" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">&amp; Designate Staff Member</text>
+
+  <line x1="190" y1="145" x2="190" y2="165" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#assign_arrow)"/>
+
+  <!-- Flow to System -->
+  <path d="M 290 186 L 380 186" fill="none" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#assign_arrow)"/>
+
+  <!-- Step 2: System Validates & Sets Pending -->
+  <rect x="380" y="165" width="240" height="52" rx="8" fill="#FFFFFF" stroke="#0284C7" stroke-width="1.5"/>
+  <text x="500" y="185" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0369A1">Create Assignment Record</text>
+  <text x="500" y="198" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">Status: PENDING_ACCEPTANCE</text>
+  <text x="500" y="210" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#0284C7">Asset Status: PENDING_ASSIGNMENT</text>
+
+  <!-- Flow to Notification -->
+  <line x1="500" y1="217" x2="500" y2="245" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#assign_arrow)"/>
+
+  <rect x="380" y="245" width="240" height="38" rx="8" fill="#FFFFFF" stroke="#0284C7" stroke-width="1.5"/>
+  <text x="500" y="268" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#0369A1">Dispatch In-App Notification</text>
+
+  <!-- Flow to Staff -->
+  <path d="M 620 264 L 720 264" fill="none" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#assign_arrow)"/>
+
+  <!-- Step 3: Staff Reviews Notification -->
+  <rect x="720" y="245" width="180" height="42" rx="8" fill="#FFFFFF" stroke="#D97706" stroke-width="1.5"/>
+  <text x="810" y="265" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#B45309">Receive Notification &amp;</text>
+  <text x="810" y="278" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#78350F">Inspect Physical Asset</text>
+
+  <!-- Decision: Accept or Reject? -->
+  <polygon points="810,320 850,345 810,370 770,345" fill="#FEF08A" stroke="#CA8A04" stroke-width="1.5"/>
+  <line x1="810" y1="287" x2="810" y2="320" stroke="#1E3A8A" stroke-width="1.5" marker-end="url(#assign_arrow)"/>
+  <text x="810" y="349" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="700" fill="#854D0E">Accept?</text>
+
+  <!-- BRANCH 1: ACCEPT -->
+  <path d="M 810 370 L 810 430 L 620 430" fill="none" stroke="#16A34A" stroke-width="1.5" marker-end="url(#assign_arrow)"/>
+  <text x="730" y="420" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="700" fill="#16A34A">[Yes] Accept Custody</text>
+
+  <rect x="380" y="410" width="240" height="52" rx="8" fill="#FFFFFF" stroke="#16A34A" stroke-width="1.5"/>
+  <text x="500" y="430" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#15803D">Assignment: ACCEPTED</text>
+  <text x="500" y="443" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#475569">Asset Status: ASSIGNED</text>
+  <text x="500" y="455" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#16A34A">Audit Log: CUSTODY_ACCEPTED</text>
+
+  <!-- Flow to End Node 1 -->
+  <line x1="500" y1="462" x2="500" y2="500" stroke="#16A34A" stroke-width="1.5" marker-end="url(#assign_arrow)"/>
+  <circle cx="500" cy="515" r="10" fill="#FFFFFF" stroke="#16A34A" stroke-width="2"/>
+  <circle cx="500" cy="515" r="6" fill="#16A34A"/>
+  <text x="500" y="538" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="700" fill="#15803D">Active Custody Confirmed</text>
+
+  <!-- BRANCH 2: REJECT -->
+  <path d="M 770 345 L 620 345" fill="none" stroke="#DC2626" stroke-width="1.5" marker-end="url(#assign_arrow)"/>
+  <text x="690" y="338" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="700" fill="#DC2626">[No] Reject</text>
+
+  <!-- Action: Enter Rejection Reason -->
+  <rect x="380" y="325" width="240" height="42" rx="8" fill="#FFFFFF" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="500" y="343" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#B91C1C">Record Rejection Reason</text>
+  <text x="500" y="357" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#7F1D1D">Asset Status Reverts to ACTIVE</text>
+
+  <!-- Flow back to PAO for Reassignment -->
+  <path d="M 380 345 L 290 345" fill="none" stroke="#DC2626" stroke-width="1.5" marker-end="url(#assign_arrow)"/>
+
+  <rect x="90" y="325" width="200" height="42" rx="8" fill="#FFFFFF" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="190" y="343" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="600" fill="#B91C1C">Review Rejection Alert</text>
+  <text x="190" y="357" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#7F1D1D">&amp; Reassign to Alternate Staff</text>
+
+  <!-- Flow from review to step 1 -->
+  <path d="M 190 367 L 190 410 L 120 410 L 120 207 L 90 207" fill="none" stroke="#64748B" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="145" y="425" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#64748B">Re-trigger assignment</text>
+
+</svg>

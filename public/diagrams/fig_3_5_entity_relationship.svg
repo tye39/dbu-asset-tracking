@@ -1,0 +1,298 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1250 880" width="1250" height="880">
+  <defs>
+    <filter id="erd_shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0F172A" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="1250" height="880" fill="#FFFFFF"/>
+
+  <!-- Title Header -->
+  <text x="625" y="35" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="22" font-weight="800" fill="#0F172A">
+    Figure 3.5: Entity-Relationship Diagram – Core Relational Database Schema
+  </text>
+  <text x="625" y="58" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="500" fill="#64748B">
+    Major Entities, Primary &amp; Foreign Keys, Relational Associations, and Cardinalities
+  </text>
+
+  <!-- ENTITY STYLING HELPER MACROS (Conceptually arranged in 4 columns / rows) -->
+
+  <!-- 1. ROLE (Top Left) -->
+  <g transform="translate(40, 80)">
+    <rect width="180" height="110" rx="8" fill="#F8FAFC" stroke="#334155" stroke-width="1.8" filter="url(#erd_shadow)"/>
+    <rect width="180" height="26" rx="6" fill="#1E293B"/>
+    <text x="90" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">Role</text>
+    <text x="10" y="44" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">PK  id : UUID</text>
+    <line x1="0" y1="52" x2="180" y2="52" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="10" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">name : RoleName (enum)</text>
+    <text x="10" y="88" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">description : String?</text>
+    <text x="10" y="104" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">createdAt : DateTime</text>
+  </g>
+
+  <!-- 2. FACULTY (Top Center-Left) -->
+  <g transform="translate(40, 220)">
+    <rect width="180" height="95" rx="8" fill="#F8FAFC" stroke="#475569" stroke-width="1.8" filter="url(#erd_shadow)"/>
+    <rect width="180" height="26" rx="6" fill="#334155"/>
+    <text x="90" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">Faculty</text>
+    <text x="10" y="44" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">PK  id : UUID</text>
+    <line x1="0" y1="52" x2="180" y2="52" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="10" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">name : String</text>
+    <text x="10" y="88" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">code : String (unique)</text>
+  </g>
+
+  <!-- 3. ORGANIZATIONAL UNIT (DEPARTMENT) (Center Left) -->
+  <g transform="translate(260, 150)">
+    <rect width="210" height="165" rx="8" fill="#F0F9FF" stroke="#0284C7" stroke-width="2" filter="url(#erd_shadow)"/>
+    <rect width="210" height="26" rx="6" fill="#0284C7"/>
+    <text x="105" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">OrganizationalUnit</text>
+    <text x="10" y="44" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">PK  id : UUID</text>
+    <line x1="0" y1="52" x2="210" y2="52" stroke="#BAE6FD" stroke-width="1"/>
+    <text x="10" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0369A1">FK  facultyId : UUID?</text>
+    <text x="10" y="88" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0369A1">FK  parentId : UUID?</text>
+    <text x="10" y="106" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">name : String</text>
+    <text x="10" y="124" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">code : String (unique)</text>
+    <text x="10" y="142" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">type : String (COLLEGE/DEPT)</text>
+    <text x="10" y="158" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">status : String (ACTIVE)</text>
+  </g>
+
+  <!-- 4. USER (Center-Top) -->
+  <g transform="translate(260, 350)">
+    <rect width="210" height="175" rx="8" fill="#F8FAFC" stroke="#1E3A8A" stroke-width="2" filter="url(#erd_shadow)"/>
+    <rect width="210" height="26" rx="6" fill="#1E3A8A"/>
+    <text x="105" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">User</text>
+    <text x="10" y="44" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">PK  id : UUID</text>
+    <line x1="0" y1="52" x2="210" y2="52" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="10" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#1E40AF">FK  roleId : UUID</text>
+    <text x="10" y="88" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#1E40AF">FK  departmentId : UUID?</text>
+    <text x="10" y="106" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">name : String</text>
+    <text x="10" y="124" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">email : String (unique)</text>
+    <text x="10" y="142" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">passwordHash : String</text>
+    <text x="10" y="160" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">employeeId : String?</text>
+    <text x="10" y="174" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#64748B">mustChangePassword : Bool</text>
+  </g>
+
+  <!-- 5. ASSET CATEGORY (Top Right-Center) -->
+  <g transform="translate(530, 80)">
+    <rect width="190" height="110" rx="8" fill="#F8FAFC" stroke="#0D9488" stroke-width="1.8" filter="url(#erd_shadow)"/>
+    <rect width="190" height="26" rx="6" fill="#0D9488"/>
+    <text x="95" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">AssetCategory</text>
+    <text x="10" y="44" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">PK  id : UUID</text>
+    <line x1="0" y1="52" x2="190" y2="52" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="10" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">name : String (unique)</text>
+    <text x="10" y="88" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">code : String (unique)</text>
+    <text x="10" y="104" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">isActive : Boolean</text>
+  </g>
+
+  <!-- 6. ASSET TYPE (Middle Right-Center) -->
+  <g transform="translate(530, 220)">
+    <rect width="190" height="115" rx="8" fill="#F8FAFC" stroke="#0D9488" stroke-width="1.8" filter="url(#erd_shadow)"/>
+    <rect width="190" height="26" rx="6" fill="#0F766E"/>
+    <text x="95" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">AssetType</text>
+    <text x="10" y="44" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">PK  id : UUID</text>
+    <line x1="0" y1="52" x2="190" y2="52" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="10" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0F766E">FK  categoryId : UUID</text>
+    <text x="10" y="88" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">name : String</text>
+    <text x="10" y="106" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">displayOrder : Int</text>
+  </g>
+
+  <!-- 7. ASSET (Central Entity) -->
+  <g transform="translate(520, 370)">
+    <rect width="230" height="245" rx="8" fill="#FEF3C7" stroke="#D97706" stroke-width="2.5" filter="url(#erd_shadow)"/>
+    <rect width="230" height="28" rx="6" fill="#D97706"/>
+    <text x="115" y="19" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="800" fill="#FFFFFF">Asset</text>
+    <text x="10" y="46" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">PK  id : UUID</text>
+    <text x="10" y="62" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#B45309">UK  publicId : UUID (QR target)</text>
+    <line x1="0" y1="70" x2="230" y2="70" stroke="#FDE68A" stroke-width="1"/>
+    <text x="10" y="86" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#92400E">FK  categoryId : UUID</text>
+    <text x="10" y="102" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#92400E">FK  assetTypeId : UUID?</text>
+    <text x="10" y="118" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#92400E">FK  departmentId : UUID</text>
+    <text x="10" y="134" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#92400E">FK  supplierId : UUID?</text>
+    <text x="10" y="152" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">assetCode : String (unique)</text>
+    <text x="10" y="168" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">serialNumber : String (unique)</text>
+    <text x="10" y="184" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">status : AssetStatus (enum)</text>
+    <text x="10" y="200" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">purchaseCost : Decimal(10,2)</text>
+    <text x="10" y="216" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">salvageValue : Decimal(10,2)</text>
+    <text x="10" y="232" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">usefulLife : Int (years)</text>
+    <text x="10" y="246" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#64748B">campus, building, roomNumber</text>
+  </g>
+
+  <!-- 8. QR CODE (Below Asset) -->
+  <g transform="translate(530, 645)">
+    <rect width="210" height="95" rx="8" fill="#F8FAFC" stroke="#475569" stroke-width="1.8" filter="url(#erd_shadow)"/>
+    <rect width="210" height="26" rx="6" fill="#475569"/>
+    <text x="105" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">QRCode</text>
+    <text x="10" y="44" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">PK  id : UUID</text>
+    <line x1="0" y1="52" x2="210" y2="52" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="10" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">FK  assetId : UUID (1-to-1 unique)</text>
+    <text x="10" y="86" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">qrCodeString : String (/verify/...)</text>
+    <text x="10" y="100" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">barcodeString : String (Code 39)</text>
+  </g>
+
+  <!-- 9. ASSIGNMENT (Center-Right) -->
+  <g transform="translate(790, 200)">
+    <rect width="210" height="165" rx="8" fill="#F0FDF4" stroke="#16A34A" stroke-width="2" filter="url(#erd_shadow)"/>
+    <rect width="210" height="26" rx="6" fill="#16A34A"/>
+    <text x="105" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">Assignment</text>
+    <text x="10" y="44" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">PK  id : UUID</text>
+    <line x1="0" y1="52" x2="210" y2="52" stroke="#BBF7D0" stroke-width="1"/>
+    <text x="10" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#15803D">FK  assetId : UUID</text>
+    <text x="10" y="88" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#15803D">FK  assignedToUserId : UUID?</text>
+    <text x="10" y="106" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#15803D">FK  departmentId : UUID?</text>
+    <text x="10" y="124" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#15803D">FK  assignedByUserId : UUID</text>
+    <text x="10" y="142" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">status : AssignmentStatus</text>
+    <text x="10" y="158" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">rejectionReason : String?</text>
+  </g>
+
+  <!-- 10. RETURN (Right-Center) -->
+  <g transform="translate(1030, 200)">
+    <rect width="180" height="145" rx="8" fill="#F8FAFC" stroke="#16A34A" stroke-width="1.8" filter="url(#erd_shadow)"/>
+    <rect width="180" height="26" rx="6" fill="#15803D"/>
+    <text x="90" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">Return</text>
+    <text x="10" y="44" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">PK  id : UUID</text>
+    <line x1="0" y1="52" x2="180" y2="52" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="10" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#15803D">FK  assignmentId : UUID</text>
+    <text x="10" y="88" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#15803D">FK  assetId : UUID</text>
+    <text x="10" y="106" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">condition : ReturnCondition</text>
+    <text x="10" y="124" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">isDamaged : Boolean</text>
+    <text x="10" y="140" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">returnedAt : DateTime</text>
+  </g>
+
+  <!-- 11. TRANSFER (Top Right) -->
+  <g transform="translate(790, 40)">
+    <rect width="210" height="135" rx="8" fill="#F8FAFC" stroke="#0284C7" stroke-width="1.8" filter="url(#erd_shadow)"/>
+    <rect width="210" height="26" rx="6" fill="#0369A1"/>
+    <text x="105" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">Transfer</text>
+    <text x="10" y="44" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">PK  id : UUID</text>
+    <line x1="0" y1="52" x2="210" y2="52" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="10" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0284C7">FK  assetId : UUID</text>
+    <text x="10" y="88" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#0284C7">FK  from/toDepartmentId : UUID?</text>
+    <text x="10" y="106" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">status : TransferStatus</text>
+    <text x="10" y="122" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">requestedBy, approvedBy : UUID</text>
+  </g>
+
+  <!-- 12. MAINTENANCE (Right-Bottom) -->
+  <g transform="translate(790, 400)">
+    <rect width="210" height="150" rx="8" fill="#FFFBEB" stroke="#D97706" stroke-width="1.8" filter="url(#erd_shadow)"/>
+    <rect width="210" height="26" rx="6" fill="#B45309"/>
+    <text x="105" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">Maintenance</text>
+    <text x="10" y="44" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">PK  id : UUID</text>
+    <line x1="0" y1="52" x2="210" y2="52" stroke="#FDE68A" stroke-width="1"/>
+    <text x="10" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#B45309">FK  assetId : UUID</text>
+    <text x="10" y="88" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#B45309">FK  assignedToId : UUID? (Tech)</text>
+    <text x="10" y="106" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">status : MaintenanceStatus</text>
+    <text x="10" y="124" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">maintenanceCost : Decimal</text>
+    <text x="10" y="140" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">priority : MaintenancePriority</text>
+  </g>
+
+  <!-- 13. INVENTORY VERIFICATION & SESSION (Bottom Right) -->
+  <g transform="translate(1030, 400)">
+    <rect width="180" height="165" rx="8" fill="#F0FDF4" stroke="#16A34A" stroke-width="1.8" filter="url(#erd_shadow)"/>
+    <rect width="180" height="26" rx="6" fill="#15803D"/>
+    <text x="90" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">InventorySession</text>
+    <text x="10" y="44" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">PK  id : UUID</text>
+    <line x1="0" y1="52" x2="180" y2="52" stroke="#BBF7D0" stroke-width="1"/>
+    <text x="10" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#15803D">FK  departmentId : UUID</text>
+    <text x="10" y="88" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#15803D">FK  inventoryPersonId : UUID</text>
+    <text x="10" y="106" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">sessionNumber : String (UQ)</text>
+    <text x="10" y="124" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">status : SessionStatus</text>
+    <text x="10" y="142" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">startDate, dueDate</text>
+    <text x="10" y="158" font-family="'Segoe UI', Arial, sans-serif" font-size="9" fill="#15803D">• verifications : Verification[]</text>
+  </g>
+
+  <!-- 14. ASSET REQUEST & APPEALS (Bottom Center-Left) -->
+  <g transform="translate(260, 560)">
+    <rect width="210" height="155" rx="8" fill="#F8FAFC" stroke="#4F46E5" stroke-width="1.8" filter="url(#erd_shadow)"/>
+    <rect width="210" height="26" rx="6" fill="#4338CA"/>
+    <text x="105" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">AssetRequest</text>
+    <text x="10" y="44" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">PK  id : UUID</text>
+    <line x1="0" y1="52" x2="210" y2="52" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="10" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#4338CA">FK  userId : UUID</text>
+    <text x="10" y="88" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#4338CA">FK  departmentId : UUID</text>
+    <text x="10" y="106" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">status : AssetRequestStatus</text>
+    <text x="10" y="124" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">quantity : Int</text>
+    <text x="10" y="140" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">FK  fulfilledAssetId : UUID?</text>
+  </g>
+
+  <!-- 15. AUDIT LOG (Bottom Left) -->
+  <g transform="translate(40, 560)">
+    <rect width="180" height="145" rx="8" fill="#F8FAFC" stroke="#7C3AED" stroke-width="1.8" filter="url(#erd_shadow)"/>
+    <rect width="180" height="26" rx="6" fill="#6D28D9"/>
+    <text x="90" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">AuditLog</text>
+    <text x="10" y="44" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">PK  id : UUID</text>
+    <line x1="0" y1="52" x2="180" y2="52" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="10" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#6D28D9">FK  userId : UUID?</text>
+    <text x="10" y="88" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#6D28D9">FK  assetId : UUID?</text>
+    <text x="10" y="106" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">action : String</text>
+    <text x="10" y="124" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">previousState, newState : Json?</text>
+    <text x="10" y="140" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#64748B">createdAt : DateTime</text>
+  </g>
+
+  <!-- 16. FINANCIAL AUDIT (Far Bottom Right) -->
+  <g transform="translate(790, 580)">
+    <rect width="210" height="135" rx="8" fill="#FAF5FF" stroke="#7C3AED" stroke-width="1.8" filter="url(#erd_shadow)"/>
+    <rect width="210" height="26" rx="6" fill="#6D28D9"/>
+    <text x="105" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">FinancialAudit</text>
+    <text x="10" y="44" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#0F172A">PK  id : UUID</text>
+    <line x1="0" y1="52" x2="210" y2="52" stroke="#E9D5FF" stroke-width="1"/>
+    <text x="10" y="70" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#6D28D9">FK  auditorId : UUID</text>
+    <text x="10" y="88" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#6D28D9">FK  departmentId : UUID?</text>
+    <text x="10" y="106" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">fiscalYear : String</text>
+    <text x="10" y="124" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">totalAssetValue : Decimal</text>
+  </g>
+
+  <!-- CARDINALITY CONNECTORS & RELATIONSHIP LINES -->
+  <!-- Role (1) -> User (0..*) -->
+  <path d="M 220 135 L 365 135 L 365 350" fill="none" stroke="#334155" stroke-width="1.5"/>
+  <text x="228" y="128" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#334155">1</text>
+  <text x="350" y="342" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#334155">0..*</text>
+
+  <!-- Faculty (1) -> OrgUnit (0..*) -->
+  <path d="M 220 260 L 260 260" fill="none" stroke="#475569" stroke-width="1.5"/>
+  <text x="228" y="254" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#475569">1</text>
+  <text x="245" y="254" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#475569">0..*</text>
+
+  <!-- OrgUnit (1) -> Asset (0..*) -->
+  <path d="M 470 230 L 510 230 L 510 420 L 520 420" fill="none" stroke="#0284C7" stroke-width="1.5"/>
+  <text x="475" y="222" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#0284C7">1</text>
+  <text x="502" y="414" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#0284C7">0..*</text>
+
+  <!-- Category (1) -> AssetType (1..*) -->
+  <path d="M 625 190 L 625 220" fill="none" stroke="#0D9488" stroke-width="1.5"/>
+  <text x="632" y="202" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#0D9488">1</text>
+  <text x="632" y="215" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#0D9488">1..*</text>
+
+  <!-- Category (1) -> Asset (0..*) -->
+  <path d="M 720 135 L 740 135 L 740 370" fill="none" stroke="#0D9488" stroke-width="1.5"/>
+  <text x="723" y="128" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#0D9488">1</text>
+  <text x="725" y="364" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#0D9488">0..*</text>
+
+  <!-- Asset (1) -> QRCode (1) -->
+  <path d="M 635 615 L 635 645" fill="none" stroke="#D97706" stroke-width="1.5"/>
+  <text x="642" y="628" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#D97706">1</text>
+  <text x="642" y="640" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#D97706">0..1</text>
+
+  <!-- Asset (1) -> Assignment (0..*) -->
+  <path d="M 750 420 L 770 420 L 770 280 L 790 280" fill="none" stroke="#16A34A" stroke-width="1.5"/>
+  <text x="753" y="412" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#16A34A">1</text>
+  <text x="775" y="274" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#16A34A">0..*</text>
+
+  <!-- Assignment (1) -> Return (0..1) -->
+  <path d="M 1000 270 L 1030 270" fill="none" stroke="#16A34A" stroke-width="1.5"/>
+  <text x="1005" y="264" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#16A34A">1</text>
+  <text x="1015" y="264" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#16A34A">0..1</text>
+
+  <!-- Asset (1) -> Maintenance (0..*) -->
+  <path d="M 750 470 L 790 470" fill="none" stroke="#D97706" stroke-width="1.5"/>
+  <text x="755" y="464" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#D97706">1</text>
+  <text x="775" y="464" font-family="'Segoe UI', sans-serif" font-size="10" font-weight="700" fill="#D97706">0..*</text>
+
+  <!-- Legend Footer -->
+  <rect x="40" y="780" width="1170" height="70" rx="8" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
+  <text x="50" y="805" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#0F172A">Relational Schema Integrity Rules:</text>
+  <text x="50" y="825" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#475569">
+    • <b>Primary Keys (PK):</b> Generated as Version-4 UUIDs ensuring collision-free globally unique identifiers across distributed nodes.
+  </text>
+  <text x="50" y="842" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#475569">
+    • <b>Public Key Security:</b> Asset table features non-guessable <code>publicId</code> UUIDs explicitly detached from internal database PKs for public QR verification URLs.
+  </text>
+</svg>

@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/db";
 import { createAuditLog } from "./audit";
-import { Prisma, AssetStatus, FundingSource, AssignmentStatus } from "@prisma/client";
+import { Prisma, AssetStatus, FundingSource, AssignmentStatus, IdentificationMethod } from "@prisma/client";
 import { calculateAssetFinancials } from "./financials";
 import { getAppBaseUrl } from "@/lib/privacy";
+import { isBuildingAsset } from "@/lib/barcode";
 
 export async function registerAsset(data: {
   name: string;
@@ -40,6 +41,7 @@ export async function registerAsset(data: {
   attachmentUrl?: string;
   remarks?: string;
   assignedToId?: string;
+  identificationMethod?: IdentificationMethod | "QR" | "BARCODE" | "NONE";
 
   // Financial fields
   fundingSource?: FundingSource;
@@ -279,6 +281,21 @@ export async function registerAsset(data: {
 
   // Transaction: Create Asset, images, QR Code, and Dynamic Custom Field Values
   const asset = await prisma.$transaction(async (tx) => {
+    // Validate building rule for identification method
+    const categoryRecord = await prisma.assetCategory.findUnique({
+      where: { id: data.categoryId },
+      select: { id: true, code: true, name: true }
+    });
+    const assetTypeRecord = data.assetTypeId ? await prisma.assetType.findUnique({
+      where: { id: data.assetTypeId },
+      select: { id: true, name: true }
+    }) : null;
+
+    const isBuilding = isBuildingAsset(categoryRecord, assetTypeRecord);
+    const finalIdentificationMethod: IdentificationMethod = isBuilding
+      ? IdentificationMethod.NONE
+      : ((data.identificationMethod as IdentificationMethod) || IdentificationMethod.NONE);
+
     const newAsset = await tx.asset.create({
       data: {
         name: data.name,
@@ -313,6 +330,7 @@ export async function registerAsset(data: {
         condition: data.condition || null,
         attachmentUrl: data.attachmentUrl || null,
         remarks: data.remarks || null,
+        identificationMethod: finalIdentificationMethod,
 
         // Financial fields
         fundingSource: data.fundingSource || null
@@ -333,13 +351,23 @@ export async function registerAsset(data: {
     }
 
     const host = getAppBaseUrl();
-    await tx.qRCode.create({
-      data: {
-        assetId: newAsset.id,
-        qrCodeString: `${host}/asset/verify/${newAsset.publicId}`,
-        barcodeString: newAsset.assetCode,
-      },
-    });
+    if (finalIdentificationMethod === IdentificationMethod.QR) {
+      await tx.qRCode.create({
+        data: {
+          assetId: newAsset.id,
+          qrCodeString: `${host}/asset/verify/${newAsset.publicId}`,
+          barcodeString: newAsset.assetCode,
+        },
+      });
+    } else if (finalIdentificationMethod === IdentificationMethod.BARCODE) {
+      await tx.qRCode.create({
+        data: {
+          assetId: newAsset.id,
+          qrCodeString: "",
+          barcodeString: newAsset.assetCode,
+        },
+      });
+    }
 
     // Save Dynamic Form Builder custom field values
     if (data.dynamicValues) {
@@ -404,9 +432,25 @@ export async function updateAsset(id: string, data: {
   salvageValue?: number;
   warrantyStartDate?: Date;
   warrantyEndDate?: Date;
+  identificationMethod?: IdentificationMethod | "QR" | "BARCODE" | "NONE";
 }, actorId: string) {
   const previous = await getAssetById(id);
   if (!previous) throw new Error("Asset not found");
+
+  const targetCategory = data.categoryId
+    ? await prisma.assetCategory.findUnique({ where: { id: data.categoryId } })
+    : previous.category;
+  const isBuilding = isBuildingAsset(targetCategory, previous.assetType);
+
+  if (isBuilding && data.identificationMethod && data.identificationMethod !== "NONE") {
+    throw new Error("QR/barcode identification is not applicable to buildings.");
+  }
+
+  const newMethod: IdentificationMethod = isBuilding
+    ? IdentificationMethod.NONE
+    : (data.identificationMethod !== undefined
+        ? (data.identificationMethod as IdentificationMethod)
+        : previous.identificationMethod);
 
   const cost = data.purchaseCost !== undefined ? Number(data.purchaseCost) : Number(previous.purchaseCost || 0);
 
@@ -437,11 +481,43 @@ export async function updateAsset(id: string, data: {
         salvageValue: data.salvageValue !== undefined ? new Prisma.Decimal(data.salvageValue) : undefined,
         warrantyStartDate: data.warrantyStartDate,
         warrantyEndDate: data.warrantyEndDate,
-        warrantyExpiry: data.warrantyEndDate // legacy sync
+        warrantyExpiry: data.warrantyEndDate, // legacy sync
+        identificationMethod: newMethod,
       },
     });
 
-
+    const host = getAppBaseUrl();
+    if (newMethod === IdentificationMethod.QR) {
+      await tx.qRCode.upsert({
+        where: { assetId: id },
+        create: {
+          assetId: id,
+          qrCodeString: `${host}/asset/verify/${previous.publicId}`,
+          barcodeString: previous.assetCode,
+        },
+        update: {
+          qrCodeString: `${host}/asset/verify/${previous.publicId}`,
+          barcodeString: previous.assetCode,
+        },
+      });
+    } else if (newMethod === IdentificationMethod.BARCODE) {
+      await tx.qRCode.upsert({
+        where: { assetId: id },
+        create: {
+          assetId: id,
+          qrCodeString: "",
+          barcodeString: previous.assetCode,
+        },
+        update: {
+          qrCodeString: "",
+          barcodeString: previous.assetCode,
+        },
+      });
+    } else if (newMethod === IdentificationMethod.NONE) {
+      await tx.qRCode.deleteMany({
+        where: { assetId: id },
+      });
+    }
 
     return updated;
   });

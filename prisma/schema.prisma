@@ -125,6 +125,7 @@ model AssetType {
   description         String?
   icon                String?
   isActive            Boolean              @default(true)
+  includeAssetImage   Boolean              @default(true)
   displayOrder        Int                  @default(0)
   categoryId          String               @db.Uuid
   createdAt           DateTime             @default(now())
@@ -179,6 +180,7 @@ model Asset {
   condition               String?
   attachmentUrl           String?
   remarks                 String?
+  identificationMethod    IdentificationMethod    @default(NONE)
   createdAt               DateTime                @default(now())
   updatedAt               DateTime                @updatedAt
   deletedAt               DateTime?
@@ -744,3 +746,10 @@ enum PropertyAppealStatus {
   REJECTED
   CLOSED
 }
+
+enum IdentificationMethod {
+  QR
+  BARCODE
+  NONE
+}
+

@@ -4,6 +4,8 @@ import React, { useState, useTransition } from "react";
 import { AssetsByCategoryChart } from "./charts/assets-by-category";
 import { assignAssetAction, requestTransferAction } from "@/app/actions/assignment";
 import { useRouter } from "next/navigation";
+import { PaoStatDetailsModal } from "./pao-stat-details-modal";
+import { PaoStatCardType } from "@/app/actions/pao-stats";
 import {
   FileText,
   Plus,
@@ -81,6 +83,7 @@ export function PaoDashboardClient({
   const [isPending, startTransition] = useTransition();
 
   // Modals state
+  const [activeStatModal, setActiveStatModal] = useState<PaoStatCardType | null>(null);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
 
@@ -187,58 +190,79 @@ export function PaoDashboardClient({
         </div>
       </div>
 
-      {/* Grid of 8 stats cards */}
+      {/* Grid of 10 stats cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
-          <div className="p-3 bg-sky-50 text-sky-600 rounded-lg"><Package size={20} /></div>
+        <div
+          onClick={() => setActiveStatModal("TOTAL_ASSETS")}
+          className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 hover:border-sky-300 hover:shadow-md cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.99] flex items-center space-x-4 group"
+        >
+          <div className="p-3 bg-sky-50 text-sky-600 rounded-lg group-hover:scale-105 transition-transform"><Package size={20} /></div>
           <div>
             <p className="text-[10px] font-extrabold text-slate-400 uppercase">Total Assets</p>
             <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.totalAssets}</h3>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
-          <div className="p-3 bg-green-50 text-green-600 rounded-lg"><CheckCircle size={20} /></div>
+        <div
+          onClick={() => setActiveStatModal("AVAILABLE_ASSETS")}
+          className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 hover:border-green-300 hover:shadow-md cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.99] flex items-center space-x-4 group"
+        >
+          <div className="p-3 bg-green-50 text-green-600 rounded-lg group-hover:scale-105 transition-transform"><CheckCircle size={20} /></div>
           <div>
             <p className="text-[10px] font-extrabold text-slate-400 uppercase">Available Assets</p>
             <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.availableAssets}</h3>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
-          <div className="p-3 bg-blue-50 text-blue-600 rounded-lg"><UserCheck size={20} /></div>
+        <div
+          onClick={() => setActiveStatModal("ASSIGNED_ASSETS")}
+          className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 hover:border-blue-300 hover:shadow-md cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.99] flex items-center space-x-4 group"
+        >
+          <div className="p-3 bg-blue-50 text-blue-600 rounded-lg group-hover:scale-105 transition-transform"><UserCheck size={20} /></div>
           <div>
             <p className="text-[10px] font-extrabold text-slate-400 uppercase">Assigned Assets</p>
             <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.assignedAssets}</h3>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
-          <div className="p-3 bg-orange-50 text-orange-600 rounded-lg"><AlertTriangle size={20} /></div>
+        <div
+          onClick={() => setActiveStatModal("IN_MAINTENANCE")}
+          className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 hover:border-orange-300 hover:shadow-md cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.99] flex items-center space-x-4 group"
+        >
+          <div className="p-3 bg-orange-50 text-orange-600 rounded-lg group-hover:scale-105 transition-transform"><AlertTriangle size={20} /></div>
           <div>
             <p className="text-[10px] font-extrabold text-slate-400 uppercase">In Maintenance</p>
             <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.underMaintenance}</h3>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
-          <div className="p-3 bg-yellow-50 text-yellow-600 rounded-lg"><Send size={20} /></div>
+        <div
+          onClick={() => setActiveStatModal("PENDING_TRANSFERS")}
+          className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 hover:border-yellow-300 hover:shadow-md cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.99] flex items-center space-x-4 group"
+        >
+          <div className="p-3 bg-yellow-50 text-yellow-600 rounded-lg group-hover:scale-105 transition-transform"><Send size={20} /></div>
           <div>
             <p className="text-[10px] font-extrabold text-slate-400 uppercase">Pending Transfers</p>
             <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.pendingTransfers}</h3>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
-          <div className="p-3 bg-red-50 text-red-600 rounded-lg"><Trash2 size={20} /></div>
+        <div
+          onClick={() => setActiveStatModal("DISPOSED_ASSETS")}
+          className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 hover:border-red-300 hover:shadow-md cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.99] flex items-center space-x-4 group"
+        >
+          <div className="p-3 bg-red-50 text-red-600 rounded-lg group-hover:scale-105 transition-transform"><Trash2 size={20} /></div>
           <div>
             <p className="text-[10px] font-extrabold text-slate-400 uppercase">Disposed Assets</p>
             <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.disposedAssets}</h3>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
-          <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg"><Hourglass size={20} /></div>
+        <div
+          onClick={() => setActiveStatModal("PENDING_MAINTENANCES")}
+          className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 hover:border-indigo-300 hover:shadow-md cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.99] flex items-center space-x-4 group"
+        >
+          <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg group-hover:scale-105 transition-transform"><Hourglass size={20} /></div>
           <div>
             <p className="text-[10px] font-extrabold text-slate-400 uppercase">Pending Maintenances</p>
             <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.pendingMaintenances}</h3>
@@ -246,8 +270,8 @@ export function PaoDashboardClient({
         </div>
 
         <div
-          onClick={() => router.push("/pao/asset-requests")}
-          className="bg-white p-4 rounded-xl shadow-sm border border-amber-200/80 hover:border-amber-400 cursor-pointer transition-all flex items-center space-x-4 group"
+          onClick={() => setActiveStatModal("REQUESTS_TO_FULFILL")}
+          className="bg-white p-4 rounded-xl shadow-sm border border-amber-200/80 hover:border-amber-400 hover:shadow-md cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.99] flex items-center space-x-4 group"
         >
           <div className="p-3 bg-amber-50 text-amber-600 rounded-lg group-hover:scale-105 transition-transform"><PackageCheck size={20} /></div>
           <div>
@@ -262,8 +286,8 @@ export function PaoDashboardClient({
         </div>
 
         <div
-          onClick={() => router.push("/pao/appeals")}
-          className="bg-white p-4 rounded-xl shadow-sm border border-purple-200/80 hover:border-purple-400 cursor-pointer transition-all flex items-center space-x-4 group"
+          onClick={() => setActiveStatModal("ACTIVE_APPEALS")}
+          className="bg-white p-4 rounded-xl shadow-sm border border-purple-200/80 hover:border-purple-400 hover:shadow-md cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.99] flex items-center space-x-4 group"
         >
           <div className="p-3 bg-purple-50 text-purple-600 rounded-lg group-hover:scale-105 transition-transform"><Scale size={20} /></div>
           <div>
@@ -277,8 +301,11 @@ export function PaoDashboardClient({
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center space-x-4">
-          <div className="p-3 bg-teal-50 text-teal-600 rounded-lg"><Building size={20} /></div>
+        <div
+          onClick={() => setActiveStatModal("ASSET_CATEGORIES")}
+          className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 hover:border-teal-300 hover:shadow-md cursor-pointer transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.99] flex items-center space-x-4 group"
+        >
+          <div className="p-3 bg-teal-50 text-teal-600 rounded-lg group-hover:scale-105 transition-transform"><Building size={20} /></div>
           <div>
             <p className="text-[10px] font-extrabold text-slate-400 uppercase">Asset Categories</p>
             <h3 className="text-lg font-bold text-slate-800 mt-0.5">{stats.totalCategories}</h3>
@@ -641,6 +668,12 @@ export function PaoDashboardClient({
           </div>
         </div>
       )}
+
+      {/* Interactive Statistic Card Details Modal / Drawer */}
+      <PaoStatDetailsModal
+        cardType={activeStatModal}
+        onClose={() => setActiveStatModal(null)}
+      />
     </div>
   );
 }

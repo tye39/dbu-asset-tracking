@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     const assetType = await prisma.assetType.findUnique({
       where: { id: assetTypeId },
-      select: { categoryId: true }
+      select: { categoryId: true, includeAssetImage: true }
     });
 
     if (!assetType) {
@@ -83,7 +83,11 @@ export async function GET(request: NextRequest) {
       ).values()
     );
 
-    return NextResponse.json({ fields, suppliers });
+    return NextResponse.json({
+      fields,
+      suppliers,
+      includeAssetImage: assetType.includeAssetImage ?? true
+    });
   } catch (error: unknown) {
     console.error("Error loading asset type configuration:", error);
     return NextResponse.json(

@@ -43,6 +43,7 @@ export async function registerAssetAction(prevState: unknown, data: {
   attachmentUrl?: string;
   remarks?: string;
   assignedToId?: string;
+  identificationMethod?: "QR" | "BARCODE" | "NONE";
 
   // Financial fields
   fundingSource?: FundingSource;
@@ -72,9 +73,15 @@ export async function updateAssetAction(prevState: unknown, id: string, data: {
   salvageValue?: number;
   warrantyStartDate?: Date;
   warrantyEndDate?: Date;
+  identificationMethod?: "QR" | "BARCODE" | "NONE";
 }) {
   const session = await auth();
   if (!session?.user?.id) return { error: "Unauthorized." };
+
+  const role = session.user.role;
+  if (role !== "PROPERTY_ADMINISTRATION_OFFICER" && role !== "SYSTEM_ADMINISTRATOR") {
+    return { error: "Permission denied. Only Property Administration Officers or System Administrators can update asset settings." };
+  }
 
   try {
     const asset = await updateAsset(id, data, session.user.id);

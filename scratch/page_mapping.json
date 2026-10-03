@@ -1,0 +1,146 @@
+[
+  {
+    "i": 0,
+    "title": "Title Page",
+    "startPage": 1,
+    "endPage": 1,
+    "delta": 1,
+    "cumulative": 1
+  },
+  {
+    "i": 1,
+    "title": "Declaration &amp; Certification",
+    "startPage": 2,
+    "endPage": 2,
+    "delta": 1,
+    "cumulative": 2
+  },
+  {
+    "i": 2,
+    "title": "Acknowledgements",
+    "startPage": 3,
+    "endPage": 3,
+    "delta": 1,
+    "cumulative": 3
+  },
+  {
+    "i": 3,
+    "title": "Abstract",
+    "startPage": 4,
+    "endPage": 4,
+    "delta": 1,
+    "cumulative": 4
+  },
+  {
+    "i": 4,
+    "title": "Table of Contents",
+    "startPage": 5,
+    "endPage": 7,
+    "delta": 3,
+    "cumulative": 7
+  },
+  {
+    "i": 5,
+    "title": "List of Figures",
+    "startPage": 8,
+    "endPage": 8,
+    "delta": 1,
+    "cumulative": 8
+  },
+  {
+    "i": 6,
+    "title": "List of Tables &amp; Abbreviations",
+    "startPage": 9,
+    "endPage": 9,
+    "delta": 1,
+    "cumulative": 9
+  },
+  {
+    "i": 7,
+    "title": "Chapter One: Introduction",
+    "startPage": 10,
+    "endPage": 13,
+    "delta": 4,
+    "cumulative": 13
+  },
+  {
+    "i": 8,
+    "title": "Chapter Two: Requirements Analysis",
+    "startPage": 14,
+    "endPage": 18,
+    "delta": 5,
+    "cumulative": 18
+  },
+  {
+    "i": 9,
+    "title": "Chapter Three: System Analysis and Design",
+    "startPage": 19,
+    "endPage": 30,
+    "delta": 12,
+    "cumulative": 30
+  },
+  {
+    "i": 10,
+    "title": "Chapter Four: System Implementation",
+    "startPage": 31,
+    "endPage": 34,
+    "delta": 4,
+    "cumulative": 34
+  },
+  {
+    "i": 11,
+    "title": "Chapter Five: System Interfaces",
+    "startPage": 35,
+    "endPage": 39,
+    "delta": 5,
+    "cumulative": 39
+  },
+  {
+    "i": 12,
+    "title": "Chapter Six: Testing and Results",
+    "startPage": 40,
+    "endPage": 43,
+    "delta": 4,
+    "cumulative": 43
+  },
+  {
+    "i": 13,
+    "title": "Chapter Seven: Discussion",
+    "startPage": 44,
+    "endPage": 44,
+    "delta": 1,
+    "cumulative": 44
+  },
+  {
+    "i": 14,
+    "title": "Chapter Eight: Conclusion and Recommendations",
+    "startPage": 45,
+    "endPage": 45,
+    "delta": 1,
+    "cumulative": 45
+  },
+  {
+    "i": 15,
+    "title": "References",
+    "startPage": 46,
+    "endPage": 46,
+    "delta": 1,
+    "cumulative": 46
+  },
+  {
+    "i": 16,
+    "title": "Appendix A: Selected Database Schema Listings",
+    "startPage": 47,
+    "endPage": 48,
+    "delta": 2,
+    "cumulative": 48
+  },
+  {
+    "i": 17,
+    "title": "Appendix B: Code 39 Barcode Encoding &amp; Valuation Proofs",
+    "startPage": 49,
+    "endPage": 49,
+    "delta": 1,
+    "cumulative": 49
+  }
+]

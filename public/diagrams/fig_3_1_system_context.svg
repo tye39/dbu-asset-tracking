@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 700" width="1100" height="700">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0F172A" flood-opacity="0.08"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#1E3A8A"/>
+    </marker>
+    <marker id="arrow-reverse" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 10 1 L 0 5 L 10 9 z" fill="#1E3A8A"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="700" fill="#FFFFFF"/>
+
+  <!-- Title Header -->
+  <text x="550" y="45" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="22" font-weight="800" fill="#0F172A">
+    Figure 3.1: System Context Diagram – DBU Asset Tracking System
+  </text>
+  <text x="550" y="70" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="500" fill="#64748B">
+    High-Level Environmental Boundaries, Primary Institutional Actors, and System Interactions
+  </text>
+
+  <!-- Central System Node -->
+  <rect x="390" y="250" width="320" height="180" rx="16" fill="#1E3A8A" filter="url(#shadow)"/>
+  <rect x="400" y="260" width="300" height="160" rx="12" fill="#1E40AF" stroke="#60A5FA" stroke-width="2"/>
+  <circle cx="550" cy="305" r="22" fill="#DBEAFE"/>
+  <!-- Central Icon (Building/Server) -->
+  <path d="M 540 315 L 540 300 L 550 292 L 560 300 L 560 315 Z M 546 303 L 546 307 L 549 307 L 549 303 Z M 551 303 L 551 307 L 554 307 L 554 303 Z" fill="#1E40AF"/>
+  <text x="550" y="348" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="17" font-weight="800" fill="#FFFFFF">
+    DBU ASSET TRACKING
+  </text>
+  <text x="550" y="370" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="15" font-weight="700" fill="#93C5FD">
+    CENTRAL SYSTEM
+  </text>
+  <text x="550" y="395" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="500" fill="#E2E8F0">
+    Next.js 14 • PostgreSQL • RBAC Engine
+  </text>
+
+  <!-- Actor 1: System Administrator (Top Left) -->
+  <g transform="translate(60, 90)">
+    <rect width="240" height="90" rx="10" fill="#F8FAFC" stroke="#0284C7" stroke-width="2" filter="url(#shadow)"/>
+    <rect width="240" height="26" rx="8" fill="#0284C7"/>
+    <text x="120" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">«Actor» System Administrator</text>
+    <text x="12" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• User &amp; Role Management</text>
+    <text x="12" y="66" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Department &amp; Faculty Config</text>
+    <text x="12" y="82" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Form Builder &amp; Audit Logs</text>
+  </g>
+  <path d="M 300 145 Q 380 180 430 250" fill="none" stroke="#1E3A8A" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="350" y="190" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#0369A1">Administer System</text>
+
+  <!-- Actor 2: Property Administration Officer (PAO) (Top Right) -->
+  <g transform="translate(800, 90)">
+    <rect width="240" height="90" rx="10" fill="#F8FAFC" stroke="#0D9488" stroke-width="2" filter="url(#shadow)"/>
+    <rect width="240" height="26" rx="8" fill="#0D9488"/>
+    <text x="120" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">«Actor» Property Admin Officer</text>
+    <text x="12" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Register Assets &amp; Generate QR</text>
+    <text x="12" y="66" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Assign &amp; Return Custody</text>
+    <text x="12" y="82" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Approve Transfers &amp; Requests</text>
+  </g>
+  <path d="M 800 145 Q 720 180 670 250" fill="none" stroke="#1E3A8A" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="690" y="190" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#0F766E">Asset Lifecycle Operations</text>
+
+  <!-- Actor 3: Department Head (Middle Left) -->
+  <g transform="translate(40, 270)">
+    <rect width="240" height="85" rx="10" fill="#F8FAFC" stroke="#4F46E5" stroke-width="2" filter="url(#shadow)"/>
+    <rect width="240" height="26" rx="8" fill="#4F46E5"/>
+    <text x="120" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">«Actor» Department Head</text>
+    <text x="12" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Review Staff Asset Requests</text>
+    <text x="12" y="66" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Oversee Department Inventory</text>
+    <text x="12" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Lodge Property Appeals</text>
+  </g>
+  <path d="M 280 320 L 390 320" fill="none" stroke="#1E3A8A" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="290" y="312" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#4338CA">Review &amp; Appeals</text>
+
+  <!-- Actor 4: Staff Member (Middle Right) -->
+  <g transform="translate(820, 270)">
+    <rect width="240" height="85" rx="10" fill="#F8FAFC" stroke="#EA580C" stroke-width="2" filter="url(#shadow)"/>
+    <rect width="240" height="26" rx="8" fill="#EA580C"/>
+    <text x="120" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">«Actor» Staff Member</text>
+    <text x="12" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Accept / Reject Asset Custody</text>
+    <text x="12" y="66" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Submit Asset Requests</text>
+    <text x="12" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Report Maintenance Issues</text>
+  </g>
+  <path d="M 820 320 L 710 320" fill="none" stroke="#1E3A8A" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="725" y="312" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#C2410C">Custody Handshake</text>
+
+  <!-- Actor 5: Maintenance Technician (Bottom Left) -->
+  <g transform="translate(60, 430)">
+    <rect width="240" height="85" rx="10" fill="#F8FAFC" stroke="#D97706" stroke-width="2" filter="url(#shadow)"/>
+    <rect width="240" height="26" rx="8" fill="#D97706"/>
+    <text x="120" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">«Actor» Maintenance Tech</text>
+    <text x="12" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Triage Repair Tickets</text>
+    <text x="12" y="66" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Update Work Status (Progress/Done)</text>
+    <text x="12" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Record Spare &amp; Labor Costs</text>
+  </g>
+  <path d="M 300 450 Q 380 430 430 400" fill="none" stroke="#1E3A8A" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="330" y="420" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#B45309">Repair Execution</text>
+
+  <!-- Actor 6: Inventory Person (Bottom Right) -->
+  <g transform="translate(800, 430)">
+    <rect width="240" height="85" rx="10" fill="#F8FAFC" stroke="#16A34A" stroke-width="2" filter="url(#shadow)"/>
+    <rect width="240" height="26" rx="8" fill="#16A34A"/>
+    <text x="120" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">«Actor» Inventory Person</text>
+    <text x="12" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Conduct Physical Inventory Sessions</text>
+    <text x="12" y="66" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Scan QR/Barcodes via Camera</text>
+    <text x="12" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Reconcile Discrepancies</text>
+  </g>
+  <path d="M 800 450 Q 720 430 670 400" fill="none" stroke="#1E3A8A" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="690" y="420" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#15803D">Physical Counts</text>
+
+  <!-- Actor 7: Internal Auditor (Bottom Center-Left) -->
+  <g transform="translate(180, 565)">
+    <rect width="260" height="85" rx="10" fill="#F8FAFC" stroke="#7C3AED" stroke-width="2" filter="url(#shadow)"/>
+    <rect width="260" height="26" rx="8" fill="#7C3AED"/>
+    <text x="130" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">«Actor» Internal Auditor</text>
+    <text x="12" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Track Financial Depreciation Metrics</text>
+    <text x="12" y="66" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Review System Transaction Audit Logs</text>
+    <text x="12" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Log Discrepancies &amp; Budget Audits</text>
+  </g>
+  <path d="M 370 565 Q 430 500 480 430" fill="none" stroke="#1E3A8A" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="430" y="520" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#6D28D9">Compliance Audit</text>
+
+  <!-- Actor 8: Public / Campus Visitor (Bottom Center-Right) -->
+  <g transform="translate(660, 565)">
+    <rect width="260" height="85" rx="10" fill="#F8FAFC" stroke="#475569" stroke-width="2" filter="url(#shadow)"/>
+    <rect width="260" height="26" rx="8" fill="#475569"/>
+    <text x="130" y="18" text-anchor="middle" font-family="'Segoe UI', Arial, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">«External» Public / Gate Security</text>
+    <text x="12" y="48" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Scan Physical QR Tag via Mobile</text>
+    <text x="12" y="66" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• View Public Asset Verification Card</text>
+    <text x="12" y="80" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#334155">• Masked Custodian (Zero Data Leak)</text>
+  </g>
+  <path d="M 730 565 Q 670 500 620 430" fill="none" stroke="#1E3A8A" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="635" y="520" font-family="'Segoe UI', Arial, sans-serif" font-size="10" font-weight="600" fill="#334155">Public QR Scan</text>
+
+</svg>

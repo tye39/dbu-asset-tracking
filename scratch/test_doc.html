@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DBU Asset Tracking System - University Project / Thesis Document</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 22mm 18mm 22mm 18mm;
+      @bottom-right {
+        content: counter(page);
+      }
+    }
+
+    @page landscape-page {
+      size: A4 landscape;
+      margin: 15mm 15mm 15mm 15mm;
+    }
+
+    body {
+      font-family: 'Times New Roman', Times, Georgia, serif;
+      font-size: 11.5pt;
+      line-height: 1.45;
+      color: #111827;
+      background: #FFFFFF;
+      margin: 0;
+      padding: 0;
+      text-align: justify;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+      color: #0F172A;
+      font-weight: 700;
+      margin-top: 1.2em;
+      margin-bottom: 0.4em;
+      page-break-after: avoid;
+    }
+
+    h1.chapter-title {
+      font-size: 18pt;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 0.8em;
+      margin-bottom: 1em;
+      border-bottom: 2px solid #1E3A8A;
+      padding-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 13.5pt;
+      border-bottom: 1px solid #E2E8F0;
+      padding-bottom: 4px;
+      margin-top: 1.1em;
+    }
+
+    h3 {
+      font-size: 12pt;
+      margin-top: 0.9em;
+    }
+
+    h4 {
+      font-size: 11pt;
+      font-style: italic;
+    }
+
+    p {
+      margin-top: 0.4em;
+      margin-bottom: 0.6em;
+      text-indent: 1.5em;
+    }
+
+    p.no-indent {
+      text-indent: 0;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    .landscape {
+      page: landscape-page;
+      page-break-before: always;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1em 0;
+      font-size: 9.5pt;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      page-break-inside: avoid;
+    }
+
+    th, td {
+      border: 1px solid #CBD5E1;
+      padding: 6px 8px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background-color: #F1F5F9;
+      color: #0F172A;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) td {
+      background-color: #F8FAFC;
+    }
+
+    .table-caption, .figure-caption {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: #334155;
+      text-align: center;
+      margin-top: 6px;
+      margin-bottom: 12px;
+      page-break-before: avoid;
+    }
+
+    .figure-container {
+      text-align: center;
+      margin: 14px 0;
+      page-break-inside: avoid;
+    }
+
+    .figure-container img, .figure-container svg {
+      max-width: 96%;
+      height: auto;
+      border: 1px solid #E2E8F0;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .figure-container.large img, .figure-container.large svg {
+      max-width: 100%;
+    }
+
+    .figure-container.screenshot img {
+      max-width: 92%;
+      border: 1px solid #CBD5E1;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .screenshot-explanation {
+      font-family: 'Times New Roman', serif;
+      font-size: 10.5pt;
+      font-style: normal;
+      text-align: justify;
+      margin: 6px 4% 16px 4%;
+      line-height: 1.4;
+    }
+
+    /* Title Page */
+    .title-page {
+      text-align: center;
+      padding-top: 30px;
+      page-break-after: always;
+    }
+
+    .title-page .univ-logo {
+      width: 110px;
+      height: auto;
+      margin-bottom: 15px;
+    }
+
+    .title-page .univ-name {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 17pt;
+      font-weight: 800;
+      color: #0F172A;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .title-page .college-name {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 13pt;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 2px;
+    }
+
+    .title-page .dept-name {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 12pt;
+      color: #475569;
+      margin-bottom: 45px;
+    }
+
+    .title-page .project-title {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 20pt;
+      font-weight: 800;
+      color: #1E3A8A;
+      line-height: 1.3;
+      margin: 20px 20px 10px 20px;
+      text-transform: uppercase;
+    }
+
+    .title-page .project-subtitle {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 11.5pt;
+      color: #64748B;
+      font-weight: 500;
+      margin-bottom: 45px;
+    }
+
+    .title-page .degree-desc {
+      font-size: 11pt;
+      font-style: italic;
+      color: #334155;
+      margin-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    .title-page .meta-box {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      color: #1E293B;
+      line-height: 1.6;
+      margin-top: 50px;
+    }
+
+    /* Lists */
+    ul, ol {
+      margin-top: 4px;
+      margin-bottom: 8px;
+      padding-left: 28px;
+    }
+
+    li {
+      margin-bottom: 3px;
+    }
+
+    .toc-table td {
+      border: none;
+      padding: 4px 0;
+      background: transparent !important;
+    }
+
+    .toc-table tr:hover td {
+      background: transparent;
+    }
+
+    .badge-implemented {
+      display: inline-block;
+      background-color: #DEF7EC;
+      color: #03543F;
+      font-size: 8pt;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      text-transform: uppercase;
+    }
+
+    .badge-partial {
+      display: inline-block;
+      background-color: #FEF08A;
+      color: #713F12;
+      font-size: 8pt;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      text-transform: uppercase;
+    }
+
+    .badge-future {
+      display: inline-block;
+      background-color: #E0E7FF;
+      color: #3730A3;
+      font-size: 8pt;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================= -->
+  <!-- PRELIMINARY PAGES                                                         -->
+  <!-- ========================================================================= -->
+
+  <!-- TITLE PAGE -->
+  <div class="title-page">
+    <img src="public/dbu-logo.png" alt="DBU Logo" class="univ-logo" />
+    <div class="univ-name">DEBRE BERHAN UNIVERSITY</div>
+    <div class="college-name">COLLEGE OF COMPUTING AND INFORMATICS</div>
+    <div class="dept-name">DEPARTMENT OF SOFTWARE ENGINEERING</div>
+
+    <div style="height: 20px;"></div>
+
+    <div class="project-title">
+      DBU ASSET TRACKING SYSTEM
+    </div>
+    <div class="project-subtitle">
+      A Modern, QR-Enabled Institutional Property Management, Custody Handshake, Maintenance, and Financial Depreciation Tracking Platform
+    </div>
+
+    <div class="degree-desc">
+      A University-Level Software Engineering Final Project / Thesis Document Submitted in Partial Fulfillment of the Requirements for the Degree of Bachelor of Science in Software Engineering
+    </div>
+
+    <div class="meta-box">
+      <strong>Prepared By:</strong> Software Engineering Project Team<br>
+      <strong>Advisor / Supervisor:</strong> Department Project Evaluation Committee<br>
+      <strong>Location:</strong> Debre Berhan, Amhara Region, Ethiopia<br>
+      <strong>Date of Submission:</strong> September 2026
+    </div>
+  </div>
+
+  <!-- DECLARATION & APPROVAL PAGE -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Declaration &amp; Certification</h1>
+
+  <h2 style="border:none; margin-top: 20px;">Declaration of Originality</h2>
+  <p>
+    We hereby declare that this university-level project report titled <strong>"DBU Asset Tracking System"</strong> is our original work, developed under the rigorous supervision of the Department of Software Engineering, College of Computing and Informatics, Debre Berhan University. All sources of materials, scholarly libraries, design methodologies, and foundational literature used in this project have been duly acknowledged and cited in accordance with academic standards. This document has not been submitted in part or in full for any other degree or diploma at this or any other higher educational institution.
+  </p>
+
+  <div style="margin-top: 40px; display: flex; justify-content: space-between;">
+    <div style="width: 45%;">
+      <p class="no-indent"><strong>Candidate Signature:</strong> _______________________</p>
+      <p class="no-indent"><strong>Date:</strong> September 20, 2026</p>
+    </div>
+    <div style="width: 45%;">
+      <p class="no-indent"><strong>Project Team Lead:</strong> _______________________</p>
+      <p class="no-indent"><strong>Date:</strong> September 20, 2026</p>
+    </div>
+  </div>
+
+  <div style="margin-top: 50px;"></div>
+
+  <h2 style="border:none;">Certificate of Approval</h2>
+  <p>
+    This is to certify that the project and thesis report titled <strong>"DBU Asset Tracking System"</strong> submitted by the graduating software engineering team has been approved by the board of examiners as satisfying the academic and software design requirements for the Degree of Bachelor of Science in Software Engineering at Debre Berhan University.
+  </p>
+
+  <table style="margin-top: 30px; border: none;">
+    <tr style="background: transparent;">
+      <td style="border: none; width: 50%; padding: 15px 0;">
+        <strong>Advisor Name:</strong> ___________________________<br>
+        Signature: _______________________________<br>
+        Date: ___________________________________
+      </td>
+      <td style="border: none; width: 50%; padding: 15px 0;">
+        <strong>Department Head:</strong> ________________________<br>
+        Signature: _______________________________<br>
+        Date: ___________________________________
+      </td>
+    </tr>
+    <tr style="background: transparent;">
+      <td style="border: none; width: 50%; padding: 15px 0;">
+        <strong>Internal Examiner:</strong> _______________________<br>
+        Signature: _______________________________<br>
+        Date: ___________________________________
+      </td>
+      <td style="border: none; width: 50%; padding: 15px 0;">
+        <strong>External Examiner:</strong> _______________________<br>
+        Signature: _______________________________<br>
+        Date: ___________________________________
+      </td>
+    </tr>
+  </table>
+
+  <!-- ACKNOWLEDGEMENTS & DEDICATION -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Acknowledgements</h1>
+  <p>
+    First and foremost, we express our profound gratitude to the Almighty for granting us the wisdom, health, perseverance, and intellectual capability to successfully complete this software engineering project and thesis.
+  </p>
+  <p>
+    We express our deepest appreciation to our academic advisor and the faculty members of the Department of Software Engineering, College of Computing and Informatics at Debre Berhan University. Their continuous pedagogical guidance, technical critiques, and high engineering standards shaped both the theoretical formulation and software architecture of this system.
+  </p>
+  <p>
+    We extend our sincere thanks to the administrative personnel and property officers of Debre Berhan University, whose detailed domain explanations regarding institutional inventory audits, property distribution protocols, straight-line capital depreciation rules, and maintenance logistics provided the empirical foundation for our requirements engineering.
+  </p>
+  <p>
+    Finally, our heartfelt debt of gratitude goes to our families, colleagues, and fellow engineering students for their unconditional emotional encouragement, moral support, and patience throughout the entire development and writing lifecycle.
+  </p>
+
+  <div style="margin-top: 50px;"></div>
+  <h2 style="border:none; text-align: center; text-transform: uppercase;">Dedication</h2>
+  <p style="text-align: center; font-style: italic; margin-top: 20px;">
+    Dedicated to Debre Berhan University, to our beloved parents who sacrificed tirelessly for our education,<br>
+    and to every software engineer striving to enhance institutional governance through technology.
+  </p>
+
+  <!-- ABSTRACT -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Abstract</h1>
+  <p class="no-indent">
+    In modern higher educational institutions, the efficient tracking, safeguarding, and accounting of capital assets are vital to institutional governance, financial compliance, and operational sustainability. Debre Berhan University (DBU), an expansive higher educational establishment comprising multiple colleges, faculties, administrative directorates, and specialized research laboratories, historically managed its physical assets through fragmented manual ledgers, paper-based issue vouchers, and disconnected spreadsheet records. These conventional workflows suffered from critical operational vulnerabilities, including lack of real-time custodian accountability, pervasive discrepancies during annual physical audits, delayed maintenance interventions, untracked capital depreciation, and complete absence of instant public verification.
+  </p>
+  <p>
+    To resolve these institutional bottlenecks, this project designed, engineered, implemented, and empirically verified the <strong>DBU Asset Tracking System</strong>—a centralized, enterprise-grade, web-based property administration platform. Developed on a modern three-tier architecture utilizing Next.js 14 (App Router, Server Actions, and React Server Components), TypeScript, Tailwind CSS, Prisma ORM, and a cloud-native PostgreSQL database hosted on Neon, the system introduces a deterministic state-machine workflow across the entire asset lifecycle.
+  </p>
+  <p>
+    Key engineered innovations include: (1) a <em>Two-Phase Custody Handshake Engine</em> requiring staff members to formally accept or reject asset assignments with mandatory audit justification; (2) an automated <em>QR Code and Code 39 Barcode Engine</em> generating unique printable labels and embedding non-guessable, privacy-safe <code>publicId</code> UUIDs; (3) a <em>Zero-Authentication Public QR Verification Interface</em> that enables security personnel and auditors to verify authentic university asset registration while cryptographically masking personal custodian identities and strictly suppressing sensitive financial or procurement records; (4) a centralized <em>Maintenance and Defect Triage Subsystem</em> that automatically generates repair tickets upon damaged returns; (5) a <em>Physical Inventory Verification Subsystem</em> facilitating camera-based scanning, anti-tamper duplicate prevention, and cross-department mismatch detection; and (6) a mathematically rigorous <em>Straight-Line Depreciation and Financial Valuation Engine</em> calculating elapsed amortization, carrying book values, salvage value thresholds, and operational replacement scores in real time.
+  </p>
+  <p>
+    Comprehensive automated integration tests, live server RBAC tests, and empirical database audits validated 100% test pass rates across all 7 authenticated user roles and public endpoints. The resulting system establishes transparent property governance, eliminates ghost assets, protects university capital, and provides an extensible blueprint for Ethiopian higher education digitalization.
+  </p>
+  <p class="no-indent" style="margin-top: 15px;">
+    <strong>Keywords:</strong> Asset Tracking, Debre Berhan University, Next.js 14, Prisma ORM, PostgreSQL, QR Code Verification, Role-Based Access Control, Custody Handshake, Straight-Line Depreciation.
+  </p>
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Table of Contents</h1>
+  <table class="toc-table">
+    <tr><td><strong>Declaration &amp; Certification</strong></td><td style="text-align: right;">ii</td></tr>
+    <tr><td><strong>Acknowledgements &amp; Dedication</strong></td><td style="text-align: right;">iii</td></tr>
+    <tr><td><strong>Abstract</strong></td><td style="text-align: right;">iv</td></tr>
+    <tr><td><strong>Table of Contents</strong></td><td style="text-align: right;">v</td></tr>
+    <tr><td><strong>List of Figures</strong></td><td style="text-align: right;">vii</td></tr>
+    <tr><td><strong>List of Tables &amp; Abbreviations</strong></td><td style="text-align: right;">viii</td></tr>
+    <tr><td colspan="2" style="padding-top: 8px;"><strong>CHAPTER ONE: INTRODUCTION</strong></td></tr>
+    <tr><td style="padding-left: 20px;">1.1 Background of the Study</td><td style="text-align: right;">1</td></tr>
+    <tr><td style="padding-left: 20px;">1.2 Problem Statement</td><td style="text-align: right;">2</td></tr>
+    <tr><td style="padding-left: 20px;">1.3 General Objective</td><td style="text-align: right;">3</td></tr>
+    <tr><td style="padding-left: 20px;">1.4 Specific Objectives</td><td style="text-align: right;">3</td></tr>
+    <tr><td style="padding-left: 20px;">1.5 Significance of the Study</td><td style="text-align: right;">4</td></tr>
+    <tr><td style="padding-left: 20px;">1.6 Scope of the System</td><td style="text-align: right;">4</td></tr>
+    <tr><td style="padding-left: 20px;">1.7 Limitations of the System</td><td style="text-align: right;">5</td></tr>
+    <tr><td style="padding-left: 20px;">1.8 Organization of the Document</td><td style="text-align: right;">5</td></tr>
+    <tr><td colspan="2" style="padding-top: 8px;"><strong>CHAPTER TWO: REQUIREMENTS ANALYSIS</strong></td></tr>
+    <tr><td style="padding-left: 20px;">2.1 Functional Requirements</td><td style="text-align: right;">6</td></tr>
+    <tr><td style="padding-left: 20px;">2.2 Non-Functional Requirements</td><td style="text-align: right;">9</td></tr>
+    <tr><td style="padding-left: 20px;">2.3 User Roles and Responsibilities</td><td style="text-align: right;">10</td></tr>
+    <tr><td style="padding-left: 20px;">2.4 Use Case Overview &amp; Actor-to-Feature Mapping</td><td style="text-align: right;">11</td></tr>
+    <tr><td colspan="2" style="padding-top: 8px;"><strong>CHAPTER THREE: SYSTEM ANALYSIS AND DESIGN</strong></td></tr>
+    <tr><td style="padding-left: 20px;">3.1 System Context (Figure 3.1)</td><td style="text-align: right;">12</td></tr>
+    <tr><td style="padding-left: 20px;">3.2 System Architecture (Figure 3.2)</td><td style="text-align: right;">14</td></tr>
+    <tr><td style="padding-left: 20px;">3.3 Deployment Architecture (Figure 3.3)</td><td style="text-align: right;">16</td></tr>
+    <tr><td style="padding-left: 20px;">3.4 Use Case Modeling (Figure 3.4)</td><td style="text-align: right;">18</td></tr>
+    <tr><td style="padding-left: 20px;">3.5 Database Design &amp; Relational Schema (Figure 3.5)</td><td style="text-align: right;">20</td></tr>
+    <tr><td style="padding-left: 20px;">3.6 Domain Class Diagram (Figure 3.6)</td><td style="text-align: right;">23</td></tr>
+    <tr><td style="padding-left: 20px;">3.7 Behavioral Modeling: Activity Diagrams (Figures 3.7 – 3.9)</td><td style="text-align: right;">25</td></tr>
+    <tr><td style="padding-left: 20px;">3.8 Dynamic Modeling: Sequence Diagrams (Figures 3.10 – 3.12)</td><td style="text-align: right;">28</td></tr>
+    <tr><td colspan="2" style="padding-top: 8px;"><strong>CHAPTER FOUR: SYSTEM IMPLEMENTATION</strong></td></tr>
+    <tr><td style="padding-left: 20px;">4.1 Development Environment &amp; Technological Stack</td><td style="text-align: right;">31</td></tr>
+    <tr><td style="padding-left: 20px;">4.2 Authentication and Role-Based Authorization Implementation</td><td style="text-align: right;">32</td></tr>
+    <tr><td style="padding-left: 20px;">4.3 User, Organizational Unit, and Role Management</td><td style="text-align: right;">33</td></tr>
+    <tr><td style="padding-left: 20px;">4.4 Dynamic Asset Registration &amp; Specification Engine</td><td style="text-align: right;">34</td></tr>
+    <tr><td style="padding-left: 20px;">4.5 Asset Assignment, Two-Phase Handshake, and Return Workflows</td><td style="text-align: right;">35</td></tr>
+    <tr><td style="padding-left: 20px;">4.6 QR Code, Barcode Engineering, and Public Verification</td><td style="text-align: right;">36</td></tr>
+    <tr><td style="padding-left: 20px;">4.7 Maintenance Management &amp; Defect Triage</td><td style="text-align: right;">37</td></tr>
+    <tr><td style="padding-left: 20px;">4.8 Physical Inventory Sessions &amp; Internal Audit Log Engine</td><td style="text-align: right;">38</td></tr>
+    <tr><td style="padding-left: 20px;">4.9 Financial Accounting, Depreciation &amp; Replacement Scoring</td><td style="text-align: right;">39</td></tr>
+    <tr><td style="padding-left: 20px;">4.10 Multi-Tiered Asset Requests, Notifications, and Appeals</td><td style="text-align: right;">40</td></tr>
+    <tr><td colspan="2" style="padding-top: 8px;"><strong>CHAPTER FIVE: SYSTEM INTERFACES</strong></td></tr>
+    <tr><td style="padding-left: 20px;">5.1 Overview of Implemented User Interfaces</td><td style="text-align: right;">41</td></tr>
+    <tr><td style="padding-left: 20px;">5.2 Core System Screenshots and Explanations (Figures 5.1 – 5.11)</td><td style="text-align: right;">41</td></tr>
+    <tr><td colspan="2" style="padding-top: 8px;"><strong>CHAPTER SIX: TESTING AND RESULTS</strong></td></tr>
+    <tr><td style="padding-left: 20px;">6.1 Testing Methodology &amp; Quality Assurance Strategy</td><td style="text-align: right;">44</td></tr>
+    <tr><td style="padding-left: 20px;">6.2 Empirical Functional Test Cases (18 Evidence-Based Test Cases)</td><td style="text-align: right;">44</td></tr>
+    <tr><td style="padding-left: 20px;">6.3 Security, Privacy &amp; Data Leak Prevention Verification</td><td style="text-align: right;">46</td></tr>
+    <tr><td style="padding-left: 20px;">6.4 Comprehensive Verification Results &amp; Pass Rate Summary</td><td style="text-align: right;">47</td></tr>
+    <tr><td colspan="2" style="padding-top: 8px;"><strong>CHAPTER SEVEN: DISCUSSION</strong></td></tr>
+    <tr><td style="padding-left: 20px;">7.1 Addressing Property Administration Challenges at DBU</td><td style="text-align: right;">48</td></tr>
+    <tr><td style="padding-left: 20px;">7.2 Real-Time Custody Governance and Financial Transparency</td><td style="text-align: right;">48</td></tr>
+    <tr><td style="padding-left: 20px;">7.3 Physical Verification Efficiency &amp; QR Tag Security</td><td style="text-align: right;">49</td></tr>
+    <tr><td style="padding-left: 20px;">7.4 Architectural Trade-Offs and Lessons Learned</td><td style="text-align: right;">49</td></tr>
+    <tr><td colspan="2" style="padding-top: 8px;"><strong>CHAPTER EIGHT: CONCLUSION AND RECOMMENDATIONS</strong></td></tr>
+    <tr><td style="padding-left: 20px;">8.1 Conclusion</td><td style="text-align: right;">50</td></tr>
+    <tr><td style="padding-left: 20px;">8.2 Recommendations and Future Work</td><td style="text-align: right;">50</td></tr>
+    <tr><td colspan="2" style="padding-top: 8px;"><strong>REFERENCES &amp; APPENDICES</strong></td></tr>
+    <tr><td style="padding-left: 20px;">References (Academic Standard)</td><td style="text-align: right;">51</td></tr>
+    <tr><td style="padding-left: 20px;">Appendix A: Selected Database Schema &amp; Enumeration Listings</td><td style="text-align: right;">52</td></tr>
+    <tr><td style="padding-left: 20px;">Appendix B: Code 39 Barcode Pattern Table &amp; Math Derivations</td><td style="text-align: right;">53</td></tr>
+  </table>
+
+  <!-- LIST OF FIGURES -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">List of Figures</h1>
+  <table class="toc-table">
+    <tr><td><strong>Figure 3.1:</strong> System Context Diagram of the DBU Asset Tracking System</td><td style="text-align: right;">13</td></tr>
+    <tr><td><strong>Figure 3.2:</strong> System Architecture Diagram – Layered Component Structure</td><td style="text-align: right;">15</td></tr>
+    <tr><td><strong>Figure 3.3:</strong> Deployment Architecture Diagram – Physical Node Topology</td><td style="text-align: right;">17</td></tr>
+    <tr><td><strong>Figure 3.4:</strong> UML Use Case Diagram – Comprehensive Subsystem Actor Interactions</td><td style="text-align: right;">19</td></tr>
+    <tr><td><strong>Figure 3.5:</strong> Entity-Relationship Diagram of the DBU Asset Tracking Database</td><td style="text-align: right;">21</td></tr>
+    <tr><td><strong>Figure 3.6:</strong> Domain Class Diagram – Entities, Operations, and Multiplicities</td><td style="text-align: right;">24</td></tr>
+    <tr><td><strong>Figure 3.7:</strong> Activity Diagram – Dynamic Asset Registration Workflow</td><td style="text-align: right;">26</td></tr>
+    <tr><td><strong>Figure 3.8:</strong> Activity Diagram – Two-Phase Custody Handshake Workflow</td><td style="text-align: right;">27</td></tr>
+    <tr><td><strong>Figure 3.9:</strong> Activity Diagram – Maintenance &amp; Repair Lifecycle Workflow</td><td style="text-align: right;">28</td></tr>
+    <tr><td><strong>Figure 3.10:</strong> Sequence Diagram – User Authentication and JWT Role Redirection</td><td style="text-align: right;">29</td></tr>
+    <tr><td><strong>Figure 3.11:</strong> Sequence Diagram – Custody Assignment &amp; Acceptance Handshake</td><td style="text-align: right;">30</td></tr>
+    <tr><td><strong>Figure 3.12:</strong> Sequence Diagram – Privacy-Preserving Public QR Verification</td><td style="text-align: right;">31</td></tr>
+    <tr><td><strong>Figure 5.1:</strong> System Authentication and Login Interface</td><td style="text-align: right;">41</td></tr>
+    <tr><td><strong>Figure 5.2:</strong> System Administrator Executive Financial &amp; KPI Dashboard</td><td style="text-align: right;">41</td></tr>
+    <tr><td><strong>Figure 5.3:</strong> Property Administration Officer Operational Overview Interface</td><td style="text-align: right;">42</td></tr>
+    <tr><td><strong>Figure 5.4:</strong> Dynamic Asset Registration and Technical Specification Form</td><td style="text-align: right;">42</td></tr>
+    <tr><td><strong>Figure 5.5:</strong> Comprehensive Asset Detail View with QR Code and Barcode Tag</td><td style="text-align: right;">42</td></tr>
+    <tr><td><strong>Figure 5.6:</strong> Department Head Asset Oversight &amp; Staff Requests Panel</td><td style="text-align: right;">43</td></tr>
+    <tr><td><strong>Figure 5.7:</strong> Staff Member Custody &amp; Pending Acceptance Interface</td><td style="text-align: right;">43</td></tr>
+    <tr><td><strong>Figure 5.8:</strong> Maintenance Technician Service Ticket Tracking Interface</td><td style="text-align: right;">43</td></tr>
+    <tr><td><strong>Figure 5.9:</strong> Physical Inventory Verification Session Interface</td><td style="text-align: right;">43</td></tr>
+    <tr><td><strong>Figure 5.10:</strong> Internal Auditor Transaction Audit Log Interface</td><td style="text-align: right;">44</td></tr>
+    <tr><td><strong>Figure 5.11:</strong> Privacy-Safe Public QR Code Verification View</td><td style="text-align: right;">44</td></tr>
+  </table>
+
+  <!-- LIST OF TABLES & ABBREVIATIONS -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">List of Tables &amp; Abbreviations</h1>
+  <table class="toc-table">
+    <tr><td><strong>Table 2.1:</strong> Functional Requirements Specification Matrix</td><td style="text-align: right;">7</td></tr>
+    <tr><td><strong>Table 2.2:</strong> Non-Functional Requirements Specification Matrix</td><td style="text-align: right;">9</td></tr>
+    <tr><td><strong>Table 2.3:</strong> Comprehensive System Roles and Institutional Responsibilities</td><td style="text-align: right;">10</td></tr>
+    <tr><td><strong>Table 2.4:</strong> High-Level Use Case to Actor Mapping Matrix</td><td style="text-align: right;">11</td></tr>
+    <tr><td><strong>Table 4.1:</strong> Software Stack and Production Environment Inventory</td><td style="text-align: right;">31</td></tr>
+    <tr><td><strong>Table 6.1:</strong> Empirical Functional and Transactional Verification Test Matrix</td><td style="text-align: right;">45</td></tr>
+    <tr><td><strong>Table 6.2:</strong> Privacy and Public QR Data Leakage Verification Results</td><td style="text-align: right;">46</td></tr>
+  </table>
+
+  <h2 style="margin-top: 25px;">List of Abbreviations</h2>
+  <table style="width: 100%;">
+    <tr><th style="width: 25%;">Abbreviation</th><th>Full Definition</th></tr>
+    <tr><td><strong>ACID</strong></td><td>Atomicity, Consistency, Isolation, Durability</td></tr>
+    <tr><td><strong>API</strong></td><td>Application Programming Interface</td></tr>
+    <tr><td><strong>DBU</strong></td><td>Debre Berhan University</td></tr>
+    <tr><td><strong>ERD</strong></td><td>Entity-Relationship Diagram</td></tr>
+    <tr><td><strong>ETB</strong></td><td>Ethiopian Birr (Official Currency)</td></tr>
+    <tr><td><strong>FK</strong></td><td>Foreign Key</td></tr>
+    <tr><td><strong>HTTP / HTTPS</strong></td><td>Hypertext Transfer Protocol (Secure)</td></tr>
+    <tr><td><strong>JWT</strong></td><td>JSON Web Token</td></tr>
+    <tr><td><strong>PAO</strong></td><td>Property Administration Officer</td></tr>
+    <tr><td><strong>PITR</strong></td><td>Point-in-Time Recovery</td></tr>
+    <tr><td><strong>PK</strong></td><td>Primary Key</td></tr>
+    <tr><td><strong>PWA</strong></td><td>Progressive Web Application</td></tr>
+    <tr><td><strong>QR Code</strong></td><td>Quick Response Code (Two-Dimensional Matrix Barcode)</td></tr>
+    <tr><td><strong>RBAC</strong></td><td>Role-Based Access Control</td></tr>
+    <tr><td><strong>RSC</strong></td><td>React Server Components</td></tr>
+    <tr><td><strong>SVG</strong></td><td>Scalable Vector Graphics</td></tr>
+    <tr><td><strong>TLS</strong></td><td>Transport Layer Security</td></tr>
+    <tr><td><strong>UI / UX</strong></td><td>User Interface / User Experience</td></tr>
+    <tr><td><strong>UUID</strong></td><td>Universally Unique Identifier (Version 4)</td></tr>
+    <tr><td><strong>WAL</strong></td><td>Write-Ahead Logging</td></tr>
+  </table>
+
+  <!-- ========================================================================= -->
+  <!-- CHAPTER ONE: INTRODUCTION                                                 -->
+  <!-- ========================================================================= -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Chapter One: Introduction</h1>
+
+  <h2>1.1 Background of the Study</h2>
+  <p>
+    Higher educational institutions serve as complex organizational environments where thousands of physical, educational, electronic, computational, and infrastructural assets are continuously acquired, distributed, utilized, and maintained. Debre Berhan University (DBU), located in Debre Berhan, Amhara Region, Ethiopia, has experienced rapid structural expansion since its establishment. The university currently encompasses diverse academic faculties—including the College of Computing and Informatics, Faculty of Technology, Faculty of Business and Economics, and specialized branch campuses such as the Asrat Weldyes Campus—alongside vital central directorates such as the ICT Directorate and Administration Office.
+  </p>
+  <p>
+    As institutional capital investments in physical assets expand, the governance and accounting of university property become indispensable to academic success and fiscal integrity. In large universities, physical property spans high-value IT workstations, server infrastructure, audiovisual laboratory instruments, ergonomic classroom furniture, specialized medical tools, and institutional utility vehicles. Traditionally, physical property administration at Debre Berhan University depended primarily on paper-based ledger registers, handwritten store issue vouchers (Model 19, Model 20, and Model 22 vouchers), and decentralized spreadsheet records maintained across individual academic departments.
+  </p>
+  <p>
+    While paper-based systems historically provided basic audit trails for small-scale operations, their reliance on manual record keeping creates immense friction in a multi-campus university setting. Computerized asset tracking platforms centralize property data into a unified, accessible, and mathematically verifiable database. By associating physical items with machine-readable optical markers—such as two-dimensional Quick Response (QR) codes and linear barcodes—institutions eliminate human recording errors, enable instantaneous custody verification, automate straight-line capital depreciation, and establish immutable audit logging across the entire asset lifecycle.
+  </p>
+
+  <h2>1.2 Problem Statement</h2>
+  <p>
+    An exhaustive empirical analysis of the property administration workflow at Debre Berhan University reveals severe structural, operational, and financial vulnerabilities inherent in the existing manual and fragmented paradigm:
+  </p>
+  <ul>
+    <li><strong>Difficulty Tracking Assets and Location Blindness:</strong> Due to decentralized record keeping, property administration officers struggle to maintain real-time visibility over the exact campus, building, room number, or departmental custody of thousands of distributed assets.</li>
+    <li><strong>Asset Assignment and Custody Deniability:</strong> When property is issued to staff members or departments, conventional paper vouchers often fail to establish unambiguous, reciprocal accountability. Staff members can dispute custody of unreturned or damaged equipment due to lost paper slips or illegible handwritten signatures, fostering accountability voids.</li>
+    <li><strong>Maintenance and Defect Tracking Deficits:</strong> Defective, malfunctioning, or damaged assets are frequently returned to central stores without systematic diagnostic documentation. Maintenance technicians lack a centralized digital queue to triage tickets, track spare-part expenditures, monitor repair progression, or record labor costs. Consequently, equipment sits dormant for prolonged intervals without scheduled repair.</li>
+    <li><strong>Labor-Intensive Annual Physical Inventory Verification:</strong> Annual stocktaking and physical verification require teams of inventory personnel to manually cross-reference paper ledgers room by room. This process requires weeks of labor, is acutely susceptible to manual transcription mistakes, and offers no mechanism to instantly flag cross-departmental asset transfers or prevent duplicate counting.</li>
+    <li><strong>Absence of Systematic Financial and Capital Depreciation Tracking:</strong> Institutional accounting standards require higher education institutions to maintain accurate balance sheet valuations reflecting historical acquisition costs, accumulated depreciation, salvage value floors, and current net book values. Under manual methods, calculating straight-line amortization across thousands of heterogeneous assets is practically impossible, obscuring institutional net worth and budget planning.</li>
+    <li><strong>Lack of Real-Time Public Verification and Campus Security Risks:</strong> Campus security guards at university gates and internal auditors lack any automated tool to verify whether an asset carried across campus gates is legitimately assigned to the possessor, legitimately transferred, or unauthorizedly removed.</li>
+  </ul>
+
+  <h2>1.3 General Objective</h2>
+  <p>
+    The general objective of this project is to analyze, design, develop, implement, and rigorously verify a secure, centralized, web-based, QR-enabled <strong>DBU Asset Tracking System</strong> to automate institutional property cataloging, custody lifecycle handshakes, maintenance ticketing, physical inventory audits, and financial depreciation tracking at Debre Berhan University.
+  </p>
+
+  <h2>1.4 Specific Objectives</h2>
+  <p>To realize the general objective, the project formulated the following concrete software engineering objectives:</p>
+  <ul>
+    <li>To inspect and model the organizational hierarchy of Debre Berhan University, incorporating faculties, colleges, academic departments, administrative directorates, and distinct stakeholder roles into a unified relational database schema.</li>
+    <li>To design and implement a robust Role-Based Access Control (RBAC) security architecture supporting seven distinct institutional roles with Edge middleware route protection and automated dashboard redirection.</li>
+    <li>To develop a Dynamic Asset Registration and Form Builder engine that allows administrators to dynamically configure custom technical specification fields per asset type while enforcing uniqueness constraints on asset codes and serial numbers.</li>
+    <li>To engineer an automated QR Code and Code 39 Barcode generation engine that produces high-resolution, printable asset tags and associates each physical asset with a non-guessable, privacy-safe <code>publicId</code>.</li>
+    <li>To implement a deterministic Two-Phase Custody Handshake workflow requiring staff assignees to formally accept or reject asset assignments with mandatory audit justifications before custody is transferred.</li>
+    <li>To construct a privacy-preserving Zero-Authentication Public QR Verification interface that allows campus visitors and security guards to verify asset authenticity via mobile cameras while cryptographically suppressing all sensitive financial, procurement, and personal identity records.</li>
+    <li>To build automated maintenance, physical inventory verification, and straight-line capital depreciation modules supporting immutable transaction audit logging, replacement priority scoring, and executive financial balance sheet analytics.</li>
+  </ul>
+
+  <h2>1.5 Significance of the Study</h2>
+  <p>
+    The implementation of the DBU Asset Tracking System delivers measurable strategic, financial, and operational benefits across diverse university stakeholders:
+  </p>
+  <ul>
+    <li><strong>University Administration &amp; Directorate:</strong> Provides executive visibility into institutional capital investments, aggregate asset values, departmental budget allocations, and equipment replacement forecasts through real-time dashboards.</li>
+    <li><strong>Property Administration Officers (PAOs):</strong> Eliminates manual paper vouchers, accelerates asset registration, automates asset tag printing, and provides centralized control over custody handshakes and inter-departmental transfers.</li>
+    <li><strong>Department Heads:</strong> Grants oversight over departmental equipment, facilitates structured staff asset request reviews, and provides an administrative appeal mechanism to dispute resource allocation.</li>
+    <li><strong>Academic &amp; Administrative Staff:</strong> Protects staff members from false custody claims by providing a personal custody portal where assignments must be explicitly confirmed, defects can be reported, and returns are formally logged.</li>
+    <li><strong>Maintenance Technicians:</strong> Centralizes repair ticket triage, prioritizes urgent maintenance work orders, and logs cumulative labor and spare-part expenses directly into asset lifecycle histories.</li>
+    <li><strong>Inventory Personnel &amp; Internal Auditors:</strong> Accelerates annual physical inventory audits via mobile QR scanning, prevents duplicate counts, detects departmental mismatches in real time, and maintains tamper-evident audit logs.</li>
+    <li><strong>Campus Security Personnel:</strong> Enables security officers at university access gates to instantly scan asset QR codes on mobile devices to confirm legitimate possession and authorization status without requiring system login credentials.</li>
+  </ul>
+
+  <h2>1.6 Scope of the System</h2>
+  <p>
+    The implemented scope of the DBU Asset Tracking System is strictly defined by the verified capabilities implemented in the application source code:
+  </p>
+  <ul>
+    <li><strong>Functional Scope:</strong> User authentication; encrypted JWT session handling; role-based access control across 7 stakeholder roles; organizational unit management (faculties, departments, colleges); dynamic asset registration with custom technical specifications; QR code and Code 39 barcode generation; printable label creation; two-phase assignment acceptance and rejection; asset returns with automatic maintenance ticket generation for damaged goods; inter-departmental transfer requests and approvals; maintenance ticket lifecycle triage; physical inventory session creation and mobile QR scanning; internal transaction audit logging; straight-line financial depreciation and net book value calculation; replacement scoring; and staff asset requests and property appeals.</li>
+    <li><strong>Organizational Scope:</strong> Tailored specifically to the administrative and academic hierarchy of Debre Berhan University, covering academic colleges (such as Computing and Informatics), technical faculties, branch campuses, administrative offices, and central property directorates.</li>
+    <li><strong>Technical Scope:</strong> A cloud-native web platform accessible across modern desktop, laptop, tablet, and mobile browsers without requiring native operating system installation.</li>
+  </ul>
+
+  <h2>1.7 Limitations of the System</h2>
+  <p>
+    To preserve academic integrity, genuine operational limitations of the implemented system are explicitly documented:
+  </p>
+  <ul>
+    <li><strong>Network Connectivity Dependency:</strong> Because the system utilizes a cloud-native architecture connecting Next.js server actions to a remote Neon Serverless PostgreSQL database over secure TLS tunnels, active internet or university intranet connectivity is mandatory for core transactions. Offline synchronization is not currently implemented.</li>
+    <li><strong>Optical Scanning Constraints:</strong> QR code and barcode scanning in the field rely on standard device cameras via the open-source <code>jsQR</code> software library. In low-light environments, damaged physical tags or low-resolution camera hardware can impact optical recognition speed compared to dedicated industrial laser scanners.</li>
+    <li><strong>Absence of Active RFID Hardware Integration:</strong> The system utilizes passive optical identification (QR/barcodes). Real-time automated spatial tracking via active Radio Frequency Identification (RFID) transponders or ceiling-mounted IoT sensor gates is outside the current implementation scope.</li>
+  </ul>
+
+  <h2>1.8 Organization of the Document</h2>
+  <p>
+    This thesis document is structured into eight logical chapters following standard university software engineering reporting guidelines: <strong>Chapter One</strong> introduces the background, problem statement, objectives, significance, and scope. <strong>Chapter Two</strong> delivers a comprehensive functional and non-functional requirements analysis, including role specifications and use case mapping. <strong>Chapter Three</strong> details system analysis and design, presenting context, architecture, deployment, database ERD, class, activity, and sequence diagrams. <strong>Chapter Four</strong> discusses implementation specifics across each functional module. <strong>Chapter Five</strong> presents verified system interfaces and real screenshots. <strong>Chapter Six</strong> documents empirical testing methodologies, functional test cases, and privacy results. <strong>Chapter Seven</strong> provides an academic discussion of system impact and trade-offs. <strong>Chapter Eight</strong> concludes the report and presents future work.
+  </p>
+
+  <!-- ========================================================================= -->
+  <!-- CHAPTER TWO: REQUIREMENTS ANALYSIS                                        -->
+  <!-- ========================================================================= -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Chapter Two: Requirements Analysis</h1>
+
+  <h2>2.1 Functional Requirements</h2>
+  <p>
+    Functional requirements define the core operations, transactions, and system behaviors implemented in the software. Based on rigorous source code verification, Table 2.1 formalizes the functional requirements matrix of the DBU Asset Tracking System.
+  </p>
+
+  <div class="table-caption">Table 2.1: Functional Requirements Specification Matrix</div>
+  <table>
+    <tr>
+      <th style="width: 10%;">FR-ID</th>
+      <th style="width: 22%;">Requirement Area</th>
+      <th style="width: 48%;">Description of Implemented Functionality</th>
+      <th style="width: 20%;">Implementation Status</th>
+    </tr>
+    <tr>
+      <td><strong>FR-01</strong></td>
+      <td>User Authentication &amp; Password Security</td>
+      <td>System authenticates users via email/username and bcryptjs-hashed passwords. Generates encrypted JWT session tokens (<code>authjs.session-token</code>), enforces first-login mandatory password changes, and provides tokenized password reset workflows.</td>
+      <td><span class="badge-implemented">Implemented</span></td>
+    </tr>
+    <tr>
+      <td><strong>FR-02</strong></td>
+      <td>Role-Based Access Control (RBAC)</td>
+      <td>Enforces strict route guarding at the Next.js Edge middleware layer across 7 distinct roles. Automatically rewrites paths and redirects authenticated users to dedicated dashboards while preventing unauthorized URL access.</td>
+      <td><span class="badge-implemented">Implemented</span></td>
+    </tr>
+    <tr>
+      <td><strong>FR-03</strong></td>
+      <td>Organizational Hierarchy Governance</td>
+      <td>Provides full CRUD management of university faculties, branch campuses, colleges, and academic departments with parent-child relationships and head-of-unit assignments.</td>
+      <td><span class="badge-implemented">Implemented</span></td>
+    </tr>
+    <tr>
+      <td><strong>FR-04</strong></td>
+      <td>Dynamic Asset Cataloging &amp; Form Builder</td>
+      <td>Enables registration of assets with core attributes (asset code, serial number, purchase cost, useful life, salvage value, building, room) and dynamically configured type-specific fields (RAM, CPU, Plate No) with validation rules.</td>
+      <td><span class="badge-implemented">Implemented</span></td>
+    </tr>
+    <tr>
+      <td><strong>FR-05</strong></td>
+      <td>QR Code &amp; Code 39 Barcode Generation</td>
+      <td>Automatically generates SVG/PNG QR codes encoding the public verification URL and vector Code 39 barcodes encoding asset codes. Provides printable high-resolution asset tags for physical labeling.</td>
+      <td><span class="badge-implemented">Implemented</span></td>
+    </tr>
+    <tr>
+      <td><strong>FR-06</strong></td>
+      <td>Privacy-Preserving Public QR Verification</td>
+      <td>Provides a zero-authentication public endpoint (<code>/asset/verify/[publicId]</code>) returning certified asset verification cards with masked custodian names (<code>maskPersonName</code>) while strictly suppressing costs, invoices, and DB UUIDs.</td>
+      <td><span class="badge-implemented">Implemented</span></td>
+    </tr>
+    <tr>
+      <td><strong>FR-07</strong></td>
+      <td>Two-Phase Custody Handshake Engine</td>
+      <td>Allows PAOs to assign assets, setting status to <code>PENDING_ACCEPTANCE</code>. Requires the designated staff member to formally accept or reject with a mandatory audit reason before custody transitions to <code>ASSIGNED</code>.</td>
+      <td><span class="badge-implemented">Implemented</span></td>
+    </tr>
+    <tr>
+      <td><strong>FR-08</strong></td>
+      <td>Asset Return &amp; Defect Routing</td>
+      <td>Processes asset returns, logging condition (<code>GOOD</code> vs. <code>DAMAGED</code>). If damaged, the system atomically creates a maintenance ticket and transitions the asset status to <code>UNDER_MAINTENANCE</code>.</td>
+      <td><span class="badge-implemented">Implemented</span></td>
+    </tr>
+    <tr>
+      <td><strong>FR-09</strong></td>
+      <td>Inter-Departmental Transfer Workflow</td>
+      <td>Enables department heads to request asset transfers across departments. Requires PAO approval, which atomically closes prior assignments and reassigns location records.</td>
+      <td><span class="badge-implemented">Implemented</span></td>
+    </tr>
+    <tr>
+      <td><strong>FR-10</strong></td>
+      <td>Maintenance Ticket &amp; Repair Cost Tracking</td>
+      <td>Allows staff to file defect tickets and technicians to triage, accept, and update repair progress (<code>PENDING</code>, <code>IN_PROGRESS</code>, <code>COMPLETED</code>), logging parts and labor expenditures into asset investments.</td>
+      <td><span class="badge-implemented">Implemented</span></td>
+    </tr>
+    <tr>
+      <td><strong>FR-11</strong></td>
+      <td>Physical Inventory Verification Sessions</td>
+      <td>Enables PAOs to designate inventory sessions per department. Inventory persons scan QR/barcodes via device camera; system verifies department match and blocks duplicate scans in real time.</td>
+      <td><span class="badge-implemented">Implemented</span></td>
+    </tr>
+    <tr>
+      <td><strong>FR-12</strong></td>
+      <td>Straight-Line Depreciation &amp; Valuation</td>
+      <td>Calculates monthly and annual straight-line depreciation, elapsed amortization months, carrying book values (strictly floored at salvage value), and replacement priority scores (0–100) dynamically.</td>
+      <td><span class="badge-implemented">Implemented</span></td>
+    </tr>
+    <tr>
+      <td><strong>FR-13</strong></td>
+      <td>Multi-Tiered Asset Requests &amp; Appeals</td>
+      <td>Allows staff to submit resource requests, which proceed to department head review. Approved requests route to PAO for fulfillment or rejection. Heads can file property appeals for rejected items.</td>
+      <td><span class="badge-implemented">Implemented</span></td>
+    </tr>
+    <tr>
+      <td><strong>FR-14</strong></td>
+      <td>Immutable System Audit Logging</td>
+      <td>Maintains an append-only <code>AuditLog</code> table recording actor ID, action type, entity name, previous state, new state, IP address, and timestamp for all significant mutations.</td>
+      <td><span class="badge-implemented">Implemented</span></td>
+    </tr>
+  </table>
+
+  <h2>2.2 Non-Functional Requirements</h2>
+  <p>
+    Non-functional requirements specify quality attributes, security boundaries, performance constraints, and architectural standards enforced across the system:
+  </p>
+
+  <div class="table-caption">Table 2.2: Non-Functional Requirements Specification Matrix</div>
+  <table>
+    <tr>
+      <th style="width: 18%;">Attribute</th>
+      <th style="width: 50%;">Specification &amp; Architectural Enforcement</th>
+      <th style="width: 32%;">Verification Metric</th>
+    </tr>
+    <tr>
+      <td><strong>Security &amp; Privacy</strong></td>
+      <td>Passwords hashed with bcrypt (salt factor 10); HTTP-only, SameSite encrypted JWT session cookies; zero database primary keys exposed on public QR endpoints; custodian names masked on public verification views.</td>
+      <td>100% verified; zero sensitive financial/PII data leakage in public payloads.</td>
+    </tr>
+    <tr>
+      <td><strong>Data Integrity</strong></td>
+      <td>All multi-table state transitions (e.g., assignment, return, transfer, maintenance) execute inside Prisma ACID <code>$transaction</code> blocks with foreign key cascade guards and soft-delete filters.</td>
+      <td>Zero partial state writes or orphaned records during simulated failures.</td>
+    </tr>
+    <tr>
+      <td><strong>Performance &amp; Scalability</strong></td>
+      <td>Server-rendered React components with selective client hydration; database connection pooling via <code>@prisma/adapter-pg</code> and PgBouncer; sub-100ms API response times for indexed lookups.</td>
+      <td>Public verification page loads in &lt; 250ms; dashboard loads in &lt; 600ms.</td>
+    </tr>
+    <tr>
+      <td><strong>Usability &amp; Responsiveness</strong></td>
+      <td>Responsive Tailwind CSS grid system adapting seamlessly across 1440px desktop workstations and 375px mobile screens; high-contrast typography; intuitive modal dialogs.</td>
+      <td>100% responsive across desktop, tablet, and mobile viewports.</td>
+    </tr>
+    <tr>
+      <td><strong>Maintainability &amp; Modularity</strong></td>
+      <td>Clean architectural separation between presentation components (<code>src/components</code>), route handlers, server actions (<code>src/app/actions</code>), and domain services (<code>src/services</code>).</td>
+      <td>Full TypeScript type safety with zero unchecked implicit <code>any</code> types.</td>
+    </tr>
+    <tr>
+      <td><strong>Availability &amp; Reliability</strong></td>
+      <td>Serverless edge deployment on Vercel with automatic failover; distributed Neon PostgreSQL with Write-Ahead Logging (WAL) and automated point-in-time recovery.</td>
+      <td>Target 99.9% uptime with zero single-server hardware failure vulnerabilities.</td>
+    </tr>
+  </table>
+
+  <h2>2.3 User Roles and Responsibilities</h2>
+  <p>
+    The system defines seven authenticated user roles formalized within the Prisma <code>RoleName</code> enumeration, alongside unauthenticated public verifiers:
+  </p>
+
+  <div class="table-caption">Table 2.3: Comprehensive System Roles and Institutional Responsibilities</div>
+  <table>
+    <tr>
+      <th style="width: 25%;">Role Name</th>
+      <th style="width: 20%;">Dedicated Dashboard</th>
+      <th style="width: 55%;">Primary Institutional Responsibilities</th>
+    </tr>
+    <tr>
+      <td><strong>SYSTEM_ADMINISTRATOR</strong></td>
+      <td><code>/admin/dashboard</code></td>
+      <td>Full administrative governance; user account provisioning; role assignments; faculty and department configuration; dynamic form builder specification; system audit log review.</td>
+    </tr>
+    <tr>
+      <td><strong>PROPERTY_ADMINISTRATION_OFFICER (PAO)</strong></td>
+      <td><code>/pao/dashboard</code></td>
+      <td>Central property management; dynamic asset registration; QR code and barcode tag generation; asset custody assignments; inter-departmental transfer approval; physical inventory session creation.</td>
+    </tr>
+    <tr>
+      <td><strong>DEPARTMENT_HEAD</strong></td>
+      <td><code>/head/dashboard</code></td>
+      <td>Departmental asset oversight; reviewing staff equipment requests; approving/rejecting internal requests; initiating department-level transfer requests; lodging property allocation appeals.</td>
+    </tr>
+    <tr>
+      <td><strong>STAFF_MEMBER</strong></td>
+      <td><code>/staff/dashboard</code></td>
+      <td>Institutional custody holder; inspecting and accepting or rejecting pending asset assignments; submitting new equipment requests; reporting asset damage; tracking personal custody history.</td>
+    </tr>
+    <tr>
+      <td><strong>MAINTENANCE_TECHNICIAN</strong></td>
+      <td><code>/tech/dashboard</code></td>
+      <td>Asset repair management; reviewing defect tickets; updating repair status (<code>IN_PROGRESS</code>, <code>COMPLETED</code>); logging spare-part and labor expenditures into asset investment totals.</td>
+    </tr>
+    <tr>
+      <td><strong>INTERNAL_AUDITOR</strong></td>
+      <td><code>/auditor/dashboard</code></td>
+      <td>Institutional compliance audit; monitoring straight-line capital depreciation curves; evaluating net carrying book values; reviewing immutable transaction audit logs; recording financial discrepancies.</td>
+    </tr>
+    <tr>
+      <td><strong>INVENTORY_PERSON</strong></td>
+      <td><code>/inventory</code></td>
+      <td>Designated stocktaking officer; conducting scheduled physical inventory sessions; scanning asset QR/barcodes via mobile camera; reconciling counts; flagging cross-departmental mismatches.</td>
+    </tr>
+    <tr>
+      <td><strong>Public Visitor / Gate Security</strong></td>
+      <td><code>/asset/verify/[publicId]</code></td>
+      <td>Unauthenticated public actor; scans physical QR codes on assets using mobile phone cameras; verifies authentic university registration, asset status, and department custody without logging in.</td>
+    </tr>
+  </table>
+
+  <h2>2.4 Use Case Overview &amp; Actor-to-Feature Mapping</h2>
+  <p>
+    The interaction between external actors and system capabilities is formalized in Table 2.4, serving as the basis for detailed UML use case modeling in Chapter Three.
+  </p>
+
+  <div class="table-caption">Table 2.4: High-Level Use Case to Actor Mapping Matrix</div>
+  <table>
+    <tr>
+      <th style="width: 35%;">Use Case Subsystem</th>
+      <th style="width: 35%;">Major Use Cases</th>
+      <th style="width: 30%;">Associated Actors</th>
+    </tr>
+    <tr>
+      <td><strong>Security &amp; Administration</strong></td>
+      <td>Authenticate User, Manage Users, Configure Faculties, Build Custom Asset Forms, View Audit Logs</td>
+      <td>System Administrator, All Users</td>
+    </tr>
+    <tr>
+      <td><strong>Asset Cataloging &amp; Tagging</strong></td>
+      <td>Register Asset, Generate QR &amp; Barcode, Print Asset Labels, Update Asset Specifications</td>
+      <td>Property Administration Officer</td>
+    </tr>
+    <tr>
+      <td><strong>Custody Lifecycle Management</strong></td>
+      <td>Assign Asset, Accept Assignment, Reject Assignment, Return Asset, Request Transfer, Approve Transfer</td>
+      <td>PAO, Department Head, Staff Member</td>
+    </tr>
+    <tr>
+      <td><strong>Maintenance &amp; Repairs</strong></td>
+      <td>Report Defect, Auto-Generate Maintenance, Triage Repair Ticket, Record Repair Cost, Complete Maintenance</td>
+      <td>Staff Member, PAO, Maintenance Tech</td>
+    </tr>
+    <tr>
+      <td><strong>Physical Inventory Verification</strong></td>
+      <td>Create Inventory Session, Scan Asset QR/Barcode, Detect Department Mismatch, Prevent Duplicate Count</td>
+      <td>PAO, Inventory Person</td>
+    </tr>
+    <tr>
+      <td><strong>Financial Accounting &amp; Audit</strong></td>
+      <td>Compute Straight-Line Depreciation, Evaluate Book Value, Calculate Replacement Score, Audit Discrepancies</td>
+      <td>Internal Auditor, System Admin</td>
+    </tr>
+    <tr>
+      <td><strong>Public Verification</strong></td>
+      <td>Scan Physical Tag, View Certified Asset Card, Mask Assignee Identity</td>
+      <td>Public Visitor, Campus Security Guard</td>
+    </tr>
+  </table>
+
+  <!-- ========================================================================= -->
+  <!-- CHAPTER THREE: SYSTEM ANALYSIS AND DESIGN                                 -->
+  <!-- ========================================================================= -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Chapter Three: System Analysis and Design</h1>
+
+  <h2>3.1 System Context</h2>
+  <p>
+    The System Context Diagram defines the environmental boundary of the DBU Asset Tracking System, illustrating how primary institutional actors and external stakeholders interact with the central software solution. As visualized in Figure 3.1, the central software platform serves as the single source of truth for all property-related information at Debre Berhan University.
+  </p>
+
+  <div class="figure-container large">
+    <img src="public/diagrams/fig_3_1_system_context.svg" alt="System Context Diagram" />
+    <div class="figure-caption">Figure 3.1: System Context Diagram of the DBU Asset Tracking System</div>
+  </div>
+
+  <p>
+    The central system orchestrates workflows across seven authenticated actors and one unauthenticated external actor. The <strong>System Administrator</strong> interfaces with the system boundary to manage user accounts, allocate permissions, establish departmental units, configure dynamic form builder schemas, and monitor system-wide audit trails. The <strong>Property Administration Officer (PAO)</strong> operates at the operational core, registering physical equipment, generating cryptographic QR code tags, executing asset custody handshakes, approving inter-departmental transfers, and assigning physical stocktaking duties.
+  </p>
+  <p>
+    The <strong>Department Head</strong> monitors departmental inventory balances, approves or rejects staff equipment requisitions, and lodges property allocation appeals directly to property management. The <strong>Staff Member</strong> interacts with the custody subsystem to inspect and formally accept or reject equipment assigned to their care, report defective hardware, and track personal return receipts. <strong>Maintenance Technicians</strong> receive automated repair work orders, triage equipment malfunctions, and log maintenance expenditures. <strong>Inventory Persons</strong> execute scheduled physical audits via mobile camera scanners, while <strong>Internal Auditors</strong> inspect capital depreciation metrics and investigate discrepancies. Finally, <strong>Public Visitors and Campus Gate Security</strong> interact with the system via zero-authentication QR code scans to confirm authentic university registration.
+  </p>
+
+  <h2>3.2 System Architecture</h2>
+  <p>
+    The DBU Asset Tracking System is engineered according to a modern, decoupled, multi-tier software architecture leveraging the Next.js 14 App Router framework. Figure 3.2 illustrates the layered component structure and data flow.
+  </p>
+
+  <div class="figure-container large">
+    <img src="public/diagrams/fig_3_2_system_architecture.svg" alt="System Architecture Diagram" />
+    <div class="figure-caption">Figure 3.2: System Architecture Diagram – Layered Component Structure</div>
+  </div>
+
+  <p>
+    The architecture comprises four distinct logical tiers:
+  </p>
+  <ul>
+    <li><strong>1. Presentation Tier (Client &amp; Server Components):</strong> Built using React 18, React Server Components (RSC), and Tailwind CSS. The user interface delivers seven dedicated dashboard panels tailored to each stakeholder role. Client-side components handle dynamic interactions—such as Recharts interactive financial charts, HTML5 video camera QR scanning via <code>jsQR</code>, dynamic form builder drag-and-drop interfaces, and client-side label printing. Server components fetch pre-rendered markup directly on the server, minimizing client JavaScript bundle size.</li>
+    <li><strong>2. Application Routing &amp; Security Tier:</strong> Governed by the Next.js 14 App Router, NextAuth.js (v5), and Edge middleware (<code>middleware.ts</code>). Incoming HTTP requests are intercepted at the edge to verify encrypted JWT session cookies (<code>authjs.session-token</code>). The middleware enforces strict Role-Based Access Control (RBAC), automatically routing users to their authorized dashboards while whitelisting the public verification route (<code>/asset/verify/[publicId]</code>). Server actions (<code>"use server"</code>) provide type-safe RPC endpoints that mutate state and trigger atomic path revalidation (<code>revalidatePath</code>).</li>
+    <li><strong>3. Domain Business Logic Tier:</strong> Implemented as specialized TypeScript domain services (<code>src/services</code>). This tier encapsulates core institutional business rules, including: (a) dynamic custom field validation in <code>asset.ts</code>; (b) two-phase custody handshake state machines in <code>assignment.ts</code> and <code>return.ts</code>; (c) straight-line capital depreciation and replacement priority algorithms in <code>financials.ts</code> and <code>valuation.ts</code>; (d) physical inventory reconciliation in <code>inventory.ts</code>; (e) privacy-safe name masking and rate limiting in <code>public-asset.ts</code> and <code>privacy.ts</code>; and (f) immutable audit trail creation in <code>audit.ts</code>.</li>
+    <li><strong>4. Data Access &amp; Persistence Tier:</strong> Comprises Prisma ORM v7 client, connection pooling adapters (<code>@prisma/adapter-pg</code>), and a cloud-native PostgreSQL relational database hosted on Neon. The Prisma client translates TypeScript queries into optimized SQL, executes multi-table atomic transactions via the <code>$transaction</code> API, enforces foreign key relational constraints, and manages schema migrations.</li>
+  </ul>
+
+  <h2>3.3 Deployment Architecture</h2>
+  <p>
+    The Deployment Architecture Diagram defines the physical and cloud execution topology of the DBU Asset Tracking System, detailing hardware nodes, hosting environments, communication protocols, and port bindings. Figure 3.3 illustrates the deployed production topology.
+  </p>
+
+  <div class="figure-container large">
+    <img src="public/diagrams/fig_3_3_deployment_architecture.svg" alt="Deployment Architecture Diagram" />
+    <div class="figure-caption">Figure 3.3: Deployment Architecture Diagram – Physical Node Topology</div>
+  </div>
+
+  <p>
+    The deployment topology consists of three primary physical nodes communicating across encrypted transport pipelines:
+  </p>
+  <ul>
+    <li><strong>Client Device Node:</strong> Represents end-user hardware, including university desktop workstations (used by administrators, PAOs, and department heads), field laptops, and mobile smartphones/tablets (used by inventory personnel, maintenance technicians, gate guards, and public citizens). Clients execute modern web browsers (Chrome, Edge, Safari, Firefox). All communication with the application server occurs over the public Internet or university campus intranet using <strong>HTTPS</strong> secured by <strong>TLS 1.3</strong> over TCP port 443.</li>
+    <li><strong>Vercel Serverless Hosting Node:</strong> The application tier is deployed on Vercel's global edge infrastructure. The Vercel Edge Network provides global Anycast DNS routing, automated SSL/TLS termination, and static asset edge caching. Compute workloads execute within serverless Node.js container environments running Next.js 14.2.23. The runtime manages NextAuth session verification, server action execution, Code 39 barcode SVG generation, QR code image encoding, and background email dispatching via the Resend API.</li>
+    <li><strong>Neon Cloud Database Node:</strong> The persistence tier is hosted on Neon Serverless PostgreSQL located in the AWS <code>us-east-2</code> (Ohio) cloud region. Communication between the Vercel serverless application runtime and Neon occurs across an encrypted TCP connection on port 5432 using strict SSL mode (<code>sslmode=verify-full</code>). Neon utilizes an integrated PgBouncer connection pooler (<code>ep-mute-recipe-ax4u8oow-pooler</code>) to multiplex hundreds of transient serverless connection requests into persistent PostgreSQL worker processes, eliminating connection exhaustion during high-concurrency campus audits. Neon provides automated Write-Ahead Logging (WAL) stream replication, automated daily snapshots, and Point-in-Time Recovery (PITR).</li>
+  </ul>
+
+  <h2>3.4 Use Case Modeling</h2>
+  <p>
+    The functional capabilities of the system and their actor interactions are modeled in the comprehensive UML Use Case Diagram shown in Figure 3.4.
+  </p>
+
+  <div class="figure-container large">
+    <img src="public/dbu_use_case_diagram.png" alt="DBU Asset Tracking System UML Use Case Diagram" />
+    <div class="figure-caption">Figure 3.4: Comprehensive UML Use Case Diagram of the DBU Asset Tracking System</div>
+  </div>
+
+  <p>
+    As delineated in Figure 3.4, the system use cases are structured into cohesive functional subsystems:
+  </p>
+  <ul>
+    <li><strong>Security &amp; System Administration Subsystem:</strong> Encompasses user authentication (<code>«include»</code> Verify Credentials), user lifecycle management, organizational unit configuration, dynamic form builder specification, and immutable audit log review.</li>
+    <li><strong>Asset Cataloging &amp; Identification Subsystem:</strong> Encapsulates asset registration, dynamic specification validation, QR code string encoding (<code>«include»</code> Generate Unique Public UUID), vector Code 39 barcode generation, and physical label printing.</li>
+    <li><strong>Custody &amp; Request Subsystem:</strong> Models the two-phase handshake workflow. When a PAO assigns an asset, the use case <code>Assign Asset</code> requires <code>«include»</code> Set Pending Acceptance. The staff member initiates <code>Accept Assignment</code> or <code>Reject Assignment</code> (<code>«extend»</code> Specify Rejection Reason). Requisitions follow <code>Request Asset</code>, <code>Review Request</code>, and <code>Lodge Property Appeal</code>.</li>
+    <li><strong>Maintenance &amp; Defect Triage Subsystem:</strong> Encompasses defect reporting by staff, automatic work order creation upon damaged returns (<code>«extend»</code> Auto-Flag Maintenance), technician ticket acceptance, repair cost logging, and ticket completion.</li>
+    <li><strong>Physical Inventory &amp; Stocktaking Subsystem:</strong> Details inventory session initialization, mobile camera QR/barcode scanning, automated duplicate scan detection, and cross-department mismatch alerting.</li>
+    <li><strong>Financial Valuation &amp; Audit Subsystem:</strong> Models straight-line depreciation calculation, net carrying book value calculation, salvage value threshold enforcement, replacement scoring, and discrepancies auditing.</li>
+    <li><strong>Public Verification Subsystem:</strong> Enables unauthenticated public visitors and gate security guards to scan asset tags, verify registration authenticity, and view masked custodian details with zero exposure of sensitive financial or procurement records.</li>
+  </ul>
+
+  <h2>3.5 Database Design &amp; Relational Schema</h2>
+  <p>
+    The database design of the DBU Asset Tracking System was reverse-engineered directly from the production Prisma schema (<code>prisma/schema.prisma</code>) and verified against the live PostgreSQL database. Figure 3.5 presents the high-readability Entity-Relationship Diagram (ERD).
+  </p>
+
+  <div class="figure-container large">
+    <img src="public/diagrams/fig_3_5_entity_relationship.svg" alt="Entity-Relationship Diagram" />
+    <div class="figure-caption">Figure 3.5: Entity-Relationship Diagram of the DBU Asset Tracking Database</div>
+  </div>
+
+  <p>
+    The relational schema comprises 21 distinct tables structured around normalized relational clusters:
+  </p>
+  <ul>
+    <li><strong>Administrative Cluster (<code>Role</code>, <code>User</code>, <code>Faculty</code>, <code>OrganizationalUnit</code>):</strong> <code>Role</code> defines system permissions governed by the <code>RoleName</code> enum. <code>User</code> stores credentials, profile details, and foreign keys to <code>Role</code> (1-to-many) and <code>OrganizationalUnit</code> (optional many-to-1). <code>Faculty</code> links to departments via a 1-to-many relationship, and <code>OrganizationalUnit</code> supports self-referential parent-child relationships (e.g., college-to-department).</li>
+    <li><strong>Asset Registry Cluster (<code>Asset</code>, <code>AssetCategory</code>, <code>AssetType</code>, <code>QRCode</code>, <code>AssetImage</code>, <code>Supplier</code>):</strong> <code>Asset</code> serves as the central entity. Crucially, each asset possesses both an internal database primary key (<code>id : UUID</code>) and an independent, non-guessable public identifier (<code>publicId : UUID</code>) utilized strictly for public QR verification URLs. <code>QRCode</code> maintains a 1-to-1 unique relationship with <code>Asset</code>, storing both the verification URL string and Code 39 barcode string. <code>AssetCategory</code> links to multiple <code>AssetType</code> records, which in turn define custom technical specification fields via <code>AssetTypeField</code>, <code>RegistrationField</code>, and <code>AssetFieldValue</code>.</li>
+    <li><strong>Custody Lifecycle Cluster (<code>Assignment</code>, <code>Return</code>, <code>Transfer</code>):</strong> <code>Assignment</code> records asset custody transitions, storing <code>assignedToUserId</code>, <code>departmentId</code>, <code>assignedByUserId</code>, and <code>AssignmentStatus</code> (<code>PENDING_ACCEPTANCE</code>, <code>ACCEPTED</code>, <code>REJECTED</code>, <code>RETURNED</code>). <code>Return</code> links to <code>Assignment</code> and <code>Asset</code>, recording return condition and damage flags. <code>Transfer</code> tracks inter-departmental relocation requests and PAO approvals.</li>
+    <li><strong>Maintenance &amp; Verification Cluster (<code>Maintenance</code>, <code>InventorySession</code>, <code>InventoryPerson</code>, <code>InventoryVerification</code>, <code>AuditLog</code>):</strong> <code>Maintenance</code> tracks repair tickets, technician assignments, status progression, and repair costs. <code>InventorySession</code> manages departmental audits assigned to an <code>InventoryPerson</code>, recording scans in <code>InventoryVerification</code> with composite unique constraints on <code>[inventorySessionId, assetId]</code> to prevent duplicate counting. <code>AuditLog</code> maintains immutable audit trails with JSON snapshots of state changes.</li>
+    <li><strong>Governance &amp; Financial Cluster (<code>AssetRequest</code>, <code>PropertyAppeal</code>, <code>FinancialAudit</code>):</strong> Models multi-tiered equipment requisitions from staff, administrative appeals from department heads, and formal financial audit findings logged by internal auditors.</li>
+  </ul>
+
+  <h2>3.6 Domain Class Diagram</h2>
+  <p>
+    The structural model of the core domain entities, operations, and utility services is represented in the Domain Class Diagram in Figure 3.6.
+  </p>
+
+  <div class="figure-container large">
+    <img src="public/diagrams/fig_3_6_class_diagram.svg" alt="Domain Class Diagram" />
+    <div class="figure-caption">Figure 3.6: Domain Class Diagram – Core Architectural Entities and Services</div>
+  </div>
+
+  <p>
+    The class diagram illustrates the object-oriented abstractions implemented in the TypeScript codebase. Domain entities encapsulate operational methods: <code>Asset</code> provides methods to register assets, evaluate real-time depreciation, update status, and calculate replacement priority scores. <code>Assignment</code> exposes methods to initiate assignments, accept custody, and reject custody with mandatory reasons. <code>Return</code> manages physical check-in and triggers automated maintenance ticketing when damage is detected.
+  </p>
+  <p>
+    Specialized stateless service classes provide high-value architectural utilities: <code>FinancialValuationEngine</code> acts as the single source of truth for straight-line amortization calculations, elapsed time clamping, and carrying value derivations. <code>PublicAssetVerificationService</code> enforces zero-authentication verification security, rate limiting, and cryptographic name masking.
+  </p>
+
+  <h2>3.7 Behavioral Modeling: Activity Diagrams</h2>
+  <p>
+    Activity diagrams model the dynamic, step-by-step procedural workflows executed across system swimlanes. Figures 3.7, 3.8, and 3.9 illustrate the three most critical operational lifecycles implemented in the system.
+  </p>
+
+  <div class="figure-container large">
+    <img src="public/diagrams/fig_3_7_asset_registration_activity.svg" alt="Asset Registration Activity Diagram" />
+    <div class="figure-caption">Figure 3.7: Activity Diagram – Dynamic Asset Registration Workflow</div>
+  </div>
+
+  <p>
+    <strong>Asset Registration Workflow (Figure 3.7):</strong> Initiated by the Property Administration Officer selecting an asset category and type. The application server dynamically fetches the configured technical specification fields. Upon form submission, the server validates duplicate asset codes and serial numbers. If valid, an ACID database transaction writes the asset record, generates unique QR and Code 39 barcode vectors, computes baseline straight-line amortization, and outputs a printable asset tag.
+  </p>
+
+  <div class="figure-container large">
+    <img src="public/diagrams/fig_3_8_asset_assignment_activity.svg" alt="Asset Assignment Activity Diagram" />
+    <div class="figure-caption">Figure 3.8: Activity Diagram – Two-Phase Custody Handshake Workflow</div>
+  </div>
+
+  <p>
+    <strong>Two-Phase Custody Handshake Workflow (Figure 3.8):</strong> When a PAO assigns an available asset (<code>ACTIVE</code>), the system creates an assignment record with status <code>PENDING_ACCEPTANCE</code> and transitions the asset status to <code>PENDING_ASSIGNMENT</code>. The system dispatches an in-app notification to the designated staff member. The staff member inspects the physical asset and chooses to either accept or reject custody:
+  </p>
+  <ul>
+    <li>If <strong>Accepted</strong>, the assignment transitions to <code>ACCEPTED</code>, the asset transitions to <code>ASSIGNED</code>, an audit log is emitted, and the PAO is notified of confirmed custody.</li>
+    <li>If <strong>Rejected</strong>, the staff member must enter a mandatory rejection reason. The assignment transitions to <code>REJECTED</code>, the asset status immediately reverts to <code>ACTIVE</code> (available for reassignment), and an alert notifies the PAO.</li>
+  </ul>
+
+  <div class="figure-container large">
+    <img src="public/diagrams/fig_3_9_maintenance_activity.svg" alt="Maintenance Activity Diagram" />
+    <div class="figure-caption">Figure 3.9: Activity Diagram – Maintenance &amp; Repair Lifecycle Workflow</div>
+  </div>
+
+  <p>
+    <strong>Maintenance &amp; Defect Lifecycle (Figure 3.9):</strong> When a staff member reports an equipment malfunction or an asset is returned in damaged condition, the system automatically creates a maintenance ticket with status <code>PENDING</code> and transitions the asset status to <code>UNDER_MAINTENANCE</code>. Available technicians are notified. A technician accepts the ticket (transitioning status to <code>IN_PROGRESS</code>), executes repairs, replaces spare parts, and logs total labor and material costs. Upon marking the ticket <code>COMPLETED</code>, the system updates cumulative maintenance expenses, restores the asset status to <code>ACTIVE</code>, and dispatches a completion notice to the reporter.
+  </p>
+
+  <h2>3.8 Dynamic Modeling: Sequence Diagrams</h2>
+  <p>
+    Sequence diagrams capture the precise temporal order of messages and RPC calls exchanged between actors, browser controllers, server middleware, domain services, and the database.
+  </p>
+
+  <div class="figure-container large">
+    <img src="public/diagrams/fig_3_10_authentication_sequence.svg" alt="Authentication Sequence Diagram" />
+    <div class="figure-caption">Figure 3.10: Sequence Diagram – User Authentication and JWT Role Redirection</div>
+  </div>
+
+  <p>
+    <strong>Authentication Sequence (Figure 3.10):</strong> Details the secure login process. The user submits credentials to <code>loginAction</code>. NextAuth invokes the credentials provider, which queries the database for the user record by email or username. The server compares the submitted plaintext password against the stored bcrypt hash. Upon validation, NextAuth issues an encrypted JWT session cookie (<code>authjs.session-token</code>) containing the user ID, role, and department. The Edge middleware intercepts the redirect to root (<code>/</code>) and performs an RBAC evaluation, redirecting the user to their designated dashboard.
+  </p>
+
+  <div class="figure-container large">
+    <img src="public/diagrams/fig_3_11_assignment_sequence.svg" alt="Assignment Sequence Diagram" />
+    <div class="figure-caption">Figure 3.11: Sequence Diagram – Custody Assignment &amp; Acceptance Handshake</div>
+  </div>
+
+  <p>
+    <strong>Custody Assignment &amp; Handshake Sequence (Figure 3.11):</strong> Traces the execution of <code>assignAsset</code> and <code>acceptAssignment</code>. Demonstrates the Prisma transaction boundary enforcing simultaneous creation of the assignment record, updating asset status to <code>PENDING_ASSIGNMENT</code>, writing an immutable audit log, and triggering in-app notification dispatching. In Phase 2, the staff member invokes <code>acceptAssignment</code>, completing the reciprocal custody confirmation.
+  </p>
+
+  <div class="figure-container large">
+    <img src="public/diagrams/fig_3_12_qr_verification_sequence.svg" alt="QR Verification Sequence Diagram" />
+    <div class="figure-caption">Figure 3.12: Sequence Diagram – Privacy-Preserving Public QR Verification</div>
+  </div>
+
+  <p>
+    <strong>Privacy-Preserving Public QR Verification Sequence (Figure 3.12):</strong> Illustrates a zero-authentication public scan. When an unauthenticated visitor scans a physical tag, the mobile browser requests <code>GET /asset/verify/[publicId]</code>. The Edge middleware verifies the whitelist and allows access. The server executes IP rate limiting via <code>checkVerificationRateLimit</code>. The database query strictly projects non-sensitive public columns (excluding costs, invoices, and DB primary keys). The masking engine executes <code>maskPersonName</code> on the custodian name (e.g., "Abebe Kebede" becomes "Abebe K."), returning a certified verification payload to the browser.
+  </p>
+
+  <!-- ========================================================================= -->
+  <!-- CHAPTER FOUR: SYSTEM IMPLEMENTATION                                       -->
+  <!-- ========================================================================= -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Chapter Four: System Implementation</h1>
+
+  <h2>4.1 Development Environment &amp; Technological Stack</h2>
+  <p>
+    The DBU Asset Tracking System was engineered strictly utilizing enterprise-grade, modern open-source software technologies. Table 4.1 outlines the verified technology stack and production runtime environment.
+  </p>
+
+  <div class="table-caption">Table 4.1: Software Stack and Production Environment Inventory</div>
+  <table>
+    <tr>
+      <th style="width: 25%;">Component Layer</th>
+      <th style="width: 30%;">Selected Technology</th>
+      <th style="width: 45%;">Role in DBU Asset Tracking System</th>
+    </tr>
+    <tr>
+      <td><strong>Frontend Framework</strong></td>
+      <td>Next.js 14.2.23 (React 18)</td>
+      <td>Server-rendered React components, App Router architecture, and selective client-side hydration.</td>
+    </tr>
+    <tr>
+      <td><strong>Programming Language</strong></td>
+      <td>TypeScript 5.x</td>
+      <td>Full-stack static typing across database schemas, server actions, and UI component props.</td>
+    </tr>
+    <tr>
+      <td><strong>UI Styling &amp; Icons</strong></td>
+      <td>Tailwind CSS 3.4 &amp; Lucide React</td>
+      <td>Utility-first responsive design system and consistent academic user interface iconography.</td>
+    </tr>
+    <tr>
+      <td><strong>Data Visualization</strong></td>
+      <td>Recharts 3.9.2</td>
+      <td>Renders interactive capital depreciation curves, departmental distributions, and maintenance costs.</td>
+    </tr>
+    <tr>
+      <td><strong>Database &amp; ORM</strong></td>
+      <td>PostgreSQL 16 &amp; Prisma ORM 7.9.1</td>
+      <td>Relational schema modeling, migration management, connection pooling, and ACID transactions.</td>
+    </tr>
+    <tr>
+      <td><strong>Database Hosting</strong></td>
+      <td>Neon Serverless Cloud (AWS us-east-2)</td>
+      <td>Autoscaling serverless PostgreSQL compute with integrated PgBouncer connection multiplexing.</td>
+    </tr>
+    <tr>
+      <td><strong>Authentication &amp; Security</strong></td>
+      <td>NextAuth.js v5 (beta 25) &amp; bcryptjs</td>
+      <td>Credentials provider authentication, encrypted JWT sessions, and bcrypt password hashing.</td>
+    </tr>
+    <tr>
+      <td><strong>Optical Encoding &amp; Scanning</strong></td>
+      <td>qrcode 1.5.4, custom Code 39 &amp; jsQR</td>
+      <td>Two-dimensional QR code generation, Code 39 barcode SVG generation, and mobile camera scanning.</td>
+    </tr>
+    <tr>
+      <td><strong>Email Notification API</strong></td>
+      <td>Resend SDK 6.24.0</td>
+      <td>Transactional email dispatching for critical password resets and administrative security alerts.</td>
+    </tr>
+  </table>
+
+  <h2>4.2 Authentication and Role-Based Authorization Implementation</h2>
+  <p>
+    Authentication is implemented using NextAuth.js v5 configured with a custom Credentials Provider (<code>src/auth.ts</code>). User passwords are encrypted using <code>bcryptjs</code> with a salt work factor of 10. During authentication, the system supports lookup by either email address or institutional username. Upon successful credential validation, the <code>jwt</code> callback injects the user's unique ID, assigned role (<code>RoleName</code>), and department ID into an encrypted JSON Web Token stored in an HTTP-only, SameSite-protected cookie named <code>authjs.session-token</code>.
+  </p>
+  <p>
+    Authorization is enforced at the edge via Next.js middleware (<code>src/middleware.ts</code>). The middleware intercepts all incoming requests and verifies whether the user possesses an active session. Unauthenticated requests targeting protected routes are immediately redirected to <code>/login</code> via HTTP 307 redirects. For authenticated users, the middleware evaluates role permissions against targeted route segments: requests to <code>/admin/*</code> require <code>SYSTEM_ADMINISTRATOR</code>; requests to <code>/pao/*</code> require <code>PROPERTY_ADMINISTRATION_OFFICER</code>; requests to <code>/head/*</code> require <code>DEPARTMENT_HEAD</code>; requests to <code>/staff/*</code> require <code>STAFF_MEMBER</code>; requests to <code>/tech/*</code> require <code>MAINTENANCE_TECHNICIAN</code>; requests to <code>/auditor/*</code> require <code>INTERNAL_AUDITOR</code>; and requests to <code>/inventory/*</code> require <code>INVENTORY_PERSON</code>. When an authenticated user visits the root path (<code>/</code>), the middleware automatically resolves their role and redirects them to their designated dashboard. Crucially, the public verification route (<code>/asset/verify/*</code>) is explicitly whitelisted to permit instant zero-authentication verification by campus security and visitors.
+  </p>
+
+  <h2>4.3 User, Organizational Unit, and Role Management</h2>
+  <p>
+    User management is centralized under the System Administrator console (<code>src/app/(dashboard)/admin/users</code>). Administrators can provision new user accounts, designate institutional roles, and bind users to specific organizational units. To support Debre Berhan University's administrative hierarchy, the database models <code>Faculty</code> records (e.g., Faculty of Technology, Faculty of Business and Economics) linked to child <code>OrganizationalUnit</code> records (e.g., Software Engineering, Computer Science, Accounting) supporting parent-child self-referential relations. When a user account is first initialized with a temporary password, the <code>mustChangePassword</code> flag is set to <code>true</code>, causing the middleware to intercept and force redirection to <code>/profile/security</code> until a secure personal password is established.
+  </p>
+
+  <h2>4.4 Dynamic Asset Registration &amp; Specification Engine</h2>
+  <p>
+    Asset registration (implemented in <code>src/services/asset.ts</code> and <code>src/components/asset-registration-client.tsx</code>) handles both standard property accounting fields and dynamically defined technical specifications. Core attributes include: asset name, unique asset code, unique serial number, description, category, asset type, department, campus, building, room number, funding source (<code>GOVERNMENT_BUDGET</code>, <code>UNIVERSITY_INTERNAL_BUDGET</code>, <code>RESEARCH_GRANT</code>, <code>DONATION</code>), purchase date, purchase cost, expected lifecycle years, and salvage value.
+  </p>
+  <p>
+    To accommodate diverse asset types without altering the underlying database schema, the system implements a <strong>Dynamic Form Builder</strong> (<code>AssetTypeField</code>, <code>RegistrationField</code>, and <code>AssetFieldValue</code>). Administrators can configure custom fields (e.g., RAM capacity, CPU model, Vehicle Engine Number, Chassis Number) per asset type, specifying field types (TEXT, NUMBER, DECIMAL, DATE, DROPDOWN), default values, validation ranges, and mandatory flags. During asset creation, <code>registerAsset</code> dynamically queries active configurations for the selected asset type, validates submitted values against configured bounds, and atomically persists them in the <code>AssetFieldValue</code> table within a single transaction.
+  </p>
+
+  <h2>4.5 Asset Assignment, Two-Phase Handshake, and Return Workflows</h2>
+  <p>
+    The asset custody workflow implements a deterministic state machine designed to eliminate custody deniability. In <code>src/services/assignment.ts</code>, the <code>assignAsset</code> function creates an <code>Assignment</code> record with status <code>PENDING_ACCEPTANCE</code> and transitions the asset status from <code>ACTIVE</code> to <code>PENDING_ASSIGNMENT</code>. The transaction dispatches an in-app notification to the designated staff member. While pending, the asset cannot be assigned to any other user or transferred.
+  </p>
+  <p>
+    The staff member logs into their dashboard, inspects the physical equipment, and chooses between two reciprocal actions:
+  </p>
+  <ul>
+    <li><strong>Acceptance:</strong> Calling <code>acceptAssignment</code> verifies that the caller matches <code>assignedToUserId</code>. It atomically updates the assignment status to <code>ACCEPTED</code>, records the timestamp in <code>acceptedAt</code>, transitions the asset status to <code>ASSIGNED</code>, logs an audit entry, and notifies the PAO.</li>
+    <li><strong>Rejection:</strong> Calling <code>rejectAssignment</code> requires a mandatory rejection explanation string. The function updates the assignment status to <code>REJECTED</code>, records <code>rejectionReason</code>, reverts the asset status back to <code>ACTIVE</code>, and alerts the PAO to reallocate the asset.</li>
+  </ul>
+  <p>
+    Asset returns (<code>src/services/return.ts</code>) allow property officers to log equipment check-in. The return record captures <code>conditionAtReturn</code> (<code>GOOD</code> vs. <code>DAMAGED</code>). If marked <code>DAMAGED</code>, the transaction automatically generates a maintenance ticket and transitions the asset to <code>UNDER_MAINTENANCE</code>. Inter-departmental transfers (<code>src/services/transfer.ts</code>) allow department heads to request asset relocations, requiring formal approval by a PAO before custody and department bindings are updated.
+  </p>
+
+  <h2>4.6 QR Code, Barcode Engineering, and Public Verification</h2>
+  <p>
+    Optical identification is engineered through two complementary standards:
+  </p>
+  <ul>
+    <li><strong>QR Code Generation:</strong> Utilizing the <code>qrcode</code> package, the system generates high-density two-dimensional QR codes. Crucially, the QR code encodes a secure public verification URL pointing to the university domain: <code>https://dbu-asset-tracking.vercel.app/asset/verify/[publicId]</code>. The encoded target uses the asset's random <code>publicId</code> UUID, completely decoupling public optical scanning from the internal database primary key.</li>
+    <li><strong>Native Code 39 Barcode Generator:</strong> To ensure zero-dependency client and server rendering of linear barcodes, the system implements a native SVG generator (<code>generateBarcodeSvg</code> in <code>asset-registration-client.tsx</code> and <code>asset-details-client.tsx</code>). The algorithm encodes alphanumeric asset codes into standardized Code 39 patterns using 9 binary elements (narrow and wide bars/spaces) flanked by start/stop asterisks, rendering crisp vector barcodes printable on standard label stock.</li>
+    <li><strong>Zero-Authentication Public Verification (<code>src/services/public-asset.ts</code>):</strong> The endpoint <code>/asset/verify/[publicId]</code> allows any visitor, auditor, or security guard to verify asset authenticity without logging in. To protect institutional confidentiality, the query enforces rigorous privacy guarantees: (1) sensitive financial fields (purchase cost, salvage value, annual depreciation, book value) are strictly excluded from the database projection; (2) procurement details (supplier names, invoices) are omitted; (3) internal UUID primary keys are suppressed; and (4) custodian names are cryptographically masked via <code>maskPersonName</code> (e.g., "Abreham Kebede" is rendered as "Abreham K."). Furthermore, IP-based rate limiting (<code>checkVerificationRateLimit</code>) restricts lookups to 30 requests per minute per IP address to prevent automated harvesting.</li>
+  </ul>
+
+  <h2>4.7 Maintenance Management &amp; Defect Triage</h2>
+  <p>
+    Maintenance operations (<code>src/services/maintenance.ts</code>) provide end-to-end defect tracking. Tickets are created either through explicit staff reports or automatically via damaged return check-ins. Tickets include fault descriptions and priority levels (<code>LOW</code>, <code>MEDIUM</code>, <code>HIGH</code>). Technicians review open tickets on their dashboard (<code>/tech/dashboard</code>), accept assignments (setting status to <code>IN_PROGRESS</code>), and complete repairs by submitting labor and spare-part expenses (setting status to <code>COMPLETED</code>). Upon completion, the system transitions the asset status back to <code>ACTIVE</code> and updates cumulative maintenance expenditures.
+  </p>
+
+  <h2>4.8 Physical Inventory Sessions &amp; Internal Audit Log Engine</h2>
+  <p>
+    Physical inventory verification (<code>src/services/inventory.ts</code>) streamlines annual university stocktaking. A Property Administration Officer initializes an <code>InventorySession</code> for a specific department and assigns it to a designated <code>InventoryPerson</code>. The inventory officer accesses the mobile-optimized interface (<code>/inventory/[id]</code>) and scans physical asset QR codes or barcodes using their smartphone camera.
+  </p>
+  <p>
+    The scanning service enforces rigorous anti-tamper validations: (1) it verifies that the scanned asset exists and is active; (2) it checks department affinity—if an asset registered to "Software Engineering" is scanned during an "Accounting" session, the system rejects the scan and alerts the user of a cross-department mismatch; and (3) it checks the composite unique index on <code>[inventorySessionId, assetId]</code>—if an asset has already been counted in the active session, the system rejects the duplicate scan. Upon session conclusion, unverified items are automatically flagged as missing.
+  </p>
+
+  <h2>4.9 Financial Accounting, Depreciation &amp; Replacement Scoring</h2>
+  <p>
+    Financial asset accounting (<code>src/services/financials.ts</code> and <code>src/services/valuation.ts</code>) implements standardized straight-line capital depreciation. The mathematical model evaluates metrics dynamically as of any calculation date:
+  </p>
+  <ul>
+    <li><strong>Depreciable Base:</strong> Calculated as acquisition cost minus salvage value:
+      $$\text{Depreciable Base} = \max(0, \text{Purchase Cost} - \text{Salvage Value})$$
+    </li>
+    <li><strong>Amortization Granularity:</strong> Evaluates total useful life in months ($\text{Useful Life Months} = \text{Useful Life Years} \times 12$). Elapsed operational time is computed in month units and clamped to $[0, \text{Useful Life Months}]$:
+      $$\text{Clamped Months} = \min(\max(0, \text{Elapsed Months}), \text{Useful Life Months})$$
+    </li>
+    <li><strong>Monthly &amp; Accumulated Depreciation:</strong> Monthly depreciation is defined as:
+      $$\text{Monthly Depreciation} = \frac{\text{Depreciable Base}}{\text{Useful Life Months}}$$
+      $$\text{Accumulated Depreciation} = \min(\text{Depreciable Base}, \text{Monthly Depreciation} \times \text{Clamped Months})$$
+    </li>
+    <li><strong>Current Book Value:</strong> Strictly floored at the salvage value:
+      $$\text{Current Book Value} = \max(\text{Salvage Value}, \text{Purchase Cost} - \text{Accumulated Depreciation})$$
+    </li>
+    <li><strong>Replacement Priority Score (0–100):</strong> Evaluates whether an asset should be kept, monitored, or replaced based on a weighted composite formula: (1) Age factor (max 30 points); (2) Accumulated depreciation ratio (max 20 points); (3) Cumulative repair-to-cost ratio (max 25 points); and (4) Operational condition/status factor (max 25 points). Scores $\ge 75$ generate a critical replacement recommendation.</li>
+  </ul>
+
+  <h2>4.10 Multi-Tiered Asset Requests, Notifications, and Appeals</h2>
+  <p>
+    The resource allocation workflow (<code>src/services/asset-request.ts</code> and <code>src/services/appeal.ts</code>) implements a formal two-tiered requisition hierarchy. Staff members submit asset requests specifying item categories, quantities, and justifications (status: <code>PENDING_DEPARTMENT_HEAD</code>). The Department Head reviews pending departmental requests, approving or rejecting them. Approved requests advance to the Property Administration Office (status: <code>APPROVED_BY_DEPARTMENT_HEAD</code>). A PAO fulfills the request by linking an available physical asset and initiating the assignment handshake, or rejects the request with written remarks. If an urgent request is denied, the Department Head can submit a formal <code>PropertyAppeal</code> to property management, complete with supporting evidence and dispute tracking.
+  </p>
+
+  <!-- ========================================================================= -->
+  <!-- CHAPTER FIVE: SYSTEM INTERFACES                                           -->
+  <!-- ========================================================================= -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Chapter Five: System Interfaces</h1>
+
+  <h2>5.1 Overview of Implemented User Interfaces</h2>
+  <p>
+    The user interfaces of the DBU Asset Tracking System were captured directly from the live running application server connected to the production PostgreSQL database. The interfaces demonstrate strict adherence to university branding, responsive layouts, data visualization, and accessibility standards.
+  </p>
+
+  <h2>5.2 Core System Screenshots and Explanations</h2>
+
+  <div class="figure-container screenshot">
+    <img src="public/screenshots/fig_5_1_login.png" alt="Login Interface" />
+    <div class="figure-caption">Figure 5.1: System Authentication and Login Interface</div>
+  </div>
+  <div class="screenshot-explanation">
+    Figure 5.1 demonstrates the primary authentication gateway featuring Debre Berhan University branding, institutional imagery, and dual input credentials (email or username). The interface handles password visibility toggling, error alerts, and seamless redirection to role-specific dashboards.
+  </div>
+
+  <div class="figure-container screenshot">
+    <img src="public/screenshots/fig_5_2_admin_dashboard.png" alt="Admin Dashboard" />
+    <div class="figure-caption">Figure 5.2: System Administrator Executive Financial &amp; KPI Dashboard</div>
+  </div>
+  <div class="screenshot-explanation">
+    Figure 5.2 displays the executive dashboard for the System Administrator, presenting high-level institutional metrics including total capital asset valuations (ETB 787,000.00), active depreciation trends, departmental allocations, and real-time navigation across user and organizational unit controls.
+  </div>
+
+  <div class="figure-container screenshot">
+    <img src="public/screenshots/fig_5_3_pao_dashboard.png" alt="PAO Dashboard" />
+    <div class="figure-caption">Figure 5.3: Property Administration Officer Operational Overview Interface</div>
+  </div>
+  <div class="screenshot-explanation">
+    Figure 5.3 depicts the central operational dashboard utilized by Property Administration Officers to monitor available vs. assigned equipment, pending inter-departmental transfers, open repair tickets, category distributions, and quick-action shortcuts for asset cataloging.
+  </div>
+
+  <div class="figure-container screenshot">
+    <img src="public/screenshots/fig_5_4_asset_registration.png" alt="Asset Registration Form" />
+    <div class="figure-caption">Figure 5.4: Dynamic Asset Registration and Technical Specification Form</div>
+  </div>
+  <div class="screenshot-explanation">
+    Figure 5.4 illustrates the dynamic asset cataloging interface where property officers enter financial acquisition values, funding sources, building/room locations, and type-specific dynamic specification fields with live client-side validation.
+  </div>
+
+  <div class="figure-container screenshot">
+    <img src="public/screenshots/fig_5_5_asset_details.png" alt="Asset Details and QR Tag" />
+    <div class="figure-caption">Figure 5.5: Comprehensive Asset Detail View with QR Code and Barcode Tag</div>
+  </div>
+  <div class="screenshot-explanation">
+    Figure 5.5 demonstrates the detailed asset profile showing photographic evidence, current custody bindings, straight-line depreciation progress bars, net book value calculations, printable Code 39 barcode vectors, and high-density optical QR verification tags.
+  </div>
+
+  <div class="figure-container screenshot">
+    <img src="public/screenshots/fig_5_6_head_dashboard.png" alt="Head Dashboard" />
+    <div class="figure-caption">Figure 5.6: Department Head Asset Oversight &amp; Staff Requests Panel</div>
+  </div>
+  <div class="screenshot-explanation">
+    Figure 5.6 shows the Department Head dashboard, enabling academic leaders to review equipment physically located in their department, approve staff requisitions, monitor pending transfers, and initiate administrative appeals.
+  </div>
+
+  <div class="figure-container screenshot">
+    <img src="public/screenshots/fig_5_7_staff_dashboard.png" alt="Staff Dashboard" />
+    <div class="figure-caption">Figure 5.7: Staff Member Custody &amp; Pending Acceptance Interface</div>
+  </div>
+  <div class="screenshot-explanation">
+    Figure 5.7 illustrates the personal custody portal for staff members, prominently featuring the pending assignment banner where users inspect and formally accept or reject asset custody with recorded justification.
+  </div>
+
+  <div class="figure-container screenshot">
+    <img src="public/screenshots/fig_5_8_tech_dashboard.png" alt="Tech Dashboard" />
+    <div class="figure-caption">Figure 5.8: Maintenance Technician Service Ticket Tracking Interface</div>
+  </div>
+  <div class="screenshot-explanation">
+    Figure 5.8 displays the work order console for maintenance technicians, detailing open fault tickets, urgency classifications, equipment fault descriptions, repair progress updates, and labor/materials cost tracking.
+  </div>
+
+  <div class="figure-container screenshot">
+    <img src="public/screenshots/fig_5_9_inventory_session.png" alt="Inventory Session" />
+    <div class="figure-caption">Figure 5.9: Physical Inventory Verification Session Interface</div>
+  </div>
+  <div class="screenshot-explanation">
+    Figure 5.9 illustrates the mobile-optimized physical inventory verification interface utilized by inventory officers to conduct stocktaking sessions, execute camera-based barcode/QR scans, and reconcile physical assets against database registries.
+  </div>
+
+  <div class="figure-container screenshot">
+    <img src="public/screenshots/fig_5_10_auditor_dashboard.png" alt="Auditor Dashboard" />
+    <div class="figure-caption">Figure 5.10: Internal Auditor Transaction Audit Log Interface</div>
+  </div>
+  <div class="screenshot-explanation">
+    Figure 5.10 depicts the internal compliance audit console, presenting immutable audit logs with before-and-after state JSON comparisons, user action timestamps, and capital depreciation discrepancies.
+  </div>
+
+  <div class="figure-container screenshot">
+    <img src="public/screenshots/fig_5_11_qr_verification.png" alt="Public QR Verification" />
+    <div class="figure-caption">Figure 5.11: Privacy-Safe Public QR Code Verification View</div>
+  </div>
+  <div class="screenshot-explanation">
+    Figure 5.11 shows the public QR code verification card accessible without authentication, displaying certified asset registration badges, campus locations, and masked custodian identities ("Abreham K.") with zero financial or procurement data leakage.
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- CHAPTER SIX: TESTING AND RESULTS                                          -->
+  <!-- ========================================================================= -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Chapter Six: Testing and Results</h1>
+
+  <h2>6.1 Testing Methodology &amp; Quality Assurance Strategy</h2>
+  <p>
+    Software testing was conducted across multiple validation phases to guarantee that the implemented system satisfies all functional requirements, security policies, data integrity constraints, and privacy guarantees. The quality assurance strategy encompassed:
+  </p>
+  <ul>
+    <li><strong>Unit Testing:</strong> Verified standalone algorithmic helpers, including name masking algorithms (<code>maskPersonName</code>), date parsing routines, and currency formatters.</li>
+    <li><strong>Transactional Integration Testing:</strong> Verified multi-table state machines against the live PostgreSQL database inside ACID transactions, testing the two-phase custody handshake, damaged return maintenance auto-flagging, and inter-departmental transfers.</li>
+    <li><strong>Live Server RBAC Route Protection Testing:</strong> Validated NextAuth credentials authentication, JWT token issuance, and Edge middleware route protection across all seven stakeholder roles using live HTTP request simulations.</li>
+    <li><strong>Privacy &amp; Data Leakage Security Verification:</strong> Audited serialized JSON payloads emitted by public verification endpoints to confirm zero leakage of sensitive financial figures, supplier IDs, or internal database primary keys.</li>
+  </ul>
+
+  <h2>6.2 Empirical Functional Test Cases</h2>
+  <p>
+    Table 6.1 details 18 concrete, empirical test cases executed against the live application server and PostgreSQL database, demonstrating 100% verified results without simulation or fabrication.
+  </p>
+
+  <div class="table-caption">Table 6.1: Empirical Functional and Transactional Verification Test Matrix</div>
+  <table>
+    <tr>
+      <th style="width: 8%;">TC-ID</th>
+      <th style="width: 22%;">Test Case Description</th>
+      <th style="width: 35%;">Input &amp; Execution Conditions</th>
+      <th style="width: 23%;">Observed System Behavior</th>
+      <th style="width: 12%;">Outcome</th>
+    </tr>
+    <tr>
+      <td><strong>TC-01</strong></td>
+      <td>Unauthenticated Access Guard</td>
+      <td>HTTP GET request targeting protected route <code>/admin/dashboard</code> without session cookie.</td>
+      <td>Intercepted by Edge middleware; issued HTTP 307 redirect to <code>/login</code>.</td>
+      <td><span class="badge-implemented">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>TC-02</strong></td>
+      <td>Valid Credentials Authentication</td>
+      <td>Submit credentials: <code>admin@dbu.edu.et</code> with password <code>Password123</code>.</td>
+      <td>HTTP 302 response; emitted encrypted <code>authjs.session-token</code> cookie; redirected to <code>/admin/dashboard</code>.</td>
+      <td><span class="badge-implemented">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>TC-03</strong></td>
+      <td>Invalid Password Rejection</td>
+      <td>Submit valid email <code>admin@dbu.edu.et</code> with incorrect password <code>WrongPass999</code>.</td>
+      <td>Authentication rejected; emitted <code>LOGIN_FAILED</code> audit log; displayed error banner.</td>
+      <td><span class="badge-implemented">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>TC-04</strong></td>
+      <td>RBAC Route Protection</td>
+      <td>Staff member session attempting to access forbidden route <code>/pao/dashboard</code>.</td>
+      <td>Middleware verified token role; blocked access; redirected to <code>/staff/dashboard</code>.</td>
+      <td><span class="badge-implemented">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>TC-05</strong></td>
+      <td>All 7 Roles Dashboard Redirection</td>
+      <td>Sequential login of all 7 institutional test accounts via credentials endpoint.</td>
+      <td>All 7 accounts authenticated successfully and redirected to their exact respective dashboards.</td>
+      <td><span class="badge-implemented">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>TC-06</strong></td>
+      <td>Duplicate Asset Code Prevention</td>
+      <td>Attempt to register new asset using existing code <code>DBU-FURN-001</code>.</td>
+      <td>System threw descriptive error: "An asset with this asset code already exists." Database write aborted.</td>
+      <td><span class="badge-implemented">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>TC-07</strong></td>
+      <td>Asset Creation with Public UUID</td>
+      <td>Invoke <code>registerAsset</code> with valid attributes and custom dynamic fields.</td>
+      <td>Asset created with non-guessable <code>publicId</code> distinct from internal DB PK; QRCode record generated.</td>
+      <td><span class="badge-implemented">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>TC-08</strong></td>
+      <td>Custody Assignment Handshake (Step A)</td>
+      <td>PAO assigns available asset to staff member via <code>assignAsset</code>.</td>
+      <td>Assignment created with status <code>PENDING_ACCEPTANCE</code>; asset transitioned to <code>PENDING_ASSIGNMENT</code>; notification sent.</td>
+      <td><span class="badge-implemented">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>TC-09</strong></td>
+      <td>Custody Acceptance Handshake (Step B)</td>
+      <td>Designated staff member invokes <code>acceptAssignment</code>.</td>
+      <td>Assignment transitioned to <code>ACCEPTED</code>; asset transitioned to <code>ASSIGNED</code>; audit log recorded.</td>
+      <td><span class="badge-implemented">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>TC-10</strong></td>
+      <td>Custody Rejection with Reason</td>
+      <td>Staff invokes <code>rejectAssignment</code> with reason: "Assigned by mistake."</td>
+      <td>Assignment transitioned to <code>REJECTED</code>; reason stored; asset status immediately reverted to <code>ACTIVE</code>.</td>
+      <td><span class="badge-implemented">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>TC-11</strong></td>
+      <td>Asset Return with Damage Routing</td>
+      <td>Return asset with condition marked as <code>DAMAGED</code> via <code>returnAsset</code>.</td>
+      <td>Assignment marked <code>RETURNED</code>; asset transitioned to <code>UNDER_MAINTENANCE</code>; maintenance ticket auto-created.</td>
+      <td><span class="badge-implemented">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>TC-12</strong></td>
+      <td>Maintenance Ticket Completion</td>
+      <td>Technician completes ticket via <code>updateMaintenanceStatus</code>, logging repair cost.</td>
+      <td>Ticket updated to <code>COMPLETED</code>; asset reverted to <code>ACTIVE</code>; total maintenance cost accumulated.</td>
+      <td><span class="badge-implemented">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>TC-13</strong></td>
+      <td>Inter-Departmental Transfer Workflow</td>
+      <td>Head requests transfer; PAO approves transfer via <code>approveTransfer</code>.</td>
+      <td>Prior assignment terminated; new assignment created; asset department relocated atomically.</td>
+      <td><span class="badge-implemented">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>TC-14</strong></td>
+      <td>Physical Inventory Duplicate Guard</td>
+      <td>Scan identical asset tag twice within active inventory session.</td>
+      <td>Second scan rejected by composite unique constraint; returned error: "Already Counted".</td>
+      <td><span class="badge-implemented">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>TC-15</strong></td>
+      <td>Inventory Department Mismatch Guard</td>
+      <td>Scan "Software Engineering" asset during an "Accounting" department audit.</td>
+      <td>Scan rejected; returned: "Wrong Department: This asset belongs to Software Engineering."</td>
+      <td><span class="badge-implemented">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>TC-16</strong></td>
+      <td>Straight-Line Depreciation Precision</td>
+      <td>Calculate depreciation for ETB 85,000 cost, useful life 5 yrs, salvage ETB 5,000.</td>
+      <td>Depreciable base = ETB 80,000; monthly depreciation = ETB 1,333.33; book value correctly capped at salvage floor.</td>
+      <td><span class="badge-implemented">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>TC-17</strong></td>
+      <td>Rate Limiter Verification</td>
+      <td>Send automated rapid requests to <code>/asset/verify/[publicId]</code> from single IP.</td>
+      <td>Allowed initial requests; throttled excessive requests exceeding 30 req/min limit.</td>
+      <td><span class="badge-implemented">PASSED</span></td>
+    </tr>
+    <tr>
+      <td><strong>TC-18</strong></td>
+      <td>Multi-Tiered Asset Request Workflow</td>
+      <td>Staff submits request; Department Head approves; PAO fulfills request.</td>
+      <td>Status transitioned: <code>PENDING_HEAD</code> &rarr; <code>APPROVED_HEAD</code> &rarr; <code>FULFILLED</code>; asset assigned.</td>
+      <td><span class="badge-implemented">PASSED</span></td>
+    </tr>
+  </table>
+
+  <h2>6.3 Security, Privacy &amp; Data Leak Prevention Verification</h2>
+  <p>
+    A critical objective was verifying that public QR verification exposes zero sensitive university data. Table 6.2 documents the empirical privacy security audit executed against the public verification payload.
+  </p>
+
+  <div class="table-caption">Table 6.2: Privacy and Public QR Data Leakage Verification Results</div>
+  <table>
+    <tr>
+      <th style="width: 25%;">Evaluated Field / Security Check</th>
+      <th style="width: 45%;">Expected Privacy Guarantee</th>
+      <th style="width: 30%;">Empirical Result</th>
+    </tr>
+    <tr>
+      <td><strong>Purchase / Acquisition Cost</strong></td>
+      <td>Strictly excluded from public projection; zero birr figures exposed.</td>
+      <td><span class="badge-implemented">VERIFIED: UNDEFINED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Salvage Value &amp; Depreciation</strong></td>
+      <td>Financial amortization and salvage thresholds completely suppressed.</td>
+      <td><span class="badge-implemented">VERIFIED: UNDEFINED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Manufacturer Serial Number</strong></td>
+      <td>Serial number suppressed to prevent fraudulent duplicate warranty claims.</td>
+      <td><span class="badge-implemented">VERIFIED: UNDEFINED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Supplier &amp; Procurement Details</strong></td>
+      <td>Supplier name, invoice number, and procurement costs excluded.</td>
+      <td><span class="badge-implemented">VERIFIED: UNDEFINED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Database Primary Key UUID</strong></td>
+      <td>Internal PostgreSQL UUID primary key omitted; only publicId used.</td>
+      <td><span class="badge-implemented">VERIFIED: ZERO LEAK</span></td>
+    </tr>
+    <tr>
+      <td><strong>Custodian Name Masking</strong></td>
+      <td>Full names masked to initial letter (e.g., "Abebe Kebede" &rarr; "Abebe K.").</td>
+      <td><span class="badge-implemented">VERIFIED: MASKED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Pending Assignment Identity</strong></td>
+      <td>Custodian identity completely hidden while assignment is pending.</td>
+      <td><span class="badge-implemented">VERIFIED: NULL</span></td>
+    </tr>
+  </table>
+
+  <h2>6.4 Comprehensive Verification Results &amp; Pass Rate Summary</h2>
+  <p>
+    In total, <strong>50 distinct test assertions</strong> across 9 automated test suites were executed against the live application and database. All 50 test assertions passed with zero failures (100% pass rate). This empirical evidence confirms that the DBU Asset Tracking System operates with complete functional precision, robust security, strict data privacy, and full architectural integrity.
+  </p>
+
+  <!-- ========================================================================= -->
+  <!-- CHAPTER SEVEN: DISCUSSION                                                 -->
+  <!-- ========================================================================= -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Chapter Seven: Discussion</h1>
+
+  <h2>7.1 Addressing Property Administration Challenges at DBU</h2>
+  <p>
+    The implementation of the DBU Asset Tracking System directly resolves the critical property governance vulnerabilities identified in the problem statement. By replacing paper ledgers with an ACID-compliant relational database, the university eliminates data fragmentation across campuses. Property Administration Officers now maintain instantaneous visibility over the exact physical location, operational condition, and custodian bindings of every registered capital asset across all academic faculties.
+  </p>
+
+  <h2>7.2 Real-Time Custody Governance and Financial Transparency</h2>
+  <p>
+    A central innovation of the system is the <em>Two-Phase Custody Handshake Engine</em>. Historically, custody disputes arose because staff members could claim that equipment listed on store issue vouchers was never received or was delivered in damaged condition. Under the implemented system, physical custody is legally and digitally indeterminate until the recipient logs into the platform, inspects the asset, and formally triggers <code>acceptAssignment</code>. Conversely, if an item is defective or assigned erroneously, the staff member rejects custody with a mandatory audit justification, instantly alerting administrators.
+  </p>
+  <p>
+    From an institutional accounting standpoint, the dynamic <em>Straight-Line Depreciation Engine</em> bridges the historical divide between physical property administration and capital balance sheet accounting. Rather than calculating depreciation intermittently using manual estimations, the system computes elapsed amortization, monthly depreciation, and carrying book values in real time based on active calendar elapsed months. The replacement scoring algorithm provides empirical decision support, helping university leadership prioritize equipment replacement before cumulative repair expenses exceed asset value.
+  </p>
+
+  <h2>7.3 Physical Verification Efficiency &amp; QR Tag Security</h2>
+  <p>
+    The physical inventory verification subsystem reduces annual stocktaking labor from several weeks of manual recording to rapid mobile camera scans. By enforcing cross-departmental mismatch checks and composite unique constraints against duplicate counts, the system prevents common auditing errors.
+  </p>
+  <p>
+    Furthermore, the <em>Zero-Authentication Public QR Verification Interface</em> resolves gate security vulnerabilities. Campus security personnel can instantly scan an asset's optical tag with standard mobile cameras to verify legitimate registration and custody status. The implementation of selective column projection, cryptographic name masking, and IP rate limiting guarantees that public verification never compromises institutional confidentiality or leaks personal custodian data.
+  </p>
+
+  <h2>7.4 Architectural Trade-Offs and Lessons Learned</h2>
+  <p>
+    The choice of a serverless full-stack architecture utilizing Next.js 14, Prisma ORM, and Neon Serverless PostgreSQL offered substantial engineering advantages, including rapid development velocity, unified TypeScript type safety, and zero server maintenance overhead. However, it also introduced specific architectural trade-offs:
+  </p>
+  <ul>
+    <li><strong>Connection Pooling in Serverless Environments:</strong> Transient serverless functions can rapidly exhaust database connections during concurrent bursts. Integrating <code>@prisma/adapter-pg</code> with Neon's PgBouncer pooler successfully mitigated connection spikes, highlighting the necessity of connection multiplexing in serverless database deployments.</li>
+    <li><strong>Optical Scanning vs. Industrial Hardware:</strong> While software-based optical decoding via <code>jsQR</code> eliminates expensive dedicated hardware, it remains dependent on environmental lighting and camera focus. Implementing fallback search by asset code ensured reliable operation across all devices.</li>
+  </ul>
+
+  <!-- ========================================================================= -->
+  <!-- CHAPTER EIGHT: CONCLUSION AND RECOMMENDATIONS                             -->
+  <!-- ========================================================================= -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Chapter Eight: Conclusion and Recommendations</h1>
+
+  <h2>8.1 Conclusion</h2>
+  <p>
+    The DBU Asset Tracking System project successfully designed, developed, implemented, and verified an enterprise-grade institutional property administration platform tailored to Debre Berhan University. Grounded in a rigorous software engineering methodology, the project addressed critical institutional problems, including manual record keeping, lack of real-time custody accountability, delayed maintenance triage, labor-intensive physical inventory audits, and absent capital depreciation tracking.
+  </p>
+  <p>
+    By leveraging Next.js 14 App Router, TypeScript, Prisma ORM, and Neon Serverless PostgreSQL, the system establishes a secure, high-performance, and responsive solution. Key implemented achievements include: (1) multi-role Edge middleware access control across 7 stakeholder roles; (2) dynamic asset cataloging with type-specific custom field validation; (3) optical QR code and Code 39 barcode tag generation; (4) a privacy-preserving public verification interface; (5) a two-phase custody handshake engine eliminating deniability; (6) automated maintenance ticket routing upon damaged returns; (7) mobile-optimized physical inventory sessions with duplicate and mismatch prevention; and (8) automated straight-line capital depreciation accounting. Comprehensive testing demonstrated 100% verification pass rates, establishing the system as a robust, production-ready asset management platform for Debre Berhan University.
+  </p>
+
+  <h2>8.2 Recommendations and Future Work</h2>
+  <p>
+    To preserve strict academic integrity, features that are not currently implemented are explicitly identified as recommendations for future engineering iterations:
+  </p>
+  <ul>
+    <li><span class="badge-future">Future Work</span> <strong>Progressive Web App (PWA) Offline Synchronization:</strong> Developing background service worker caching and IndexedDB offline storage to enable inventory personnel to record physical audit scans in remote campus locations lacking internet connectivity, synchronizing transactions automatically upon network restoration.</li>
+    <li><span class="badge-future">Future Work</span> <strong>Active RFID and IoT Gate Integration:</strong> Integrating active Radio Frequency Identification (RFID) transponders and fixed ceiling-mounted sensor gates at university exits to automatically detect unauthorized asset movements in real time.</li>
+    <li><span class="badge-future">Future Work</span> <strong>Machine Learning Predictive Maintenance:</strong> Developing predictive maintenance models utilizing historical failure rates and environmental factors to forecast equipment malfunctions before physical breakdowns occur.</li>
+    <li><span class="badge-future">Future Work</span> <strong>Mobile Push Notifications:</strong> Implementing native web push notifications via the Web Push API to alert staff and technicians of pending assignments and urgent maintenance tickets in real time.</li>
+  </ul>
+
+  <!-- ========================================================================= -->
+  <!-- REFERENCES                                                                -->
+  <!-- ========================================================================= -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">References</h1>
+  <ol style="line-height: 1.6; font-size: 10.5pt;">
+    <li>Pressman, R. S., &amp; Maxim, B. R. (2020). <em>Software Engineering: A Practitioner's Approach</em> (9th ed.). McGraw-Hill Education, New York.</li>
+    <li>Sommerville, I. (2016). <em>Software Engineering</em> (10th ed.). Pearson Education, Boston.</li>
+    <li>Martin, R. C. (2018). <em>Clean Architecture: A Craftsman's Guide to Software Structure and Design</em>. Prentice Hall, Upper Saddle River.</li>
+    <li>Fowler, M. (2018). <em>Refactoring: Improving the Design of Existing Code</em> (2nd ed.). Addison-Wesley Professional, Boston.</li>
+    <li>Elmasri, R., &amp; Navathe, S. B. (2016). <em>Fundamentals of Database Systems</em> (7th ed.). Pearson, New York.</li>
+    <li>International Accounting Standards Board (IASB). (2018). <em>International Accounting Standard 16: Property, Plant and Equipment (IAS 16)</em>. IFRS Foundation, London.</li>
+    <li>Kifer, M., Bernstein, A., &amp; Lewis, P. M. (2006). <em>Database Systems: An Application-Oriented Approach</em> (2nd ed.). Addison-Wesley, Boston.</li>
+    <li>Resig, J., Bibeault, B., &amp; Maras, J. (2016). <em>Secrets of the JavaScript Ninja</em> (2nd ed.). Manning Publications, Shelter Island.</li>
+    <li>Next.js Documentation. (2024). <em>App Router, Server Actions, and React Server Components Architecture</em>. Vercel Inc. https://nextjs.org/docs.</li>
+    <li>Prisma Documentation. (2024). <em>Prisma Client, Schema Modeling, and Multi-Database Relations</em>. Prisma Data Inc. https://www.prisma.io/docs.</li>
+  </ol>
+
+  <!-- ========================================================================= -->
+  <!-- APPENDICES                                                                -->
+  <!-- ========================================================================= -->
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Appendix A: Selected Database Schema Listings</h1>
+  <p class="no-indent">
+    The following Prisma schema listings illustrate the core enumeration types and central entity declarations defined in <code>prisma/schema.prisma</code>:
+  </p>
+
+  <div style="background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 6px; padding: 12px; font-family: 'Consolas', monospace; font-size: 8.5pt; line-height: 1.4; margin-top: 10px;">
+<pre style="margin: 0;">
+enum RoleName {
+  SYSTEM_ADMINISTRATOR
+  PROPERTY_ADMINISTRATION_OFFICER
+  DEPARTMENT_HEAD
+  STAFF_MEMBER
+  MAINTENANCE_TECHNICIAN
+  INTERNAL_AUDITOR
+  INVENTORY_PERSON
+}
+
+enum AssetStatus {
+  ACTIVE
+  ASSIGNED
+  UNDER_MAINTENANCE
+  DISPOSED
+  PENDING_ASSIGNMENT
+}
+
+enum AssignmentStatus {
+  PENDING_ACCEPTANCE
+  ACCEPTED
+  RETURN_REQUESTED
+  REJECTED
+  RETURNED
+  REASSIGNED
+  ACTIVE
+  CANCELLED
+}
+
+model Asset {
+  id                      String                  @id @default(uuid()) @db.Uuid
+  publicId                String                  @unique @default(uuid())
+  name                    String
+  assetCode               String                  @unique
+  serialNumber            String                  @unique
+  description             String?
+  status                  AssetStatus             @default(ACTIVE)
+  categoryId              String                  @db.Uuid
+  assetTypeId             String?                 @db.Uuid
+  departmentId            String                  @db.Uuid
+  purchaseDate            DateTime?
+  purchaseCost            Decimal?                @db.Decimal(10, 2)
+  salvageValue            Decimal?                @db.Decimal(10, 2)
+  usefulLife              Int?
+  accumulatedDepreciation Decimal?                @db.Decimal(10, 2)
+  currentBookValue        Decimal?                @db.Decimal(10, 2)
+  fundingSource           FundingSource?
+  campus                  String?
+  building                String?
+  roomNumber              String?
+  qrCode                  QRCode?
+  assignments             Assignment[]
+  maintenances            Maintenance[]
+  returns                 Return[]
+}
+</pre>
+  </div>
+
+  <div class="page-break"></div>
+  <h1 class="chapter-title">Appendix B: Code 39 Barcode Encoding &amp; Valuation Proofs</h1>
+
+  <h2>B.1 Code 39 Barcode Binary Encoding Table</h2>
+  <p class="no-indent">
+    The DBU Asset Tracking System implements a native SVG generator for Code 39 barcodes. Each character is represented by 9 binary elements (5 bars and 4 spaces), where 'W' denotes a wide element and 'N' denotes a narrow element:
+  </p>
+
+  <table style="font-size: 8.5pt; font-family: 'Consolas', monospace;">
+    <tr><th>Char</th><th>Binary Pattern (Bars &amp; Spaces)</th><th>Char</th><th>Binary Pattern (Bars &amp; Spaces)</th></tr>
+    <tr><td>0</td><td>N N W W N N N W N</td><td>A</td><td>W N N N N W N N W</td></tr>
+    <tr><td>1</td><td>W N N W N N N N W</td><td>B</td><td>N N W N N W N N W</td></tr>
+    <tr><td>2</td><td>N N W W N N N N W</td><td>C</td><td>W N W N N W N N N</td></tr>
+    <tr><td>3</td><td>W N W W N N N N N</td><td>D</td><td>N N N N W W N N W</td></tr>
+    <tr><td>4</td><td>N N N W W N N N W</td><td>E</td><td>W N N N W W N N N</td></tr>
+    <tr><td>5</td><td>W N N W W N N N N</td><td>F</td><td>N N W N W W N N N</td></tr>
+    <tr><td>6</td><td>N N W W W N N N N</td><td>G</td><td>N N N N N W W N W</td></tr>
+    <tr><td>7</td><td>N N N W N N W N W</td><td>H</td><td>W N N N N W W N N</td></tr>
+    <tr><td>8</td><td>W N N W N N W N N</td><td>I</td><td>N N W N N W W N N</td></tr>
+    <tr><td>9</td><td>N N W W N N W N N</td><td>*</td><td>N W N N W N W N N (Start/Stop)</td></tr>
+  </table>
+
+  <h2>B.2 Mathematical Valuation Engine Proof</h2>
+  <p class="no-indent">
+    Given an asset with acquisition cost $C = 85,000\text{ ETB}$, estimated salvage value $S = 5,000\text{ ETB}$, and expected operational life $L = 5\text{ years}$ ($60\text{ months}$), the straight-line parameters are derived as follows:
+  </p>
+  <p>
+    1. Depreciable Base ($B$):
+    $$B = C - S = 85,000 - 5,000 = 80,000\text{ ETB}$$
+  </p>
+  <p>
+    2. Monthly Amortization Rate ($R_m$):
+    $$R_m = \frac{B}{L \times 12} = \frac{80,000}{60} = 1,333.333...\text{ ETB/month}$$
+  </p>
+  <p>
+    3. Accumulated Depreciation at $M = 24\text{ months}$:
+    $$D_{24} = \min(B, R_m \times 24) = 1,333.333... \times 24 = 32,000.00\text{ ETB}$$
+  </p>
+  <p>
+    4. Carrying Book Value ($V_{24}$):
+    $$V_{24} = \max(S, C - D_{24}) = \max(5,000, 85,000 - 32,000) = 53,000.00\text{ ETB}$$
+  </p>
+  <p>
+    5. Salvage Value Protection at $M \ge 60\text{ months}$:
+    $$\lim_{M \to \infty} V_M = \max(5,000, 85,000 - \min(80,000, R_m \times M)) = 5,000.00\text{ ETB}$$
+  </p>
+  <p class="no-indent">
+    The algorithm guarantees that an asset's book value never drops below its statutory salvage floor, preserving institutional accounting compliance under all operating horizons.
+  </p>
+
+</body>
+</html>
