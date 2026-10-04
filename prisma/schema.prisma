@@ -41,65 +41,65 @@ model OrganizationalUnit {
   updatedAt         DateTime             @updatedAt
   deletedAt         DateTime?
   assets            Asset[]
+  assetRequests     AssetRequest[]       @relation("DepartmentAssetRequests")
   assignments       Assignment[]
   financialAudits   FinancialAudit[]
   inventorySessions InventorySession[]
   faculty           Faculty?             @relation(fields: [facultyId], references: [id])
   parent            OrganizationalUnit?  @relation("ParentChild", fields: [parentId], references: [id])
   children          OrganizationalUnit[] @relation("ParentChild")
+  propertyAppeals   PropertyAppeal[]     @relation("DepartmentAppeals")
   transfersFrom     Transfer[]           @relation("FromDepartment")
   transfersTo       Transfer[]           @relation("ToDepartment")
   users             User[]
-  assetRequests     AssetRequest[]       @relation("DepartmentAssetRequests")
-  propertyAppeals   PropertyAppeal[]     @relation("DepartmentAppeals")
 }
 
 model User {
-  id                         String                  @id @default(uuid()) @db.Uuid
-  name                       String
-  email                      String                  @unique
-  passwordHash               String
-  username                   String?                 @unique
-  phoneNumber                String?
-  employeeId                 String?                 @unique
-  roleId                     String                  @db.Uuid
-  departmentId               String?                 @db.Uuid
-  mustChangePassword         Boolean                 @default(false)
-  createdAt                  DateTime                @default(now())
-  updatedAt                  DateTime                @updatedAt
-  deletedAt                  DateTime?
-  assignmentsAccepted        Assignment[]            @relation("AcceptedBy")
-  assignmentsCreated         Assignment[]            @relation("AssignedBy")
-  assignmentsTo              Assignment[]            @relation("AssignedTo")
-  assignmentsRejected        Assignment[]            @relation("RejectedBy")
-  auditLogs                  AuditLog[]
-  auditSessions              AuditSession[]
-  disposals                  Disposal[]
-  financialAudits            FinancialAudit[]
-  registeredInventoryPersons InventoryPerson[]       @relation("RegisteredPersons")
-  inventoryPersonProfile     InventoryPerson?        @relation("InventoryPersonProfile")
-  inventoryAssignedBy        InventorySession[]      @relation("AssignedBy")
-  inventoryCompleted         InventorySession[]      @relation("CompletedBy")
-  verificationsDone          InventoryVerification[]
-  maintenanceDone            Maintenance[]           @relation("AssignedTo")
-  maintenanceFiled           Maintenance[]           @relation("ReportedBy")
-  notifications              Notification[]
-  passwordResetTokens        PasswordResetToken[]
-  returnsReceived            Return[]                @relation("ReceivedBy")
-  returnsMade                Return[]                @relation("ReturnedBy")
-  transfersApproved          Transfer[]              @relation("ApprovedBy")
-  transfersFromUser          Transfer[]              @relation("FromUser")
-  transfersRequested         Transfer[]              @relation("RequestedBy")
-  transfersToUser            Transfer[]              @relation("ToUser")
-  department                 OrganizationalUnit?     @relation(fields: [departmentId], references: [id])
-  role                       Role                    @relation(fields: [roleId], references: [id])
-  assetRequestsRequested     AssetRequest[]          @relation("StaffAssetRequests")
-  assetRequestsReviewedByHead AssetRequest[]         @relation("HeadReviewedRequests")
-  assetRequestsReviewedByPao  AssetRequest[]         @relation("PaoReviewedRequests")
-  assetRequestHistories      AssetRequestHistory[]
-  propertyAppealsFiled       PropertyAppeal[]        @relation("HeadFiledAppeals")
-  propertyAppealsResponded   PropertyAppeal[]        @relation("PaoRespondedAppeals")
-  propertyAppealHistories    PropertyAppealHistory[]
+  id                          String                  @id @default(uuid()) @db.Uuid
+  name                        String
+  email                       String                  @unique
+  passwordHash                String
+  username                    String?                 @unique
+  phoneNumber                 String?
+  employeeId                  String?                 @unique
+  roleId                      String                  @db.Uuid
+  departmentId                String?                 @db.Uuid
+  mustChangePassword          Boolean                 @default(false)
+  createdAt                   DateTime                @default(now())
+  updatedAt                   DateTime                @updatedAt
+  deletedAt                   DateTime?
+  assetRequestsReviewedByHead AssetRequest[]          @relation("HeadReviewedRequests")
+  assetRequestsReviewedByPao  AssetRequest[]          @relation("PaoReviewedRequests")
+  assetRequestsRequested      AssetRequest[]          @relation("StaffAssetRequests")
+  assetRequestHistories       AssetRequestHistory[]
+  assignmentsAccepted         Assignment[]            @relation("AcceptedBy")
+  assignmentsCreated          Assignment[]            @relation("AssignedBy")
+  assignmentsTo               Assignment[]            @relation("AssignedTo")
+  assignmentsRejected         Assignment[]            @relation("RejectedBy")
+  auditLogs                   AuditLog[]
+  auditSessions               AuditSession[]
+  disposals                   Disposal[]
+  financialAudits             FinancialAudit[]
+  registeredInventoryPersons  InventoryPerson[]       @relation("RegisteredPersons")
+  inventoryPersonProfile      InventoryPerson?        @relation("InventoryPersonProfile")
+  inventoryAssignedBy         InventorySession[]      @relation("AssignedBy")
+  inventoryCompleted          InventorySession[]      @relation("CompletedBy")
+  verificationsDone           InventoryVerification[]
+  maintenanceDone             Maintenance[]           @relation("AssignedTo")
+  maintenanceFiled            Maintenance[]           @relation("ReportedBy")
+  notifications               Notification[]
+  passwordResetTokens         PasswordResetToken[]
+  propertyAppealsFiled        PropertyAppeal[]        @relation("HeadFiledAppeals")
+  propertyAppealsResponded    PropertyAppeal[]        @relation("PaoRespondedAppeals")
+  propertyAppealHistories     PropertyAppealHistory[]
+  returnsReceived             Return[]                @relation("ReceivedBy")
+  returnsMade                 Return[]                @relation("ReturnedBy")
+  transfersApproved           Transfer[]              @relation("ApprovedBy")
+  transfersFromUser           Transfer[]              @relation("FromUser")
+  transfersRequested          Transfer[]              @relation("RequestedBy")
+  transfersToUser             Transfer[]              @relation("ToUser")
+  department                  OrganizationalUnit?     @relation(fields: [departmentId], references: [id])
+  role                        Role                    @relation(fields: [roleId], references: [id])
 }
 
 model AssetCategory {
@@ -114,9 +114,9 @@ model AssetCategory {
   updatedAt           DateTime             @updatedAt
   deletedAt           DateTime?
   assets              Asset[]
+  assetRequests       AssetRequest[]
   assetTypes          AssetType[]
   supplierAssignments SupplierAssignment[]
-  assetRequests       AssetRequest[]
 }
 
 model AssetType {
@@ -125,16 +125,16 @@ model AssetType {
   description         String?
   icon                String?
   isActive            Boolean              @default(true)
-  includeAssetImage   Boolean              @default(true)
   displayOrder        Int                  @default(0)
   categoryId          String               @db.Uuid
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
+  includeAssetImage   Boolean              @default(true)
   assets              Asset[]
+  assetRequests       AssetRequest[]
   category            AssetCategory        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   formFields          AssetTypeField[]
   supplierAssignments SupplierAssignment[]
-  assetRequests       AssetRequest[]
 }
 
 model Asset {
@@ -180,27 +180,27 @@ model Asset {
   condition               String?
   attachmentUrl           String?
   remarks                 String?
-  identificationMethod    IdentificationMethod    @default(NONE)
   createdAt               DateTime                @default(now())
   updatedAt               DateTime                @updatedAt
   deletedAt               DateTime?
+  identificationMethod    IdentificationMethod    @default(NONE)
   assetType               AssetType?              @relation(fields: [assetTypeId], references: [id])
   category                AssetCategory           @relation(fields: [categoryId], references: [id])
   department              OrganizationalUnit      @relation(fields: [departmentId], references: [id])
   supplier                Supplier?               @relation(fields: [supplierId], references: [id])
   fieldValues             AssetFieldValue[]
   images                  AssetImage[]
+  fulfilledAssetRequests  AssetRequest[]
   assignments             Assignment[]
   auditLogs               AuditLog[]
   auditSessionItems       AuditSessionItem[]
   disposals               Disposal[]
   inventoryVerifications  InventoryVerification[]
   maintenances            Maintenance[]
+  propertyAppeals         PropertyAppeal[]
   qrCode                  QRCode?
   returns                 Return[]
   transfers               Transfer[]
-  fulfilledAssetRequests  AssetRequest[]
-  propertyAppeals         PropertyAppeal[]
 
   @@index([purchaseDate])
 }
@@ -226,30 +226,30 @@ model QRCode {
 }
 
 model Assignment {
-  id               String              @id @default(uuid()) @db.Uuid
-  assetId          String              @db.Uuid
-  assignedToUserId String?             @map("assignedToId") @db.Uuid
-  departmentId     String?             @db.Uuid
-  assignedByUserId String              @map("assignedById") @db.Uuid
-  status           AssignmentStatus    @default(PENDING_ACCEPTANCE)
-  notes            String?
-  assignedAt       DateTime            @default(now())
-  returnedAt       DateTime?
-  acceptedAt       DateTime?
-  acceptedById     String?             @db.Uuid
-  rejectedAt       DateTime?
-  rejectedById     String?             @db.Uuid
-  rejectionReason  String?             @map("rejectReason")
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
-  acceptedBy       User?               @relation("AcceptedBy", fields: [acceptedById], references: [id])
-  asset            Asset               @relation(fields: [assetId], references: [id])
-  assignedBy       User                @relation("AssignedBy", fields: [assignedByUserId], references: [id])
-  assignedTo       User?               @relation("AssignedTo", fields: [assignedToUserId], references: [id])
-  department       OrganizationalUnit? @relation(fields: [departmentId], references: [id])
-  rejectedBy       User?               @relation("RejectedBy", fields: [rejectedById], references: [id])
-  returns          Return[]
+  id                     String              @id @default(uuid()) @db.Uuid
+  assetId                String              @db.Uuid
+  assignedToUserId       String?             @map("assignedToId") @db.Uuid
+  departmentId           String?             @db.Uuid
+  assignedByUserId       String              @map("assignedById") @db.Uuid
+  status                 AssignmentStatus    @default(PENDING_ACCEPTANCE)
+  notes                  String?
+  assignedAt             DateTime            @default(now())
+  returnedAt             DateTime?
+  acceptedAt             DateTime?
+  acceptedById           String?             @db.Uuid
+  rejectedAt             DateTime?
+  rejectedById           String?             @db.Uuid
+  rejectionReason        String?             @map("rejectReason")
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt
   fulfilledAssetRequests AssetRequest[]
+  acceptedBy             User?               @relation("AcceptedBy", fields: [acceptedById], references: [id])
+  asset                  Asset               @relation(fields: [assetId], references: [id])
+  assignedBy             User                @relation("AssignedBy", fields: [assignedByUserId], references: [id])
+  assignedTo             User?               @relation("AssignedTo", fields: [assignedToUserId], references: [id])
+  department             OrganizationalUnit? @relation(fields: [departmentId], references: [id])
+  rejectedBy             User?               @relation("RejectedBy", fields: [rejectedById], references: [id])
+  returns                Return[]
 }
 
 model Transfer {
@@ -548,6 +548,100 @@ model PasswordResetToken {
   @@index([userId])
 }
 
+model AssetRequest {
+  id                 String                @id @default(uuid()) @db.Uuid
+  requestNumber      String                @unique
+  userId             String                @db.Uuid
+  departmentId       String                @db.Uuid
+  categoryId         String                @db.Uuid
+  assetTypeId        String?               @db.Uuid
+  quantity           Int                   @default(1)
+  reason             String
+  priority           String                @default("MEDIUM")
+  status             AssetRequestStatus    @default(PENDING_DEPARTMENT_HEAD)
+  reviewedByHeadId   String?               @db.Uuid
+  headReviewDate     DateTime?
+  headResponseReason String?
+  reviewedByPaoId    String?               @db.Uuid
+  paoReviewDate      DateTime?
+  paoResponseReason  String?
+  fulfilledAssetId   String?               @db.Uuid
+  assignmentId       String?               @db.Uuid
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  assetType          AssetType?            @relation(fields: [assetTypeId], references: [id])
+  assignment         Assignment?           @relation(fields: [assignmentId], references: [id])
+  category           AssetCategory         @relation(fields: [categoryId], references: [id])
+  department         OrganizationalUnit    @relation("DepartmentAssetRequests", fields: [departmentId], references: [id])
+  fulfilledAsset     Asset?                @relation(fields: [fulfilledAssetId], references: [id])
+  reviewedByHead     User?                 @relation("HeadReviewedRequests", fields: [reviewedByHeadId], references: [id])
+  reviewedByPao      User?                 @relation("PaoReviewedRequests", fields: [reviewedByPaoId], references: [id])
+  user               User                  @relation("StaffAssetRequests", fields: [userId], references: [id])
+  history            AssetRequestHistory[]
+  appeals            PropertyAppeal[]
+
+  @@index([userId])
+  @@index([departmentId])
+  @@index([status])
+}
+
+model AssetRequestHistory {
+  id         String              @id @default(uuid()) @db.Uuid
+  requestId  String              @db.Uuid
+  actorId    String?             @db.Uuid
+  fromStatus AssetRequestStatus?
+  toStatus   AssetRequestStatus
+  comment    String?
+  createdAt  DateTime            @default(now())
+  actor      User?               @relation(fields: [actorId], references: [id])
+  request    AssetRequest        @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+}
+
+model PropertyAppeal {
+  id               String                  @id @default(uuid()) @db.Uuid
+  appealNumber     String                  @unique
+  departmentId     String                  @db.Uuid
+  departmentHeadId String                  @db.Uuid
+  requestId        String?                 @db.Uuid
+  assetId          String?                 @db.Uuid
+  subject          String
+  reason           String
+  description      String
+  supportingInfo   String?
+  status           PropertyAppealStatus    @default(PENDING_PROPERTY_MANAGEMENT)
+  responderId      String?                 @db.Uuid
+  responseDate     DateTime?
+  responseComment  String?
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+  asset            Asset?                  @relation(fields: [assetId], references: [id])
+  departmentHead   User                    @relation("HeadFiledAppeals", fields: [departmentHeadId], references: [id])
+  department       OrganizationalUnit      @relation("DepartmentAppeals", fields: [departmentId], references: [id])
+  request          AssetRequest?           @relation(fields: [requestId], references: [id])
+  responder        User?                   @relation("PaoRespondedAppeals", fields: [responderId], references: [id])
+  history          PropertyAppealHistory[]
+
+  @@index([departmentId])
+  @@index([departmentHeadId])
+  @@index([status])
+}
+
+model PropertyAppealHistory {
+  id         String                @id @default(uuid()) @db.Uuid
+  appealId   String                @db.Uuid
+  actorId    String?               @db.Uuid
+  fromStatus PropertyAppealStatus?
+  toStatus   PropertyAppealStatus
+  comment    String?
+  createdAt  DateTime              @default(now())
+  actor      User?                 @relation(fields: [actorId], references: [id])
+  appeal     PropertyAppeal        @relation(fields: [appealId], references: [id], onDelete: Cascade)
+
+  @@index([appealId])
+}
+
 enum RoleName {
   SYSTEM_ADMINISTRATOR
   PROPERTY_ADMINISTRATION_OFFICER
@@ -630,104 +724,6 @@ enum InventorySessionStatus {
   REOPENED
 }
 
-model AssetRequest {
-  id                  String               @id @default(uuid()) @db.Uuid
-  requestNumber       String               @unique
-  userId              String               @db.Uuid
-  departmentId        String               @db.Uuid
-  categoryId          String               @db.Uuid
-  assetTypeId         String?              @db.Uuid
-  quantity            Int                  @default(1)
-  reason              String
-  priority            String               @default("MEDIUM")
-  status              AssetRequestStatus   @default(PENDING_DEPARTMENT_HEAD)
-  reviewedByHeadId    String?              @db.Uuid
-  headReviewDate      DateTime?
-  headResponseReason  String?
-  reviewedByPaoId     String?              @db.Uuid
-  paoReviewDate       DateTime?
-  paoResponseReason   String?
-  fulfilledAssetId    String?              @db.Uuid
-  assignmentId        String?              @db.Uuid
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-
-  user                User                 @relation("StaffAssetRequests", fields: [userId], references: [id])
-  department          OrganizationalUnit   @relation("DepartmentAssetRequests", fields: [departmentId], references: [id])
-  category            AssetCategory        @relation(fields: [categoryId], references: [id])
-  assetType           AssetType?           @relation(fields: [assetTypeId], references: [id])
-  reviewedByHead      User?                @relation("HeadReviewedRequests", fields: [reviewedByHeadId], references: [id])
-  reviewedByPao       User?                @relation("PaoReviewedRequests", fields: [reviewedByPaoId], references: [id])
-  fulfilledAsset      Asset?               @relation(fields: [fulfilledAssetId], references: [id])
-  assignment          Assignment?          @relation(fields: [assignmentId], references: [id])
-  history             AssetRequestHistory[]
-  appeals             PropertyAppeal[]
-
-  @@index([userId])
-  @@index([departmentId])
-  @@index([status])
-}
-
-model AssetRequestHistory {
-  id         String              @id @default(uuid()) @db.Uuid
-  requestId  String              @db.Uuid
-  actorId    String?             @db.Uuid
-  fromStatus AssetRequestStatus?
-  toStatus   AssetRequestStatus
-  comment    String?
-  createdAt  DateTime            @default(now())
-
-  request    AssetRequest        @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  actor      User?               @relation(fields: [actorId], references: [id])
-
-  @@index([requestId])
-}
-
-model PropertyAppeal {
-  id               String               @id @default(uuid()) @db.Uuid
-  appealNumber     String               @unique
-  departmentId     String               @db.Uuid
-  departmentHeadId String               @db.Uuid
-  requestId        String?              @db.Uuid
-  assetId          String?              @db.Uuid
-  subject          String
-  reason           String
-  description      String
-  supportingInfo   String?
-  status           PropertyAppealStatus @default(PENDING_PROPERTY_MANAGEMENT)
-  responderId      String?              @db.Uuid
-  responseDate     DateTime?
-  responseComment  String?
-  createdAt        DateTime             @default(now())
-  updatedAt        DateTime             @updatedAt
-
-  department       OrganizationalUnit   @relation("DepartmentAppeals", fields: [departmentId], references: [id])
-  departmentHead   User                 @relation("HeadFiledAppeals", fields: [departmentHeadId], references: [id])
-  request          AssetRequest?        @relation(fields: [requestId], references: [id])
-  asset            Asset?               @relation(fields: [assetId], references: [id])
-  responder        User?                @relation("PaoRespondedAppeals", fields: [responderId], references: [id])
-  history          PropertyAppealHistory[]
-
-  @@index([departmentId])
-  @@index([departmentHeadId])
-  @@index([status])
-}
-
-model PropertyAppealHistory {
-  id         String                @id @default(uuid()) @db.Uuid
-  appealId   String                @db.Uuid
-  actorId    String?               @db.Uuid
-  fromStatus PropertyAppealStatus?
-  toStatus   PropertyAppealStatus
-  comment    String?
-  createdAt  DateTime              @default(now())
-
-  appeal     PropertyAppeal        @relation(fields: [appealId], references: [id], onDelete: Cascade)
-  actor      User?                 @relation(fields: [actorId], references: [id])
-
-  @@index([appealId])
-}
-
 enum AssetRequestStatus {
   PENDING_DEPARTMENT_HEAD
   APPROVED_BY_DEPARTMENT_HEAD
@@ -752,4 +748,3 @@ enum IdentificationMethod {
   BARCODE
   NONE
 }
-
