@@ -9,9 +9,25 @@ import {
   PropertyAppealStatus,
 } from "@prisma/client";
 
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+import { ROLES, getRoleDashboard, isValidRole } from "@/lib/rbac";
+
+export const dynamic = "force-dynamic";
 export const revalidate = 0; // Disable caching to ensure real-time dashboard data
 
 export default async function PaoDashboardPage() {
+  const session = await auth();
+  if (!session?.user || !isValidRole(session.user.role)) {
+    redirect("/");
+  }
+  if (
+    session.user.role !== ROLES.PROPERTY_ADMINISTRATION_OFFICER &&
+    session.user.role !== ROLES.SYSTEM_ADMINISTRATOR
+  ) {
+    redirect(getRoleDashboard(session.user.role));
+  }
+
   // 1. Fetch Stats
   const [
     totalAssets,

@@ -13,11 +13,11 @@ export default auth((req) => {
   const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth");
   const isPublicVerificationRoute = nextUrl.pathname.startsWith("/asset/verify");
   const isPublicRoute =
+    nextUrl.pathname === "/" ||
     nextUrl.pathname === "/login" ||
     nextUrl.pathname === "/forgot-password" ||
     nextUrl.pathname === "/reset-password" ||
-    isPublicVerificationRoute ||
-    nextUrl.pathname.startsWith("/assets/");
+    isPublicVerificationRoute;
 
   if (isApiAuthRoute) {
     return NextResponse.next();
@@ -36,18 +36,18 @@ export default auth((req) => {
     }
   }
 
-  // Handle public routes (login, forgot password, reset password)
+  // Handle public routes (login, forgot password, reset password, root) when already authenticated
   if (isPublicRoute) {
-    if (isLoggedIn && isValidRole(userRole) && (nextUrl.pathname === "/login" || nextUrl.pathname === "/forgot-password" || nextUrl.pathname === "/reset-password")) {
+    if (isLoggedIn && isValidRole(userRole) && (nextUrl.pathname === "/" || nextUrl.pathname === "/login" || nextUrl.pathname === "/forgot-password" || nextUrl.pathname === "/reset-password")) {
       const destination = getRoleDashboard(userRole);
       return NextResponse.redirect(new URL(destination, nextUrl));
     }
     return NextResponse.next();
   }
 
-  // Not logged in or invalid role -> redirect to login
+  // Not logged in or invalid role -> redirect to root "/" (which renders login page)
   if (!isLoggedIn || !isValidRole(userRole)) {
-    return NextResponse.redirect(new URL("/login", nextUrl));
+    return NextResponse.redirect(new URL("/", nextUrl));
   }
 
   // First login enforcement: If user must change password, redirect to /profile/security
@@ -58,16 +58,39 @@ export default auth((req) => {
 
   let effectivePath = nextUrl.pathname;
   let isRewrite = false;
+
+  // Department Head aliases
   if (effectivePath.startsWith("/department-head/")) {
     effectivePath = effectivePath.replace("/department-head/", "/head/");
     isRewrite = true;
   } else if (effectivePath === "/department-head") {
     effectivePath = "/head/dashboard";
     isRewrite = true;
-  } else if (effectivePath === "/staff/asset-requests") {
+  }
+
+  // Maintenance & Technician aliases
+  else if (effectivePath === "/maintenance" || effectivePath === "/maintenance/dashboard") {
+    effectivePath = "/tech/dashboard";
+    isRewrite = true;
+  } else if (effectivePath.startsWith("/maintenance/")) {
+    effectivePath = effectivePath.replace("/maintenance/", "/tech/maintenance/");
+    isRewrite = true;
+  }
+
+  // Inventory aliases
+  else if (effectivePath === "/inventory/dashboard") {
+    effectivePath = "/inventory";
+    isRewrite = true;
+  }
+
+  // Staff aliases
+  else if (effectivePath === "/staff/asset-requests") {
     effectivePath = "/staff/requests";
     isRewrite = true;
-  } else if (effectivePath === "/admin/property-management/appeals") {
+  }
+
+  // PAO aliases
+  else if (effectivePath === "/admin/property-management/appeals") {
     effectivePath = "/pao/appeals";
     isRewrite = true;
   } else if (effectivePath === "/admin/property-management/requests") {
@@ -88,10 +111,10 @@ export default auth((req) => {
   if (effectivePath.startsWith("/pao") && userRole !== ROLES.PROPERTY_ADMINISTRATION_OFFICER && userRole !== ROLES.SYSTEM_ADMINISTRATOR) {
     return NextResponse.redirect(new URL(getRoleDashboard(userRole), nextUrl));
   }
-  if (effectivePath.startsWith("/head") && userRole !== ROLES.DEPARTMENT_HEAD) {
+  if (effectivePath.startsWith("/head") && userRole !== ROLES.DEPARTMENT_HEAD && userRole !== ROLES.SYSTEM_ADMINISTRATOR) {
     return NextResponse.redirect(new URL(getRoleDashboard(userRole), nextUrl));
   }
-  if (effectivePath.startsWith("/staff") && userRole !== ROLES.STAFF_MEMBER) {
+  if (effectivePath.startsWith("/staff") && userRole !== ROLES.STAFF_MEMBER && userRole !== ROLES.SYSTEM_ADMINISTRATOR) {
     return NextResponse.redirect(new URL(getRoleDashboard(userRole), nextUrl));
   }
   if (effectivePath.startsWith("/tech") && userRole !== ROLES.MAINTENANCE_TECHNICIAN && userRole !== ROLES.SYSTEM_ADMINISTRATOR) {

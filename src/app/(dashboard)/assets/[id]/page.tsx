@@ -5,6 +5,10 @@ import { auth } from "@/auth";
 import { calculateSingleAssetFinancials } from "@/services/financials";
 
 
+import { redirect } from "next/navigation";
+import { isValidRole } from "@/lib/rbac";
+
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 interface AssetDetailPageProps {
@@ -15,6 +19,9 @@ interface AssetDetailPageProps {
 
 export default async function AssetDetailPage({ params }: AssetDetailPageProps) {
   const session = await auth();
+  if (!session?.user || !isValidRole(session.user.role)) {
+    redirect(`/asset/verify/${params.id}`);
+  }
 
   // Find asset by ID
   const asset = await prisma.asset.findFirst({

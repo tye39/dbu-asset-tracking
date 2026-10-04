@@ -12,7 +12,11 @@ import {
 } from "@/app/actions/financial-audit";
 import { calculateSingleAssetFinancials } from "@/services/financials";
 import Link from "next/link";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+import { ROLES, getRoleDashboard, isValidRole } from "@/lib/rbac";
 
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 function toSafeISOString(date: Date | string | null | undefined): string {
@@ -47,6 +51,14 @@ interface AuditorDashboardProps {
 }
 
 export default async function AuditorDashboardPage({ searchParams }: AuditorDashboardProps) {
+  const session = await auth();
+  if (!session?.user || !isValidRole(session.user.role)) {
+    redirect("/");
+  }
+  if (session.user.role !== ROLES.INTERNAL_AUDITOR && session.user.role !== ROLES.SYSTEM_ADMINISTRATOR) {
+    redirect(getRoleDashboard(session.user.role));
+  }
+
   const tab = searchParams.tab || "physical";
   const page = Number(searchParams.page) || 1;
   const limit = 10;

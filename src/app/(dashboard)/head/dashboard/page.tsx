@@ -10,11 +10,21 @@ import {
   PropertyAppealStatus,
 } from "@prisma/client";
 
+import { redirect } from "next/navigation";
+import { ROLES, getRoleDashboard, isValidRole } from "@/lib/rbac";
+
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function HeadDashboardPage() {
   const session = await auth();
-  if (!session?.user?.departmentId) {
+  if (!session?.user || !isValidRole(session.user.role)) {
+    redirect("/");
+  }
+  if (session.user.role !== ROLES.DEPARTMENT_HEAD && session.user.role !== ROLES.SYSTEM_ADMINISTRATOR) {
+    redirect(getRoleDashboard(session.user.role));
+  }
+  if (!session.user.departmentId) {
     // If somehow a department head doesn't have a department assigned, show empty or default to first
     const fallbackDept = await prisma.organizationalUnit.findFirst({ where: { deletedAt: null } });
     if (fallbackDept && session?.user) {

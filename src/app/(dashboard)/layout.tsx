@@ -4,6 +4,10 @@ import { redirect } from "next/navigation";
 import { DashboardShell } from "@/components/dashboard-shell";
 import { prisma } from "@/lib/db";
 
+import { isValidRole } from "@/lib/rbac";
+
+export const dynamic = "force-dynamic";
+
 export default async function DashboardLayout({
   children,
 }: {
@@ -11,11 +15,11 @@ export default async function DashboardLayout({
 }) {
   const session = await auth();
 
-  if (!session?.user) {
-    redirect("/login");
+  if (!session?.user || !isValidRole(session.user.role)) {
+    redirect("/");
   }
 
-  const isInventoryPerson = await prisma.inventoryPerson.findUnique({
+  const isInventoryPerson = await prisma.inventoryPerson.findFirst({
     where: { userId: session.user.id, isActive: true }
   });
 
@@ -34,15 +38,22 @@ export default async function DashboardLayout({
       assignedToUserId: session.user.id,
       status: "PENDING_ACCEPTANCE",
     },
-    include: {
+    select: {
+      id: true,
+      assignedAt: true,
+      assignedBy: { select: { name: true } },
       asset: {
-        include: {
-          category: true,
-          assetType: true,
-          department: true,
+        select: {
+          id: true,
+          name: true,
+          assetCode: true,
+          serialNumber: true,
+          condition: true,
+          category: { select: { name: true } },
+          assetType: { select: { name: true } },
+          department: { select: { name: true } },
         },
       },
-      assignedBy: { select: { name: true } },
     },
     orderBy: { assignedAt: "desc" },
   });

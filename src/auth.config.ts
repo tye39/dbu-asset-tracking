@@ -1,12 +1,14 @@
 import type { NextAuthConfig } from "next-auth";
 
 export const authConfig = {
+  trustHost: true,
   pages: {
-    signIn: "/login",
+    signIn: "/",
   },
   session: {
     strategy: "jwt",
   },
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || "dbu_asset_tracking_secret_key_1234567890_abcdef",
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       if (user) {
@@ -40,11 +42,13 @@ export const authConfig = {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       const isApiAuthRoute = nextUrl.pathname.startsWith("/api/auth");
+      const isPublicVerificationRoute = nextUrl.pathname.startsWith("/asset/verify");
       const isPublicRoute =
+        nextUrl.pathname === "/" ||
         nextUrl.pathname === "/login" ||
         nextUrl.pathname === "/forgot-password" ||
         nextUrl.pathname === "/reset-password" ||
-        nextUrl.pathname.startsWith("/assets/");
+        isPublicVerificationRoute;
 
       if (isApiAuthRoute) return true;
       if (isPublicRoute) return true;

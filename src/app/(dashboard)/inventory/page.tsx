@@ -4,21 +4,20 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { InventoryPersonDashboardClient } from "@/components/inventory-person-dashboard-client";
 
+import { ROLES, getRoleDashboard, isValidRole } from "@/lib/rbac";
+
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function InventoryPage() {
   const session = await auth();
-  if (!session?.user?.id) {
-    redirect("/login");
+  if (!session?.user || !isValidRole(session.user.role)) {
+    redirect("/");
   }
 
   const role = session.user.role;
-  if (role !== "INVENTORY_PERSON" && role !== "SYSTEM_ADMINISTRATOR" && role !== "PROPERTY_ADMINISTRATION_OFFICER") {
-    return (
-      <div className="p-8 text-center text-red-655 font-bold">
-        Permission denied. Only designated Inventory Persons can access this dashboard.
-      </div>
-    );
+  if (role !== ROLES.INVENTORY_PERSON && role !== ROLES.SYSTEM_ADMINISTRATOR && role !== ROLES.PROPERTY_ADMINISTRATION_OFFICER) {
+    redirect(getRoleDashboard(role));
   }
 
   // Find active profile

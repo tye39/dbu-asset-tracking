@@ -3,9 +3,22 @@ import { prisma } from "@/lib/db";
 import { DashboardFinancialClient } from "@/components/dashboard-financial-client";
 import { scanAndGenerateFinancialAlerts, calculateSingleAssetFinancials } from "@/services/financials";
 
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+import { ROLES, getRoleDashboard, isValidRole } from "@/lib/rbac";
+
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function AdminDashboardPage() {
+  const session = await auth();
+  if (!session?.user || !isValidRole(session.user.role)) {
+    redirect("/");
+  }
+  if (session.user.role !== ROLES.SYSTEM_ADMINISTRATOR) {
+    redirect(getRoleDashboard(session.user.role));
+  }
+
   // Trigger scan & generate alerts in background
   prisma.$transaction(async (tx) => {
     await scanAndGenerateFinancialAlerts(tx);

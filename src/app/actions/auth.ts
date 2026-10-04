@@ -38,5 +38,5 @@ export async function logoutAction() {
   if (session?.user?.id) {
     await createAuditLog(session.user.id, "LOGOUT", "Authentication", session.user.id);
   }
-  await signOut({ redirectTo: "/login" });
+  await signOut({ redirectTo: "/" });
 }
